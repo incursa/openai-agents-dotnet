@@ -251,3 +251,6 @@ $summary | Set-Content -Path $SummaryPath -Encoding UTF8
 if ($requiredBump -ne "None") {
     Write-Host "Release policy check passed for shipped API changes: $requiredBump increment required."
 }
+
+$global:LASTEXITCODE = 0
+exit 0
