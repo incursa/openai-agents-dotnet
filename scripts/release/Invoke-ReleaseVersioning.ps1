@@ -292,7 +292,7 @@ else {
     Write-Host "$PropsPath already matches $targetVersion"
 }
 
-& (Join-Path $PSScriptRoot "validate-public-api-versioning.ps1") -Tag $targetTag
+& pwsh -NoProfile -File (Join-Path $PSScriptRoot "validate-public-api-versioning.ps1") -Tag $targetTag
 if ($LASTEXITCODE -ne 0) {
     throw "validate-public-api-versioning.ps1 failed for $targetTag"
 }
