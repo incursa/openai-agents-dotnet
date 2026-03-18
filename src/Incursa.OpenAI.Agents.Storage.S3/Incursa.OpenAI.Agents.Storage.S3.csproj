@@ -9,7 +9,6 @@
     <Description>AWS S3-backed session storage for Incursa.OpenAI.Agents.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>openai;agents;aws;s3;storage;sessions</PackageTags>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,7 +23,6 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
-    <None Include="..\..\assets\package-icon.png" Pack="true" PackagePath="\" Visible="false" Link="package-icon.png" />
   </ItemGroup>
 
 </Project>

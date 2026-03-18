@@ -6,7 +6,15 @@
     <Company>Incursa</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/incursa/openai-agents-dotnet</PackageProjectUrl>
+    <PackageIcon>package-icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/incursa/openai-agents-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <DebugType>portable</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == '' and ('$(CI)' == 'true' or '$(TF_BUILD)' == 'True' or '$(GITHUB_ACTIONS)' == 'true')">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 </Project>

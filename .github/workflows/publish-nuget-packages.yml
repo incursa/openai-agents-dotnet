@@ -74,3 +74,4 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
           dotnet nuget push artifacts/packages/*.nupkg --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet nuget push artifacts/packages/*.snupkg --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate

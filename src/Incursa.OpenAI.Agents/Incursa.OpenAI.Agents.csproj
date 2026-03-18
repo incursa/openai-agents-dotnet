@@ -8,7 +8,6 @@
     <Description>Core OpenAI Agents runtime for .NET: orchestration primitives, streaming, MCP integration, approvals, handoffs, and durable session workflows.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>openai;agents;llm;orchestration;mcp;</PackageTags>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

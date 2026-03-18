@@ -8,7 +8,6 @@
     <Description>Dependency injection and host integration extensions for Incursa.OpenAI.Agents, including service registration, HttpClient wiring, and session store defaults.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>openai;agents;llm;aspnetcore;microsoft.extensions;di</PackageTags>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
