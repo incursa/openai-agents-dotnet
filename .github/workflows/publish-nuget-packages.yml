@@ -33,25 +33,20 @@ jobs:
         run: dotnet restore Incursa.OpenAI.Agents.slnx
 
       - name: Validate release/version policy
-        shell: bash
+        shell: pwsh
         env:
           RELEASE_TAG: ${{ github.ref_name }}
           MANUAL_VERSION: ${{ inputs.version }}
         run: |
-          set -euo pipefail
-
-          if [[ -n "${MANUAL_VERSION:-}" ]]; then
-            tag="v${MANUAL_VERSION#v}"
-          else
-            tag="${RELEASE_TAG:-}"
-          fi
-
-          if [[ -z "$tag" ]]; then
-            echo "Manual publish requires 'version' input." >&2
-            exit 1
-          fi
-
-          pwsh -File "$GITHUB_WORKSPACE/scripts/release/validate-public-api-versioning.ps1" -Tag "$tag"
+          $tag = if ($env:MANUAL_VERSION) {
+            "v$($env:MANUAL_VERSION.TrimStart('v'))"
+          } else {
+            $env:RELEASE_TAG
+          }
+          if (-not $tag) {
+            throw "Manual publish requires 'version' input."
+          }
+          & "$env:GITHUB_WORKSPACE/scripts/release/validate-public-api-versioning.ps1" -Tag $tag
 
       - name: Build
         run: dotnet build Incursa.OpenAI.Agents.slnx --no-restore --configuration Release -p:ContinuousIntegrationBuild=true
