@@ -45,7 +45,7 @@
       "behavior": "Expired sessions are deleted and no longer load after cleanup runs.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests/AzureAgentSessionStoreIntegrationTests.cs",
-        "line": 91,
+        "line": 93,
         "member": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.CleanupExpiredSessionsAsync_RemovesExpiredSessions"
       },
       "status": "compliant",
@@ -61,7 +61,7 @@
       "behavior": "Saving then loading a session preserves the key runtime fields and conversation content.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests/AzureAgentSessionStoreIntegrationTests.cs",
-        "line": 43,
+        "line": 45,
         "member": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.SaveAndLoadAsync_PreservesSessionState"
       },
       "status": "compliant",
@@ -77,7 +77,7 @@
       "behavior": "A stale copy of the same session key fails with a version mismatch after a newer save succeeds.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests/AzureAgentSessionStoreIntegrationTests.cs",
-        "line": 68,
+        "line": 70,
         "member": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.SaveAsync_RejectsStaleVersionWrites"
       },
       "status": "compliant",
@@ -93,7 +93,7 @@
       "behavior": "Expired sessions are deleted and no longer load after cleanup runs.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests/S3AgentSessionStoreIntegrationTests.cs",
-        "line": 95,
+        "line": 97,
         "member": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.S3AgentSessionStoreIntegrationTests.CleanupExpiredSessionsAsync_RemovesExpiredSessions"
       },
       "status": "compliant",
@@ -109,7 +109,7 @@
       "behavior": "Saving then loading a session preserves the key runtime fields and conversation content.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests/S3AgentSessionStoreIntegrationTests.cs",
-        "line": 47,
+        "line": 49,
         "member": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.S3AgentSessionStoreIntegrationTests.SaveAndLoadAsync_PreservesSessionState"
       },
       "status": "compliant",
@@ -125,7 +125,7 @@
       "behavior": "A stale copy of the same session key fails with a version mismatch after a newer save succeeds.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests/S3AgentSessionStoreIntegrationTests.cs",
-        "line": 72,
+        "line": 74,
         "member": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.S3AgentSessionStoreIntegrationTests.SaveAsync_RejectsStaleVersionWrites"
       },
       "status": "compliant",
@@ -141,7 +141,7 @@
       "behavior": "Builder output keeps model, instructions, tools, handoffs, MCP definitions, metadata, model settings, and output contracts.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentBuilderTests.cs",
-        "line": 15,
+        "line": 16,
         "member": "Incursa.OpenAI.Agents.Tests.AgentBuilderTests.AgentBuilder_CreatesConfiguredAgent"
       },
       "status": "compliant",
@@ -157,7 +157,7 @@
       "behavior": "Helper APIs carry session, previous-response, and approval-resume data into the resulting request.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentBuilderTests.cs",
-        "line": 55,
+        "line": 56,
         "member": "Incursa.OpenAI.Agents.Tests.AgentBuilderTests.AgentRunRequest_HelpersCreateResumeAndPreviousResponseRequests"
       },
       "status": "compliant",
@@ -173,7 +173,7 @@
       "behavior": "Completed runs return a final output and save the final-output item into the stored conversation.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
-        "line": 14,
+        "line": 15,
         "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_CompletesWithFinalOutputAndPersistsConversation"
       },
       "status": "compliant",
@@ -189,7 +189,7 @@
       "behavior": "Runs return MaxTurnsExceeded once the configured turn budget is exhausted.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
-        "line": 148,
+        "line": 149,
         "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_EnforcesMaxTurns"
       },
       "status": "compliant",
@@ -205,7 +205,7 @@
       "behavior": "When a handoff is requested the runner invokes the handoff and reports the delegated agent as the final agent.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
-        "line": 89,
+        "line": 90,
         "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_ExecutesHandoffAndSwitchesAgent"
       },
       "status": "compliant",
@@ -221,7 +221,7 @@
       "behavior": "Tool calls invoke the configured tool and append tool output items before the next turn completes.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
-        "line": 46,
+        "line": 47,
         "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_ExecutesToolCallAndContinues"
       },
       "status": "compliant",
@@ -237,7 +237,7 @@
       "behavior": "Streaming execution emits the initial user input, generated message items, and the final output item in-order.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
-        "line": 173,
+        "line": 174,
         "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunStreamingAsync_EmitsItemsAsTheyAreGenerated"
       },
       "status": "compliant",
@@ -253,7 +253,7 @@
       "behavior": "Stored sessions expose pending approval state that can be resumed and completed later.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
-        "line": 192,
+        "line": 193,
         "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_CanResumeApprovalFromPersistedSession"
       },
       "status": "compliant",
@@ -269,7 +269,7 @@
       "behavior": "Approval-required tool calls return ApprovalRequired first and only execute after an approval response is supplied.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
-        "line": 13,
+        "line": 14,
         "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_ReturnsApprovalRequiredAndCanResume"
       },
       "status": "compliant",
@@ -285,7 +285,7 @@
       "behavior": "Tripwired tool input guardrails return GuardrailTriggered and surface the guardrail message on the result.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
-        "line": 120,
+        "line": 121,
         "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_StopsOnToolGuardrailTripwire"
       },
       "status": "compliant",
@@ -301,7 +301,7 @@
       "behavior": "Run-level input guardrails can stop execution before any turn executor output is accepted.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
-        "line": 155,
+        "line": 156,
         "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_UsesRunLevelInputGuardrailsOnFirstTurn"
       },
       "status": "compliant",
@@ -317,7 +317,7 @@
       "behavior": "Rejected approval items use the supplied tool error formatter instead of invoking the tool.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
-        "line": 66,
+        "line": 67,
         "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_UsesToolErrorFormatterForRejectedApprovals"
       },
       "status": "compliant",
@@ -333,7 +333,7 @@
       "behavior": "A custom \u0060IAgentSessionStore\u0060 is used by the runner and does not require cleanup support.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
-        "line": 76,
+        "line": 77,
         "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddAgentSessionStore_RegistersCustomStore"
       },
       "status": "compliant",
@@ -349,7 +349,7 @@
       "behavior": "\u0060AddAzureAgentSessions\u0060 resolves a concrete Azure store and the generic session interfaces to the same instance.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
-        "line": 115,
+        "line": 116,
         "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddAzureAgentSessions_RegistersAzureStore"
       },
       "status": "compliant",
@@ -365,7 +365,7 @@
       "behavior": "The container resolves runnable services and persists sessions through the file-backed store.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
-        "line": 24,
+        "line": 25,
         "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddIncursaAgents_AndOpenAiResponses_ResolveRunnableServices"
       },
       "status": "compliant",
@@ -381,7 +381,7 @@
       "behavior": "\u0060OpenAiResponsesOptions.ApiKey\u0060 sets the bearer token on the configured OpenAI client.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
-        "line": 163,
+        "line": 164,
         "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddOpenAiResponses_AppliesConfiguredApiKeyToHttpClient"
       },
       "status": "compliant",
@@ -397,7 +397,7 @@
       "behavior": "\u0060AddS3AgentSessions\u0060 resolves a concrete S3 store and the generic session interfaces to the same instance.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
-        "line": 139,
+        "line": 140,
         "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddS3AgentSessions_RegistersS3Store"
       },
       "status": "compliant",
@@ -413,7 +413,7 @@
       "behavior": "Each sink receives the same observation exactly once.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
-        "line": 187,
+        "line": 188,
         "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.CompositeAgentRuntimeObserver_FansOutObservationsToAllSinks"
       },
       "status": "compliant",
@@ -429,7 +429,7 @@
       "behavior": "Allowed tools remain visible while blocked or filter-error tools do not appear in the final list.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
-        "line": 69,
+        "line": 70,
         "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_AppliesDynamicToolFilterAndSkipsFilterErrors"
       },
       "status": "compliant",
@@ -445,7 +445,7 @@
       "behavior": "Repeated tool discovery calls reuse the cached result instead of issuing a second HTTP request.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
-        "line": 111,
+        "line": 112,
         "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_CachesToolListWhenEnabled"
       },
       "status": "compliant",
@@ -461,7 +461,7 @@
       "behavior": "Unauthorized responses throw McpAuthenticationException without performing additional attempts.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
-        "line": 218,
+        "line": 219,
         "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_DoesNotRetryAuthenticationFailures"
       },
       "status": "compliant",
@@ -477,7 +477,7 @@
       "behavior": "Requests carry resolver-provided bearer tokens, dynamic headers, and metadata payload content.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
-        "line": 16,
+        "line": 17,
         "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_InsertsDynamicHeadersAndMetadataPerRequest"
       },
       "status": "compliant",
@@ -493,7 +493,7 @@
       "behavior": "Retryable failures schedule a retry, eventually succeed, and emit retry and success observations.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
-        "line": 167,
+        "line": 168,
         "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_RetriesTransientHttpFailuresAndObservesAttempts"
       },
       "status": "compliant",
@@ -509,7 +509,7 @@
       "behavior": "JSON-RPC error responses throw McpServerException with the server message included.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
-        "line": 146,
+        "line": 147,
         "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_ThrowsHelpfulErrorForJsonRpcErrors"
       },
       "status": "compliant",
@@ -525,7 +525,7 @@
       "behavior": "Mapped requests preserve model selection, previous-response IDs, tool payloads, MCP payloads, and response-format metadata.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 17,
+        "line": 18,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_MapsToolsHandoffsAndStructuredOutput"
       },
       "status": "compliant",
@@ -541,7 +541,7 @@
       "behavior": "Normalized model input omits pre-handoff function-call and function-call-output items when that mode is enabled.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 167,
+        "line": 168,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_NormalizesHandoffModelInputAfterHandoff"
       },
       "status": "compliant",
@@ -557,7 +557,7 @@
       "behavior": "Mapped reasoning items omit their IDs when the configured reasoning-item policy is Omit.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 237,
+        "line": 238,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_OmitsReasoningIdsWhenConfigured"
       },
       "status": "compliant",
@@ -573,7 +573,7 @@
       "behavior": "Mapped input reflects the filtered conversation instead of the full stored conversation.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 203,
+        "line": 204,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_UsesRunLevelModelInputFilter"
       },
       "status": "compliant",
@@ -589,7 +589,7 @@
       "behavior": "Completed function arguments appear on emitted tool-call run items and on the final response tool-call data.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 269,
+        "line": 270,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse"
       },
       "status": "compliant",
@@ -605,7 +605,7 @@
       "behavior": "Resolved streamable MCP tools are added to the request body before the turn completes.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 93,
+        "line": 94,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestBody"
       },
       "status": "compliant",
@@ -621,7 +621,7 @@
       "behavior": "Each sink receives the same observation exactly once.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/RuntimeObservabilityTests.cs",
-        "line": 45,
+        "line": 46,
         "member": "Incursa.OpenAI.Agents.Tests.RuntimeObservabilityTests.CompositeMcpClientObserver_FansOutObservationsToAllSinks"
       },
       "status": "compliant",
@@ -637,7 +637,7 @@
       "behavior": "The observer receives the run and turn lifecycle events in the emitted observation stream.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/RuntimeObservabilityTests.cs",
-        "line": 14,
+        "line": 15,
         "member": "Incursa.OpenAI.Agents.Tests.RuntimeObservabilityTests.RunAsync_EmitsLifecycleObservations"
       },
       "status": "compliant",
@@ -653,7 +653,7 @@
       "behavior": "Expired file-backed sessions are removed and no longer load after cleanup.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
-        "line": 184,
+        "line": 185,
         "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_CleansUpExpiredSessions"
       },
       "status": "compliant",
@@ -669,7 +669,7 @@
       "behavior": "Saving and loading a file-backed session preserves core run-state fields and conversation items.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
-        "line": 38,
+        "line": 39,
         "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_PersistsSessionsAcrossLoads"
       },
       "status": "compliant",
@@ -685,7 +685,7 @@
       "behavior": "Configured limits trim older conversation items and record the trimmed item count.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
-        "line": 75,
+        "line": 76,
         "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_TrimsToLatestWindowWhenConfigured"
       },
       "status": "compliant",
@@ -701,7 +701,7 @@
       "behavior": "Repeated saves leave only the final session file and no lingering temp files.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
-        "line": 120,
+        "line": 121,
         "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_UsesAtomicReplaceWithoutLeavingTempFiles"
       },
       "status": "compliant",
@@ -717,7 +717,7 @@
       "behavior": "Saving a session to the in-memory store preserves its conversation for later retrieval.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
-        "line": 12,
+        "line": 13,
         "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.InMemoryStore_PersistsConversationAcrossLoads"
       },
       "status": "compliant",
@@ -733,7 +733,7 @@
       "behavior": "Saving an older session version throws a version mismatch exception after a newer write succeeds.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
-        "line": 153,
+        "line": 154,
         "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.InMemoryStore_RejectsStaleVersionWrites"
       },
       "status": "compliant",

@@ -711,6 +711,7 @@ public sealed record AgentRunRequest<TContext>
         TContext context)
         => FromUserInput(agent, userInput, context, null, 8, null);
 
+    /// <summary>Creates a request from user input with an optional session key.</summary>
     public static AgentRunRequest<TContext> FromUserInput(
         Agent<TContext> agent,
         string userInput,
@@ -727,6 +728,7 @@ public sealed record AgentRunRequest<TContext>
         int maxTurns)
         => FromUserInput(agent, userInput, context, sessionKey, maxTurns, null);
 
+    /// <summary>Creates a request from user input with an optional session key and options.</summary>
     public static AgentRunRequest<TContext> FromUserInput(
         Agent<TContext> agent,
         string userInput,
@@ -766,6 +768,7 @@ public sealed record AgentRunRequest<TContext>
         AgentRunOptions<TContext>? options)
         => new(state.CurrentAgent, context, null, null, state, approvalResponses, state.SessionKey, maxTurns ?? Math.Max(state.TurnsExecuted + 1, 8), options, null);
 
+    /// <summary>Creates a request to resume an approved tool call.</summary>
     public static AgentRunRequest<TContext> ResumeApproved(
         AgentRunState<TContext> state,
         TContext context,
@@ -789,6 +792,7 @@ public sealed record AgentRunRequest<TContext>
         AgentRunOptions<TContext>? options)
         => FromState(state, context, [new AgentApprovalResponse(toolCallId, true)], maxTurns, options);
 
+    /// <summary>Creates a request to resume a rejected tool call.</summary>
     public static AgentRunRequest<TContext> ResumeRejected(
         AgentRunState<TContext> state,
         TContext context,

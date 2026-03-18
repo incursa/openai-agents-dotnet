@@ -3,6 +3,7 @@ using Incursa.OpenAI.Agents;
 
 namespace Incursa.OpenAI.Agents.Tests;
 
+/// <summary>Tests for the agent runner execution loop.</summary>
 public sealed class AgentRunnerTests
 {
     /// <summary>Completed runs persist the final output back into the session conversation.</summary>

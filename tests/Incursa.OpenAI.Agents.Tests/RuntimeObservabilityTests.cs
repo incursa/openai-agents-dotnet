@@ -4,6 +4,7 @@ using Incursa.OpenAI.Agents.Mcp;
 
 namespace Incursa.OpenAI.Agents.Tests;
 
+/// <summary>Tests for runtime and MCP observability hooks.</summary>
 public sealed class RuntimeObservabilityTests
 {
     /// <summary>Verifies the runtime observer receives the lifecycle events emitted by a successful run.</summary>

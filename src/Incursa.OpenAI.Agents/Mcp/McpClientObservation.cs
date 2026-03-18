@@ -8,6 +8,9 @@ namespace Incursa.OpenAI.Agents.Mcp;
 
 public sealed record McpClientObservation
 {
+    /// <summary>
+    /// Creates an observation describing one MCP client call.
+    /// </summary>
     public McpClientObservation(
         string serverLabel,
         string method,

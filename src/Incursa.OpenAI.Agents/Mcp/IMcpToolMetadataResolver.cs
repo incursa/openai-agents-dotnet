@@ -8,5 +8,8 @@ namespace Incursa.OpenAI.Agents.Mcp;
 
 public interface IMcpToolMetadataResolver
 {
+    /// <summary>
+    /// Resolves additional metadata to attach to an MCP tool call.
+    /// </summary>
     ValueTask<JsonObject?> ResolveAsync(McpToolMetadataContext context, CancellationToken cancellationToken);
 }

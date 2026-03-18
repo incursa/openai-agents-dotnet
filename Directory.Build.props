@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Version>1.0.12</Version>
     <Authors>Samuel McAravey</Authors>
     <Company>Incursa</Company>

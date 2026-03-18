@@ -3,6 +3,7 @@ using Incursa.OpenAI.Agents;
 
 namespace Incursa.OpenAI.Agents.Tests;
 
+/// <summary>Tests for approval and guardrail behavior during agent execution.</summary>
 public sealed class ApprovalAndGuardrailTests
 {
     /// <summary>Approval-required tool calls pause execution until the caller resumes the run.</summary>

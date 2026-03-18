@@ -26,6 +26,7 @@ public sealed class S3AgentSessionStoreIntegrationTests : IAsyncLifetime
 
     private IAmazonS3 client = null!;
 
+    /// <summary>Starts the MinIO container and prepares the S3 client.</summary>
     public async Task InitializeAsync()
     {
         await minio.StartAsync();
@@ -34,6 +35,7 @@ public sealed class S3AgentSessionStoreIntegrationTests : IAsyncLifetime
         client = CreateClient();
     }
 
+    /// <summary>Stops and disposes the MinIO container used by the integration tests.</summary>
     public async Task DisposeAsync()
         => await minio.DisposeAsync();
 

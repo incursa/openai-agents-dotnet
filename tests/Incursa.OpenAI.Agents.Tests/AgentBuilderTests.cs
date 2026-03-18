@@ -4,6 +4,7 @@ using Incursa.OpenAI.Agents.Mcp;
 
 namespace Incursa.OpenAI.Agents.Tests;
 
+/// <summary>Tests for agent composition helpers and request factory APIs.</summary>
 public sealed class AgentBuilderTests
 {
     /// <summary>AgentBuilder preserves the configured composition surface when building an agent.</summary>

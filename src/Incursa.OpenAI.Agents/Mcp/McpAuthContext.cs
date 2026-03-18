@@ -15,6 +15,9 @@ public sealed record McpAuthContext
     {
     }
 
+    /// <summary>
+    /// Creates an auth context with explicit user, session, and custom metadata.
+    /// </summary>
     public McpAuthContext(
         string? userId,
         string? tenantId,

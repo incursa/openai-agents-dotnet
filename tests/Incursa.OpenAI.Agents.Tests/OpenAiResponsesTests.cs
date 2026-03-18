@@ -6,6 +6,7 @@ using Incursa.OpenAI.Agents.Mcp;
 
 namespace Incursa.OpenAI.Agents.Tests;
 
+/// <summary>Tests for the OpenAI Responses adapter and request mapping.</summary>
 public sealed class OpenAiResponsesTests
 {
     /// <summary>Request mapping includes tools, handoffs, hosted MCP tools, and structured output definitions.</summary>

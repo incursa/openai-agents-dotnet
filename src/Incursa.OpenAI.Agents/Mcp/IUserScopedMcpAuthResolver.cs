@@ -6,5 +6,8 @@ namespace Incursa.OpenAI.Agents.Mcp;
 
 public interface IUserScopedMcpAuthResolver
 {
+    /// <summary>
+    /// Resolves user-scoped authorization material for an MCP call.
+    /// </summary>
     ValueTask<McpAuthResult> ResolveAsync(McpAuthContext context, CancellationToken cancellationToken);
 }

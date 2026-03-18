@@ -2,6 +2,7 @@ using Incursa.OpenAI.Agents;
 
 namespace Incursa.OpenAI.Agents.Tests;
 
+/// <summary>Tests for the built-in agent session stores.</summary>
 public sealed class SessionStoreTests
 {
     /// <summary>The in-memory session store returns the saved conversation on later loads.</summary>

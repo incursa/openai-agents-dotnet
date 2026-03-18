@@ -22,6 +22,7 @@ public sealed class AzureAgentSessionStoreIntegrationTests : IAsyncLifetime
 
     private BlobContainerClient containerClient = null!;
 
+    /// <summary>Starts the Azurite container and prepares the blob container client.</summary>
     public async Task InitializeAsync()
     {
         await azurite.StartAsync();
@@ -30,6 +31,7 @@ public sealed class AzureAgentSessionStoreIntegrationTests : IAsyncLifetime
         containerClient = new BlobContainerClient(GetConnectionString(), ContainerName);
     }
 
+    /// <summary>Stops and disposes the Azurite container used by the integration tests.</summary>
     public async Task DisposeAsync()
         => await azurite.DisposeAsync();
 

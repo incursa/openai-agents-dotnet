@@ -23,6 +23,9 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
     private readonly McpClientOptions options;
     private IReadOnlyList<McpToolDescriptor>? cachedTools;
 
+    /// <summary>
+    /// Creates a streamable MCP client for the specified server.
+    /// </summary>
     public StreamableHttpMcpClient(
         HttpClient httpClient,
         string serverLabel,
@@ -31,6 +34,9 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
     {
     }
 
+    /// <summary>
+    /// Creates a streamable MCP client with explicit auth, metadata, filtering, and client options.
+    /// </summary>
     public StreamableHttpMcpClient(
         HttpClient httpClient,
         string serverLabel,

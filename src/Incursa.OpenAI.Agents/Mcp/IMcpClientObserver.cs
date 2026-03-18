@@ -6,5 +6,8 @@ namespace Incursa.OpenAI.Agents.Mcp;
 
 public interface IMcpClientObserver
 {
+    /// <summary>
+    /// Observes one MCP client call and its outcome.
+    /// </summary>
     ValueTask ObserveAsync(McpClientObservation observation, CancellationToken cancellationToken);
 }

@@ -6,11 +6,17 @@ namespace Incursa.OpenAI.Agents.Mcp;
 
 public abstract class McpException : Exception
 {
+    /// <summary>
+    /// Initializes an MCP exception with server and tool context.
+    /// </summary>
     protected McpException(string serverLabel, string method, string? toolName, string message)
         : this(serverLabel, method, toolName, message, null)
     {
     }
 
+    /// <summary>
+    /// Initializes an MCP exception with server and tool context and an inner exception.
+    /// </summary>
     protected McpException(string serverLabel, string method, string? toolName, string message, Exception? innerException)
         : base(message, innerException)
     {

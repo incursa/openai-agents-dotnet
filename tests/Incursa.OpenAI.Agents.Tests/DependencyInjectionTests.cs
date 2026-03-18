@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 
 namespace Incursa.OpenAI.Agents.Tests;
 
+/// <summary>Tests for dependency injection registration helpers.</summary>
 public sealed class DependencyInjectionTests
 {
     /// <summary>Verifies the extensions package wires the runnable default stack for DI consumers.</summary>

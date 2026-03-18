@@ -90,6 +90,7 @@ public sealed class AgentBuilder<TContext>
         string? description)
         => AddTool(name, executeAsync, description, null, false);
 
+    /// <summary>Adds a tool with a description and approval requirement.</summary>
     public AgentBuilder<TContext> AddTool(
         string name,
         Func<AgentToolInvocation<TContext>, CancellationToken, ValueTask<AgentToolResult>> executeAsync,
@@ -206,7 +207,7 @@ public sealed class AgentBuilder<TContext>
         return this;
     }
 
-    /// <summary>Builds the configured <see cref=\"Agent{TContext}\"/> instance.</summary>
+    /// <summary>Builds the configured <see cref="Agent{TContext}"/> instance.</summary>
     public Agent<TContext> Build()
         => new()
         {

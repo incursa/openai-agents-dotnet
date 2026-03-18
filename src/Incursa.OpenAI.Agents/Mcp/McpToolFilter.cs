@@ -15,6 +15,9 @@ public sealed record McpToolFilter
     {
     }
 
+    /// <summary>
+    /// Creates a filter with optional include names, exclude names, and a custom async predicate.
+    /// </summary>
     public McpToolFilter(
         IReadOnlyCollection<string>? includeNames,
         IReadOnlyCollection<string>? excludeNames,

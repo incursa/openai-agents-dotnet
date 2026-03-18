@@ -15,6 +15,9 @@ public sealed record StreamableHttpMcpServerDefinition
     {
     }
 
+    /// <summary>
+    /// Creates a server definition with explicit connector, approval, and filtering settings.
+    /// </summary>
     public StreamableHttpMcpServerDefinition(
         string serverLabel,
         Uri serverUrl,

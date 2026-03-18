@@ -5,6 +5,7 @@ using Incursa.OpenAI.Agents.Mcp;
 
 namespace Incursa.OpenAI.Agents.Tests;
 
+/// <summary>Tests for MCP discovery, auth, and tool invocation behavior.</summary>
 public sealed class McpTests
 {
     /// <summary>Streamable MCP requests apply dynamic auth headers and metadata on each request.</summary>

@@ -15,6 +15,9 @@ public sealed record HostedMcpToolDefinition
     {
     }
 
+    /// <summary>
+    /// Creates a hosted MCP definition with the supplied server and authorization settings.
+    /// </summary>
     public HostedMcpToolDefinition(
         string serverLabel,
         Uri? serverUrl,
