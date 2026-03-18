@@ -13,7 +13,7 @@ public sealed class ApprovalAndGuardrailTests
     public async Task RunAsync_ReturnsApprovalRequiredAndCanResume()
     {
         var toolExecuted = 0;
-        var tool = new AgentTool<TestContext>
+        AgentTool<TestContext> tool = new()
         {
             Name = "send_mail",
             RequiresApproval = true,
@@ -25,8 +25,8 @@ public sealed class ApprovalAndGuardrailTests
         };
 
         Agent<TestContext> agent = CreateAgent(tool);
-        var runner = new AgentRunner(new RequireApprovalService<TestContext>());
-        var executor = new SequenceTurnExecutor<TestContext>(
+        AgentRunner runner = new(new RequireApprovalService<TestContext>());
+        SequenceTurnExecutor<TestContext> executor = new(
             new AgentTurnResponse<TestContext>
             {
                 ToolCalls =
@@ -65,7 +65,7 @@ public sealed class ApprovalAndGuardrailTests
     [Fact]
     public async Task RunAsync_UsesToolErrorFormatterForRejectedApprovals()
     {
-        var tool = new AgentTool<TestContext>
+        AgentTool<TestContext> tool = new()
         {
             Name = "delete_mail",
             RequiresApproval = true,
@@ -73,8 +73,8 @@ public sealed class ApprovalAndGuardrailTests
         };
 
         Agent<TestContext> agent = CreateAgent(tool);
-        var runner = new AgentRunner(new RequireApprovalService<TestContext>());
-        var executor = new SequenceTurnExecutor<TestContext>(
+        AgentRunner runner = new(new RequireApprovalService<TestContext>());
+        SequenceTurnExecutor<TestContext> executor = new(
             new AgentTurnResponse<TestContext>
             {
                 ToolCalls =
@@ -119,7 +119,7 @@ public sealed class ApprovalAndGuardrailTests
     [Fact]
     public async Task RunAsync_StopsOnToolGuardrailTripwire()
     {
-        var tool = new AgentTool<TestContext>
+        AgentTool<TestContext> tool = new()
         {
             Name = "send_mail",
             InputGuardrails =
@@ -130,8 +130,8 @@ public sealed class ApprovalAndGuardrailTests
         };
 
         Agent<TestContext> agent = CreateAgent(tool);
-        var runner = new AgentRunner();
-        var executor = new SequenceTurnExecutor<TestContext>(
+        AgentRunner runner = new();
+        SequenceTurnExecutor<TestContext> executor = new(
             new AgentTurnResponse<TestContext>
             {
                 ToolCalls =
@@ -160,8 +160,8 @@ public sealed class ApprovalAndGuardrailTests
             ExecuteAsync = (_, _) => ValueTask.FromResult(AgentToolResult.FromText("ok")),
         });
 
-        var runner = new AgentRunner();
-        var executor = new SequenceTurnExecutor<TestContext>(
+        AgentRunner runner = new();
+        SequenceTurnExecutor<TestContext> executor = new(
             new AgentTurnResponse<TestContext> { FinalOutput = new AgentFinalOutput("should not happen") });
 
         AgentRunResult<TestContext> result = await runner.RunAsync(
@@ -195,7 +195,7 @@ public sealed class ApprovalAndGuardrailTests
         try
         {
             var toolExecuted = 0;
-            var tool = new AgentTool<TestContext>
+            AgentTool<TestContext> tool = new()
             {
                 Name = "send_mail",
                 RequiresApproval = true,
@@ -207,9 +207,9 @@ public sealed class ApprovalAndGuardrailTests
             };
 
             Agent<TestContext> agent = CreateAgent(tool);
-            var store = new FileAgentSessionStore(directory);
-            var runner = new AgentRunner(store, new RequireApprovalService<TestContext>());
-            var executor = new SequenceTurnExecutor<TestContext>(
+            FileAgentSessionStore store = new(directory);
+            AgentRunner runner = new(store, new RequireApprovalService<TestContext>());
+            SequenceTurnExecutor<TestContext> executor = new(
                 new AgentTurnResponse<TestContext>
                 {
                     ToolCalls =
@@ -270,7 +270,7 @@ public sealed class ApprovalAndGuardrailTests
         }
 
         public ValueTask<AgentTurnResponse<TContext>> ExecuteTurnAsync(AgentTurnRequest<TContext> request, CancellationToken cancellationToken)
-            => ValueTask.FromResult(this.responses.Dequeue());
+            => ValueTask.FromResult(responses.Dequeue());
     }
 
     private sealed class RequireApprovalService<TContext> : IAgentApprovalService

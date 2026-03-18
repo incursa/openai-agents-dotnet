@@ -27,7 +27,7 @@ This repository focuses on the same primitives shown in the upstream Agents SDK 
 - OpenAI Responses is the primary runtime integration.
 - Per-user MCP context is handled through `IUserScopedMcpAuthResolver`.
 - Runtime behavior is built to be deterministic and hostable in DI containers.
-- Durable local session state is provided through `FileAgentSessionStore` and retention options.
+- Durable local session state is provided through `FileAgentSessionStore` and retention options, while alternate backends can plug in through `IAgentSessionStore`.
 
 ## Mapping from upstream
 

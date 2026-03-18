@@ -11,8 +11,8 @@ public sealed class SessionStoreTests
     [Fact]
     public async Task InMemoryStore_PersistsConversationAcrossLoads()
     {
-        var store = new InMemoryAgentSessionStore();
-        var session = new AgentSession
+        InMemoryAgentSessionStore store = new();
+        AgentSession session = new()
         {
             SessionKey = "session-1",
             Conversation =
@@ -40,8 +40,8 @@ public sealed class SessionStoreTests
         var directory = CreateTempDirectory();
         try
         {
-            var store = new FileAgentSessionStore(directory);
-            var session = new AgentSession
+            FileAgentSessionStore store = new(directory);
+            AgentSession session = new()
             {
                 SessionKey = "session-file-1",
                 CurrentAgentName = "triage",
@@ -77,7 +77,7 @@ public sealed class SessionStoreTests
         var directory = CreateTempDirectory();
         try
         {
-            var store = new FileAgentSessionStore(
+            FileAgentSessionStore store = new(
                 directory,
                 new AgentSessionStoreOptions
                 {
@@ -85,7 +85,7 @@ public sealed class SessionStoreTests
                     MaxTurns = 1,
                 });
 
-            var session = new AgentSession
+            AgentSession session = new()
             {
                 SessionKey = "session-trim-1",
                 Conversation =
@@ -122,8 +122,8 @@ public sealed class SessionStoreTests
         var directory = CreateTempDirectory();
         try
         {
-            var store = new FileAgentSessionStore(directory);
-            var session = new AgentSession
+            FileAgentSessionStore store = new(directory);
+            AgentSession session = new()
             {
                 SessionKey = "session-atomic-1",
                 Conversation =
@@ -152,8 +152,8 @@ public sealed class SessionStoreTests
     [Fact]
     public async Task InMemoryStore_RejectsStaleVersionWrites()
     {
-        var store = new InMemoryAgentSessionStore();
-        var session = new AgentSession
+        InMemoryAgentSessionStore store = new();
+        AgentSession session = new()
         {
             SessionKey = "session-version-1",
             Conversation =
@@ -186,7 +186,7 @@ public sealed class SessionStoreTests
         var directory = CreateTempDirectory();
         try
         {
-            var store = new FileAgentSessionStore(
+            FileAgentSessionStore store = new(
                 directory,
                 new AgentSessionStoreOptions
                 {
@@ -195,7 +195,7 @@ public sealed class SessionStoreTests
                     CleanupExpiredOnSave = false,
                 });
 
-            var session = new AgentSession
+            AgentSession session = new()
             {
                 SessionKey = "session-expired-1",
                 Conversation =

@@ -17,7 +17,7 @@ internal sealed class HostedMcpToolFactory
         McpAuthContext? authContext = null,
         CancellationToken cancellationToken = default)
     {
-        var resolvedHeaders = new Dictionary<string, string>(definition.Headers ?? new Dictionary<string, string>(StringComparer.Ordinal), StringComparer.Ordinal);
+        Dictionary<string, string> resolvedHeaders = new(definition.Headers ?? new Dictionary<string, string>(StringComparer.Ordinal), StringComparer.Ordinal);
         var resolvedAuthorization = definition.Authorization;
         McpAuthContext context = authContext ?? authContextFactory?.Invoke() ?? new McpAuthContext();
 

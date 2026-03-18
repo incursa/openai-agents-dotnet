@@ -45,6 +45,58 @@ public static class AgentServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>Replaces session storage with a custom store implementation.</summary>
+    public static IServiceCollection AddAgentSessionStore(
+        this IServiceCollection services,
+        IAgentSessionStore sessionStore)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(sessionStore);
+
+        services.RemoveAll<IVersionedAgentSessionStore>();
+        services.Replace(ServiceDescriptor.Singleton<IAgentSessionStore>(sessionStore));
+        return services;
+    }
+
+    /// <summary>Replaces session storage with a custom store implementation.</summary>
+    public static IServiceCollection AddAgentSessionStore(
+        this IServiceCollection services,
+        Func<IServiceProvider, IAgentSessionStore> sessionStoreFactory)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(sessionStoreFactory);
+
+        services.RemoveAll<IVersionedAgentSessionStore>();
+        services.Replace(ServiceDescriptor.Singleton(sessionStoreFactory));
+        return services;
+    }
+
+    /// <summary>Replaces session storage with a versioned store implementation.</summary>
+    public static IServiceCollection AddVersionedAgentSessionStore(
+        this IServiceCollection services,
+        IVersionedAgentSessionStore sessionStore)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(sessionStore);
+
+        services.Replace(ServiceDescriptor.Singleton<IVersionedAgentSessionStore>(sessionStore));
+        services.Replace(ServiceDescriptor.Singleton<IAgentSessionStore>(sp => sp.GetRequiredService<IVersionedAgentSessionStore>()));
+        return services;
+    }
+
+    /// <summary>Replaces session storage with a versioned store implementation.</summary>
+    public static IServiceCollection AddVersionedAgentSessionStore(
+        this IServiceCollection services,
+        Func<IServiceProvider, IVersionedAgentSessionStore> sessionStoreFactory)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(sessionStoreFactory);
+
+        services.Replace(ServiceDescriptor.Singleton(sessionStoreFactory));
+        services.Replace(ServiceDescriptor.Singleton<IAgentSessionStore>(sp => sp.GetRequiredService<IVersionedAgentSessionStore>()));
+        return services;
+    }
+
     /// <summary>Replaces session storage with file-backed persistence.</summary>
     public static IServiceCollection AddFileAgentSessions(
         this IServiceCollection services,
@@ -67,9 +119,9 @@ public static class AgentServiceCollectionExtensions
         }
 
         services.Replace(ServiceDescriptor.Singleton<FileAgentSessionStore>(sp =>
-            new(directoryPath, sp.GetRequiredService<IOptions<AgentSessionRetentionOptions>>().Value.ToStoreOptions())));
-        services.Replace(ServiceDescriptor.Singleton<IAgentSessionStore>(sp => sp.GetRequiredService<FileAgentSessionStore>()));
-        services.Replace(ServiceDescriptor.Singleton<IVersionedAgentSessionStore>(sp => sp.GetRequiredService<FileAgentSessionStore>()));
+            new FileAgentSessionStore(directoryPath, sp.GetRequiredService<IOptions<AgentSessionRetentionOptions>>().Value.ToStoreOptions())));
+        services.AddVersionedAgentSessionStore(sp =>
+            sp.GetRequiredService<FileAgentSessionStore>());
 
         return services;
     }

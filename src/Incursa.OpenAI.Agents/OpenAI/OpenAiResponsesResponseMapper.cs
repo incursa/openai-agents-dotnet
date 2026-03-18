@@ -10,9 +10,9 @@ internal sealed class OpenAiResponsesResponseMapper
     internal AgentTurnResponse<TContext> Map<TContext>(OpenAiResponsesResponse response, OpenAiResponsesTurnPlan<TContext> plan)
     {
         JsonArray output = response.Raw["output"] as JsonArray ?? [];
-        var toolCalls = new List<AgentToolCall<TContext>>();
-        var handoffs = new List<AgentHandoffRequest<TContext>>();
-        var items = new List<AgentRunItem>();
+        List<AgentToolCall<TContext>> toolCalls = new();
+        List<AgentHandoffRequest<TContext>> handoffs = new();
+        List<AgentRunItem> items = new();
         string? finalText = null;
         JsonNode? structured = null;
 
@@ -38,27 +38,27 @@ internal sealed class OpenAiResponsesResponseMapper
                     break;
                 case "function_call":
                 case "tool_call":
-                {
-                    var toolName = item["name"]?.GetValue<string>() ?? string.Empty;
-                    // Resolve handoff calls separately from generic tool calls to route execution.
-                    JsonNode? arguments = ParseJsonNode(item["arguments"]);
-                    if (plan.HandoffMap.TryGetValue(toolName, out AgentHandoff<TContext>? handoff))
                     {
-                        handoffs.Add(new AgentHandoffRequest<TContext>(handoff.Name, handoff.TargetAgent, arguments, item["status"]?.GetValue<string>()));
-                    }
-                    else
-                    {
-                        toolCalls.Add(new AgentToolCall<TContext>(
-                            item["call_id"]?.GetValue<string>() ?? item["id"]?.GetValue<string>() ?? Guid.NewGuid().ToString("n"),
-                            toolName,
-                            arguments,
-                            item["approval_required"]?.GetValue<bool>() ?? false,
-                            item["approval_reason"]?.GetValue<string>(),
-                            item["tool_type"]?.GetValue<string>() ?? "function"));
-                    }
+                        var toolName = item["name"]?.GetValue<string>() ?? string.Empty;
+                        // Resolve handoff calls separately from generic tool calls to route execution.
+                        JsonNode? arguments = ParseJsonNode(item["arguments"]);
+                        if (plan.HandoffMap.TryGetValue(toolName, out AgentHandoff<TContext>? handoff))
+                        {
+                            handoffs.Add(new AgentHandoffRequest<TContext>(handoff.Name, handoff.TargetAgent, arguments, item["status"]?.GetValue<string>()));
+                        }
+                        else
+                        {
+                            toolCalls.Add(new AgentToolCall<TContext>(
+                                item["call_id"]?.GetValue<string>() ?? item["id"]?.GetValue<string>() ?? Guid.NewGuid().ToString("n"),
+                                toolName,
+                                arguments,
+                                item["approval_required"]?.GetValue<bool>() ?? false,
+                                item["approval_reason"]?.GetValue<string>(),
+                                item["tool_type"]?.GetValue<string>() ?? "function"));
+                        }
 
-                    break;
-                }
+                        break;
+                    }
                 case "mcp_list_tools":
                     // Expose raw MCP tool-list events in the run item stream for observability/debugging.
                     items.Add(new AgentRunItem(AgentItemTypes.McpListTools, "system", plan.EffectiveAgent.Name)

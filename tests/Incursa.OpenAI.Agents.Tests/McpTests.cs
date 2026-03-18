@@ -15,8 +15,8 @@ public sealed class McpTests
     [Fact]
     public async Task StreamableMcpClient_InsertsDynamicHeadersAndMetadataPerRequest()
     {
-        var recorded = new List<(HttpRequestMessage Request, string Body)>();
-        var handler = new RecordingHandler(async (request, _) =>
+        List<(HttpRequestMessage Request, string Body)> recorded = new();
+        RecordingHandler handler = new(async (request, _) =>
         {
             recorded.Add((CloneRequest(request), request.Content is null ? string.Empty : await request.Content.ReadAsStringAsync()));
             var payload = recorded.Count == 1
@@ -28,20 +28,20 @@ public sealed class McpTests
             };
         });
 
-        var httpClient = new HttpClient(handler);
-        var resolver = new DelegateMcpAuthResolver(_ => new McpAuthResult(
+        HttpClient httpClient = new(handler);
+        DelegateMcpAuthResolver resolver = new(_ => new McpAuthResult(
             "token-123",
             new Dictionary<string, string>
             {
                 ["X-Tenant"] = "tenant-a",
                 ["X-User"] = "user-a",
             }));
-        var metadataResolver = new DelegateMcpMetadataResolver(_ => ValueTask.FromResult<JsonObject?>(new JsonObject
+        DelegateMcpMetadataResolver metadataResolver = new(_ => ValueTask.FromResult<JsonObject?>(new JsonObject
         {
             ["tenant_id"] = "tenant-a",
         }));
 
-        var factory = new StreamableMcpClientFactory(
+        StreamableMcpClientFactory factory = new(
             httpClient,
             resolver,
             () => new McpAuthContext { UserId = "user-a", TenantId = "tenant-a", SessionKey = "session-1" },
@@ -68,12 +68,12 @@ public sealed class McpTests
     [Fact]
     public async Task StreamableMcpClient_AppliesDynamicToolFilterAndSkipsFilterErrors()
     {
-        var handler = new RecordingHandler((_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+        RecordingHandler handler = new((_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
         {
             Content = new StringContent("""{"jsonrpc":"2.0","id":"1","result":{"tools":[{"name":"allowed_tool","inputSchema":{"type":"object"}},{"name":"error_tool","inputSchema":{"type":"object"}},{"name":"blocked_tool","inputSchema":{"type":"object"}}]}}""", Encoding.UTF8, "application/json"),
         }));
 
-        var client = new StreamableHttpMcpClient(
+        StreamableHttpMcpClient client = new(
             new HttpClient(handler),
             "mail",
             new Uri("https://example.test/mcp"),
@@ -111,7 +111,7 @@ public sealed class McpTests
     public async Task StreamableMcpClient_CachesToolListWhenEnabled()
     {
         var calls = 0;
-        var handler = new RecordingHandler((_, _) =>
+        RecordingHandler handler = new((_, _) =>
         {
             calls++;
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
@@ -120,7 +120,7 @@ public sealed class McpTests
             });
         });
 
-        var client = new StreamableHttpMcpClient(
+        StreamableHttpMcpClient client = new(
             new HttpClient(handler),
             "mail",
             new Uri("https://example.test/mcp"),
@@ -145,12 +145,12 @@ public sealed class McpTests
     [Fact]
     public async Task StreamableMcpClient_ThrowsHelpfulErrorForJsonRpcErrors()
     {
-        var handler = new RecordingHandler((_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+        RecordingHandler handler = new((_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
         {
             Content = new StringContent("""{"jsonrpc":"2.0","id":"1","error":{"code":-32603,"message":"server exploded"}}""", Encoding.UTF8, "application/json"),
         }));
 
-        var client = new StreamableHttpMcpClient(
+        StreamableHttpMcpClient client = new(
             new HttpClient(handler),
             "mail",
             new Uri("https://example.test/mcp"));
@@ -167,8 +167,8 @@ public sealed class McpTests
     public async Task StreamableMcpClient_RetriesTransientHttpFailuresAndObservesAttempts()
     {
         var calls = 0;
-        var observations = new List<McpClientObservation>();
-        var handler = new RecordingHandler((_, _) =>
+        List<McpClientObservation> observations = new();
+        RecordingHandler handler = new((_, _) =>
         {
             calls++;
             if (calls == 1)
@@ -185,7 +185,7 @@ public sealed class McpTests
             });
         });
 
-        var client = new StreamableHttpMcpClient(
+        StreamableHttpMcpClient client = new(
             new HttpClient(handler),
             "mail",
             new Uri("https://example.test/mcp"),
@@ -218,7 +218,7 @@ public sealed class McpTests
     public async Task StreamableMcpClient_DoesNotRetryAuthenticationFailures()
     {
         var calls = 0;
-        var handler = new RecordingHandler((_, _) =>
+        RecordingHandler handler = new((_, _) =>
         {
             calls++;
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.Unauthorized)
@@ -227,7 +227,7 @@ public sealed class McpTests
             });
         });
 
-        var client = new StreamableHttpMcpClient(
+        StreamableHttpMcpClient client = new(
             new HttpClient(handler),
             "mail",
             new Uri("https://example.test/mcp"),
@@ -304,7 +304,7 @@ public sealed class McpTests
 
     private static HttpRequestMessage CloneRequest(HttpRequestMessage request)
     {
-        var clone = new HttpRequestMessage(request.Method, request.RequestUri);
+        HttpRequestMessage clone = new(request.Method, request.RequestUri);
         foreach (KeyValuePair<string, IEnumerable<string>> header in request.Headers)
         {
             clone.Headers.TryAddWithoutValidation(header.Key, header.Value);

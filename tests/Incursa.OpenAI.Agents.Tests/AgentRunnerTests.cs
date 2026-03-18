@@ -13,10 +13,10 @@ public sealed class AgentRunnerTests
     [Fact]
     public async Task RunAsync_CompletesWithFinalOutputAndPersistsConversation()
     {
-        var store = new InMemoryAgentSessionStore();
-        var runner = new AgentRunner(store);
+        InMemoryAgentSessionStore store = new();
+        AgentRunner runner = new(store);
         Agent<TestContext> agent = CreateAgent();
-        var executor = new SequenceTurnExecutor<TestContext>(
+        SequenceTurnExecutor<TestContext> executor = new(
             new AgentTurnResponse<TestContext>
             {
                 FinalOutput = new AgentFinalOutput("done"),
@@ -46,7 +46,7 @@ public sealed class AgentRunnerTests
     public async Task RunAsync_ExecutesToolCallAndContinues()
     {
         var toolCalls = 0;
-        var tool = new AgentTool<TestContext>
+        AgentTool<TestContext> tool = new()
         {
             Name = "lookup_customer",
             Description = "Look up a customer",
@@ -58,8 +58,8 @@ public sealed class AgentRunnerTests
         };
 
         Agent<TestContext> agent = CreateAgent(tool);
-        var runner = new AgentRunner();
-        var executor = new SequenceTurnExecutor<TestContext>(
+        AgentRunner runner = new();
+        SequenceTurnExecutor<TestContext> executor = new(
             new AgentTurnResponse<TestContext>
             {
                 ToolCalls =
@@ -89,14 +89,14 @@ public sealed class AgentRunnerTests
     public async Task RunAsync_ExecutesHandoffAndSwitchesAgent()
     {
         var handoffInvoked = false;
-        var specialist = new Agent<TestContext>
+        Agent<TestContext> specialist = new()
         {
             Name = "mail specialist",
             Model = "gpt-5.4",
             Instructions = "handle mail",
         };
 
-        var triage = new Agent<TestContext>
+        Agent<TestContext> triage = new()
         {
             Name = "triage",
             Model = "gpt-5.4",
@@ -116,8 +116,8 @@ public sealed class AgentRunnerTests
             ],
         };
 
-        var runner = new AgentRunner();
-        var executor = new SequenceTurnExecutor<TestContext>(
+        AgentRunner runner = new();
+        SequenceTurnExecutor<TestContext> executor = new(
             new AgentTurnResponse<TestContext>
             {
                 Handoffs =
@@ -147,15 +147,15 @@ public sealed class AgentRunnerTests
     [Fact]
     public async Task RunAsync_EnforcesMaxTurns()
     {
-        var tool = new AgentTool<TestContext>
+        AgentTool<TestContext> tool = new()
         {
             Name = "loop",
             ExecuteAsync = (_, _) => ValueTask.FromResult(AgentToolResult.FromText("again")),
         };
 
         Agent<TestContext> agent = CreateAgent(tool);
-        var runner = new AgentRunner();
-        var executor = new SequenceTurnExecutor<TestContext>(
+        AgentRunner runner = new();
+        SequenceTurnExecutor<TestContext> executor = new(
             new AgentTurnResponse<TestContext> { ToolCalls = [new AgentToolCall<TestContext>("call-1", "loop")], ResponseId = "resp-1" },
             new AgentTurnResponse<TestContext> { ToolCalls = [new AgentToolCall<TestContext>("call-2", "loop")], ResponseId = "resp-2" });
 
@@ -173,8 +173,8 @@ public sealed class AgentRunnerTests
     public async Task RunStreamingAsync_EmitsItemsAsTheyAreGenerated()
     {
         Agent<TestContext> agent = CreateAgent();
-        var runner = new AgentRunner();
-        var executor = new SequenceTurnExecutor<TestContext>(
+        AgentRunner runner = new();
+        SequenceTurnExecutor<TestContext> executor = new(
             new AgentTurnResponse<TestContext>
             {
                 FinalOutput = new AgentFinalOutput("done"),
@@ -185,7 +185,7 @@ public sealed class AgentRunnerTests
                 ResponseId = "resp-1",
             });
 
-        var events = new List<AgentStreamEvent>();
+        List<AgentStreamEvent> events = new();
         await foreach (AgentStreamEvent item in runner.RunStreamingAsync(AgentRunRequest<TestContext>.FromUserInput(agent, "hello", new TestContext(), "session-stream"), executor))
         {
             events.Add(item);

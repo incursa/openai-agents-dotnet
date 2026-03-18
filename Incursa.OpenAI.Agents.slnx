@@ -1,6 +1,8 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Incursa.OpenAI.Agents.Extensions/Incursa.OpenAI.Agents.Extensions.csproj" />
+    <Project Path="src/Incursa.OpenAI.Agents.Storage.Azure/Incursa.OpenAI.Agents.Storage.Azure.csproj" />
+    <Project Path="src/Incursa.OpenAI.Agents.Storage.S3/Incursa.OpenAI.Agents.Storage.S3.csproj" />
     <Project Path="src/Incursa.OpenAI.Agents/Incursa.OpenAI.Agents.csproj" />
   </Folder>
   <Folder Name="/samples/">
@@ -8,6 +10,8 @@
     <Project Path="samples/Incursa.OpenAI.Agents.HostSample/Incursa.OpenAI.Agents.HostSample.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.csproj" />
+    <Project Path="tests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.csproj" />
     <Project Path="tests/Incursa.OpenAI.Agents.Tests/Incursa.OpenAI.Agents.Tests.csproj" />
   </Folder>
 </Solution>

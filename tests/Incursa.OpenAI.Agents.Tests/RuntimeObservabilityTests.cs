@@ -13,15 +13,15 @@ public sealed class RuntimeObservabilityTests
     [Fact]
     public async Task RunAsync_EmitsLifecycleObservations()
     {
-        var observer = new RecordingObserver();
-        var runner = new AgentRunner(observer);
-        var agent = new Agent<TestContext>
+        RecordingObserver observer = new();
+        AgentRunner runner = new(observer);
+        Agent<TestContext> agent = new()
         {
             Name = "primary",
             Model = "gpt-5.4",
             Instructions = "answer",
         };
-        var executor = new SequenceTurnExecutor<TestContext>(
+        SequenceTurnExecutor<TestContext> executor = new(
             new AgentTurnResponse<TestContext>
             {
                 FinalOutput = new AgentFinalOutput("done"),
@@ -44,10 +44,10 @@ public sealed class RuntimeObservabilityTests
     [Fact]
     public async Task CompositeMcpClientObserver_FansOutObservationsToAllSinks()
     {
-        var first = new RecordingMcpSink();
-        var second = new RecordingMcpSink();
-        var observer = new CompositeMcpClientObserver([first, second]);
-        var observation = new McpClientObservation("local", "tools/list", "lookup", 1, TimeSpan.FromMilliseconds(12), McpCallOutcome.Success, null, null);
+        RecordingMcpSink first = new();
+        RecordingMcpSink second = new();
+        CompositeMcpClientObserver observer = new([first, second]);
+        McpClientObservation observation = new("local", "tools/list", "lookup", 1, TimeSpan.FromMilliseconds(12), McpCallOutcome.Success, null, null);
 
         await observer.ObserveAsync(observation);
 

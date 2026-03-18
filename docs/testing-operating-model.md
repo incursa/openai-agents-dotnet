@@ -15,6 +15,7 @@ The repo uses four quality lanes:
 - `blocking`: required non-Docker validation over the maintained solution
 - `observational`: visible `Category=KnownIssue` regressions that do not block the lane
 - `advisory`: blocking tests plus package coverage, then Workbench normalization
+- `integration`: Docker-backed checks tagged with `Category=Integration` and `RequiresDocker=true`
 
 Local commands:
 
@@ -23,6 +24,8 @@ pwsh -File scripts/quality/run-smoke-tests.ps1
 pwsh -File scripts/quality/run-blocking-tests.ps1
 pwsh -File scripts/quality/run-observational-tests.ps1
 pwsh -File scripts/quality/run-quality-evidence.ps1
+dotnet test --settings runsettings/integration.runsettings
+pwsh -File scripts/testing/run-integration-tests.ps1
 ```
 
 Traceability is governed by:

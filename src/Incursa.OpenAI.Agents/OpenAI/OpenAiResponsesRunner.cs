@@ -67,8 +67,8 @@ public sealed class OpenAiResponsesRunner
         CancellationToken cancellationToken)
     {
         // Composition root for standard (non-streaming) execution: runner + turn executor injection.
-        var runner = new AgentRunner(sessionStore, approvalService, observer);
-        var turnExecutor = new OpenAiResponsesTurnExecutor<TContext>(client, mcpHttpClient, authResolver, authContextFactory, mcpToolMetadataResolver, mcpClientOptions);
+        AgentRunner runner = new(sessionStore, approvalService, observer);
+        OpenAiResponsesTurnExecutor<TContext> turnExecutor = new(client, mcpHttpClient, authResolver, authContextFactory, mcpToolMetadataResolver, mcpClientOptions);
         return runner.RunAsync(request, turnExecutor, cancellationToken);
     }
 
@@ -95,8 +95,8 @@ public sealed class OpenAiResponsesRunner
         CancellationToken cancellationToken)
     {
         // Streaming variant keeps exactly the same execution chain, but wires a turn executor that emits AgentStreamEvent.
-        var runner = new AgentRunner(sessionStore, approvalService, observer);
-        var turnExecutor = new OpenAiResponsesTurnExecutor<TContext>(client, mcpHttpClient, authResolver, authContextFactory, mcpToolMetadataResolver, mcpClientOptions);
+        AgentRunner runner = new(sessionStore, approvalService, observer);
+        OpenAiResponsesTurnExecutor<TContext> turnExecutor = new(client, mcpHttpClient, authResolver, authContextFactory, mcpToolMetadataResolver, mcpClientOptions);
         return runner.RunStreamingAsync(request, turnExecutor, cancellationToken);
     }
 }

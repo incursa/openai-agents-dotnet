@@ -44,7 +44,7 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
         HostedMcpToolFactory? hostedFactory = authContextFactory is null && authResolver is null
             ? null
             : new HostedMcpToolFactory(authResolver, () => authContextFactory?.Invoke(request) ?? new McpAuthContext());
-        var mapper = new OpenAiResponsesRequestMapper(hostedFactory, authContextFactory is null ? null : _ => authContextFactory(request));
+        OpenAiResponsesRequestMapper mapper = new(hostedFactory, authContextFactory is null ? null : _ => authContextFactory(request));
 
         // 3) Translate the turn request into the OpenAI responses wire format and execute once.
         OpenAiResponsesTurnPlan<TContext> plan = await mapper.CreateAsync(effectiveRequest, cancellationToken).ConfigureAwait(false);
@@ -64,10 +64,10 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
         HostedMcpToolFactory? hostedFactory = authContextFactory is null && authResolver is null
             ? null
             : new HostedMcpToolFactory(authResolver, () => authContextFactory?.Invoke(request) ?? new McpAuthContext());
-        var mapper = new OpenAiResponsesRequestMapper(hostedFactory, authContextFactory is null ? null : _ => authContextFactory(request));
+        OpenAiResponsesRequestMapper mapper = new(hostedFactory, authContextFactory is null ? null : _ => authContextFactory(request));
         OpenAiResponsesTurnPlan<TContext> plan = await mapper.CreateAsync(effectiveRequest, cancellationToken).ConfigureAwait(false);
 
-        var accumulator = new StreamingResponseAccumulator();
+        StreamingResponseAccumulator accumulator = new();
 
         // Stream in-order model deltas, emit raw events, and emit normalized run items when complete frames arrive.
         await foreach (OpenAiResponsesStreamEvent? streamEvent in client.StreamResponseAsync(new OpenAiResponsesRequest(plan.Body, true), cancellationToken).ConfigureAwait(false))
@@ -103,8 +103,8 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
             SessionKey = request.SessionKey,
             AgentName = request.Agent.Name,
         };
-        var factory = new StreamableMcpClientFactory(mcpHttpClient, authResolver, () => authContext, mcpToolMetadataResolver, mcpClientOptions);
-        var tools = request.Agent.Tools.ToList();
+        StreamableMcpClientFactory factory = new(mcpHttpClient, authResolver, () => authContext, mcpToolMetadataResolver, mcpClientOptions);
+        List<IAgentTool<TContext>> tools = request.Agent.Tools.ToList();
 
         // For each MCP server, enumerate tools and register proxy tools that invoke the server tool through the MCP client.
         foreach (StreamableHttpMcpServerDefinition server in request.Agent.StreamableMcpServers)

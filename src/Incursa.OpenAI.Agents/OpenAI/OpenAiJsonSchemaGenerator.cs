@@ -69,8 +69,8 @@ internal static class OpenAiJsonSchemaGenerator
         }
 
         // Reflect public instance properties into JSON object schema, marking non-nullable properties required.
-        var properties = new JsonObject();
-        var required = new JsonArray();
+        JsonObject properties = new();
+        JsonArray required = new();
         foreach (PropertyInfo property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             properties[property.Name] = CreateSchema(property.PropertyType, visited);

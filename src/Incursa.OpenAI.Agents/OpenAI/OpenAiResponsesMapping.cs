@@ -35,7 +35,7 @@ internal sealed class OpenAiResponsesRequestMapper
                 new AgentInstructionContext<TContext>(request.Agent, request.Context, request.SessionKey, request.Conversation),
                 cancellationToken).ConfigureAwait(false);
 
-        var body = new JsonObject
+        JsonObject body = new()
         {
             ["model"] = request.Agent.Model,
             ["instructions"] = instructions,
@@ -60,8 +60,8 @@ internal sealed class OpenAiResponsesRequestMapper
             body[pair.Key] = JsonSerializer.SerializeToNode(pair.Value, new JsonSerializerOptions(JsonSerializerDefaults.Web));
         }
 
-        var tools = new JsonArray();
-        var handoffMap = new Dictionary<string, AgentHandoff<TContext>>(StringComparer.Ordinal);
+        JsonArray tools = new();
+        Dictionary<string, AgentHandoff<TContext>> handoffMap = new(StringComparer.Ordinal);
 
         // Register user-defined function tools.
         foreach (IAgentTool<TContext> tool in request.Agent.Tools)
@@ -104,7 +104,7 @@ internal sealed class OpenAiResponsesRequestMapper
                 resolved = await hostedMcpToolFactory.CreateAsync(hostedMcp, authContext, cancellationToken).ConfigureAwait(false);
             }
 
-            var hosted = new JsonObject
+            JsonObject hosted = new()
             {
                 ["type"] = "mcp",
                 ["server_label"] = resolved.ServerLabel,
@@ -185,7 +185,7 @@ internal sealed class OpenAiResponsesRequestMapper
                 cancellationToken).ConfigureAwait(false);
         }
 
-        var input = new JsonArray();
+        JsonArray input = new();
         foreach (AgentConversationItem item in conversation)
         {
             // Preserve one-to-one mapping between internal conversation items and provider item schema.

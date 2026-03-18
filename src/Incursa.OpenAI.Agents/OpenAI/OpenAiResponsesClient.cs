@@ -56,7 +56,7 @@ public sealed class OpenAiResponsesClient : IOpenAiResponsesClient
         JsonObject body = request.Body.DeepClone() as JsonObject ?? new JsonObject();
         body["stream"] = true;
 
-        using var message = new HttpRequestMessage(HttpMethod.Post, responsesPath)
+        using HttpRequestMessage message = new(HttpMethod.Post, responsesPath)
         {
             Content = JsonContent.Create(body, options: SerializerOptions),
         };
@@ -66,7 +66,7 @@ public sealed class OpenAiResponsesClient : IOpenAiResponsesClient
         response.EnsureSuccessStatusCode();
 
         await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        using var reader = new StreamReader(stream, Encoding.UTF8);
+        using StreamReader reader = new(stream, Encoding.UTF8);
 
         // Parse SSE stream incrementally and emit model events until DONE or EOF.
         while (!cancellationToken.IsCancellationRequested)

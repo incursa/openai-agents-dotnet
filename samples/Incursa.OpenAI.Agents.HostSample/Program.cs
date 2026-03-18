@@ -13,8 +13,8 @@ if (Directory.Exists(sessionDirectory))
     Directory.Delete(sessionDirectory, recursive: true);
 }
 
-var context = new AppContext(new AppUser("user-1", "tenant-1", "mailbox-1", "conn-1"));
-var responsesClient = new SampleResponsesClient();
+AppContext context = new(new AppUser("user-1", "tenant-1", "mailbox-1", "conn-1"));
+SampleResponsesClient responsesClient = new();
 
 Agent<AppContext> mailAgent = AgentBuilder
     .Create<AppContext>("mail specialist")
@@ -76,7 +76,7 @@ await resumedProvider.DisposeAsync();
 
 static ServiceProvider BuildServices(string sessionDirectory, SampleResponsesClient responsesClient)
 {
-    var services = new ServiceCollection();
+    ServiceCollection services = new();
     services.AddLogging(builder =>
     {
         builder.AddSimpleConsole(options =>

@@ -23,7 +23,9 @@ Recommended conventions:
 - keep `summary` and `behavior` focused on public behavior, not implementation details
 - align `scenario` with the closest `LIB-*` spec row when the test maps directly to the conformance matrix
 - use `Trait("Category", "Smoke")` only for intentionally curated fast checks
+- use `Trait("Category", "Integration")` for Docker-backed tests that exercise real external services
 - use `Trait("Category", "KnownIssue")` only for visible non-blocking regressions
+- add `Trait("RequiresDocker", "true")` when a test needs Docker to run
 
 Example:
 

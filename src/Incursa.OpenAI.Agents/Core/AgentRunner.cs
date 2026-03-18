@@ -77,8 +77,8 @@ public sealed partial class AgentRunner
         IAgentTurnExecutor<TContext> turnExecutor,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var channel = Channel.CreateUnbounded<AgentStreamEvent>();
-        var runTask = Task.Run(async () =>
+        Channel<AgentStreamEvent> channel = Channel.CreateUnbounded<AgentStreamEvent>();
+        Task runTask = Task.Run(async () =>
         {
             Exception? failure = null;
             try
@@ -110,7 +110,7 @@ public sealed partial class AgentRunner
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var runStart = Stopwatch.StartNew();
+        Stopwatch runStart = Stopwatch.StartNew();
 
         var sessionKey = request.ResumeState?.SessionKey
             ?? request.SessionKey
@@ -126,7 +126,7 @@ public sealed partial class AgentRunner
 
         Agent<TContext> currentAgent = request.ResumeState?.CurrentAgent ?? request.StartingAgent;
         List<AgentConversationItem> conversation = request.ResumeState?.Conversation.ToList() ?? session.Conversation.ToList();
-        var items = new List<AgentRunItem>();
+        List<AgentRunItem> items = new();
         var turns = request.ResumeState?.TurnsExecuted ?? 0;
         var previousResponseId = request.ResumeState?.LastResponseId ?? options.PreviousResponseId ?? session.LastResponseId;
         List<AgentPendingApproval<TContext>> pendingApprovals = request.ResumeState?.PendingApprovals.ToList()
@@ -211,14 +211,14 @@ public sealed partial class AgentRunner
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 turns++;
-                var turnStart = Stopwatch.StartNew();
+                Stopwatch turnStart = Stopwatch.StartNew();
                 await ObserveAsync(new AgentRuntimeObservation(AgentRuntimeEventNames.TurnStarted, sessionKey, currentAgent.Name)
                 {
                     TurnNumber = turns,
                 },
                     cancellationToken).ConfigureAwait(false);
 
-                var turnRequest = new AgentTurnRequest<TContext>(
+                AgentTurnRequest<TContext> turnRequest = new(
                     currentAgent,
                     request.Context,
                     sessionKey,

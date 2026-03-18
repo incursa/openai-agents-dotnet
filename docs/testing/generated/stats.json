@@ -1,30 +1,136 @@
 {
-  "generatedAtUtc": "2026-03-18T05:32:47.4041305Z",
+  "generatedAtUtc": "1970-01-01T00:00:00Z",
   "repo": {
     "defaultBranch": "main"
   },
   "summary": {
-    "total": 34,
-    "compliant": 34,
+    "total": 44,
+    "compliant": 44,
     "missingRequired": 0,
     "invalidFormat": 0
   },
   "byCategory": [
     {
       "category": "Incursa.OpenAI.Agents",
-      "total": 34,
-      "compliant": 34
+      "total": 44,
+      "compliant": 44
     }
   ],
   "byTag": [],
   "byProject": [
     {
+      "project": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests",
+      "total": 3,
+      "compliant": 3
+    },
+    {
+      "project": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests",
+      "total": 3,
+      "compliant": 3
+    },
+    {
       "project": "Incursa.OpenAI.Agents.Tests",
-      "total": 34,
-      "compliant": 34
+      "total": 38,
+      "compliant": 38
     }
   ],
   "tests": [
+    {
+      "testId": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests:Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.CleanupExpiredSessionsAsync_RemovesExpiredSessions",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The Azure session store removes expired sessions during explicit cleanup.",
+      "intent": "Protect cleanup behavior against real blob listing and deletion semantics.",
+      "scenario": "LIB-STORAGE-AZURE-INT-001-CLEANUP",
+      "behavior": "Expired sessions are deleted and no longer load after cleanup runs.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests/AzureAgentSessionStoreIntegrationTests.cs",
+        "line": 91,
+        "member": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.CleanupExpiredSessionsAsync_RemovesExpiredSessions"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests:Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.SaveAndLoadAsync_PreservesSessionState",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The Azure session store round-trips the persisted session state through Azurite.",
+      "intent": "Protect the live blob serialization path rather than only the in-memory contract.",
+      "scenario": "LIB-STORAGE-AZURE-INT-001-ROUNDTRIP",
+      "behavior": "Saving then loading a session preserves the key runtime fields and conversation content.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests/AzureAgentSessionStoreIntegrationTests.cs",
+        "line": 43,
+        "member": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.SaveAndLoadAsync_PreservesSessionState"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests:Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.SaveAsync_RejectsStaleVersionWrites",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The Azure session store rejects stale writes after a newer version is persisted.",
+      "intent": "Protect optimistic concurrency for resumable session state.",
+      "scenario": "LIB-STORAGE-AZURE-INT-001-VERSION",
+      "behavior": "A stale copy of the same session key fails with a version mismatch after a newer save succeeds.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests/AzureAgentSessionStoreIntegrationTests.cs",
+        "line": 68,
+        "member": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.SaveAsync_RejectsStaleVersionWrites"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests:Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.S3AgentSessionStoreIntegrationTests.CleanupExpiredSessionsAsync_RemovesExpiredSessions",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The S3 session store removes expired sessions during explicit cleanup.",
+      "intent": "Protect cleanup behavior against real bucket listing and deletion semantics.",
+      "scenario": "LIB-STORAGE-S3-INT-001-CLEANUP",
+      "behavior": "Expired sessions are deleted and no longer load after cleanup runs.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests/S3AgentSessionStoreIntegrationTests.cs",
+        "line": 95,
+        "member": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.S3AgentSessionStoreIntegrationTests.CleanupExpiredSessionsAsync_RemovesExpiredSessions"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests:Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.S3AgentSessionStoreIntegrationTests.SaveAndLoadAsync_PreservesSessionState",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The S3 session store round-trips the persisted session state through MinIO.",
+      "intent": "Protect the live S3 serialization path rather than only the in-memory contract.",
+      "scenario": "LIB-STORAGE-S3-INT-001-ROUNDTRIP",
+      "behavior": "Saving then loading a session preserves the key runtime fields and conversation content.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests/S3AgentSessionStoreIntegrationTests.cs",
+        "line": 47,
+        "member": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.S3AgentSessionStoreIntegrationTests.SaveAndLoadAsync_PreservesSessionState"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests:Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.S3AgentSessionStoreIntegrationTests.SaveAsync_RejectsStaleVersionWrites",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The S3 session store rejects stale writes after a newer version is persisted.",
+      "intent": "Protect optimistic concurrency for resumable session state.",
+      "scenario": "LIB-STORAGE-S3-INT-001-VERSION",
+      "behavior": "A stale copy of the same session key fails with a version mismatch after a newer save succeeds.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests/S3AgentSessionStoreIntegrationTests.cs",
+        "line": 72,
+        "member": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.S3AgentSessionStoreIntegrationTests.SaveAsync_RejectsStaleVersionWrites"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Storage.S3.IntegrationTests"
+    },
     {
       "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.AgentBuilderTests.AgentBuilder_CreatesConfiguredAgent",
       "category": "Incursa.OpenAI.Agents",
@@ -51,7 +157,7 @@
       "behavior": "Helper APIs carry session, previous-response, and approval-resume data into the resulting request.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentBuilderTests.cs",
-        "line": 52,
+        "line": 55,
         "member": "Incursa.OpenAI.Agents.Tests.AgentBuilderTests.AgentRunRequest_HelpersCreateResumeAndPreviousResponseRequests"
       },
       "status": "compliant",
@@ -83,7 +189,7 @@
       "behavior": "Runs return MaxTurnsExceeded once the configured turn budget is exhausted.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
-        "line": 138,
+        "line": 148,
         "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_EnforcesMaxTurns"
       },
       "status": "compliant",
@@ -99,7 +205,7 @@
       "behavior": "When a handoff is requested the runner invokes the handoff and reports the delegated agent as the final agent.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
-        "line": 83,
+        "line": 89,
         "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_ExecutesHandoffAndSwitchesAgent"
       },
       "status": "compliant",
@@ -115,7 +221,7 @@
       "behavior": "Tool calls invoke the configured tool and append tool output items before the next turn completes.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
-        "line": 44,
+        "line": 46,
         "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_ExecutesToolCallAndContinues"
       },
       "status": "compliant",
@@ -131,7 +237,7 @@
       "behavior": "Streaming execution emits the initial user input, generated message items, and the final output item in-order.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
-        "line": 163,
+        "line": 173,
         "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunStreamingAsync_EmitsItemsAsTheyAreGenerated"
       },
       "status": "compliant",
@@ -147,7 +253,7 @@
       "behavior": "Stored sessions expose pending approval state that can be resumed and completed later.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
-        "line": 177,
+        "line": 192,
         "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_CanResumeApprovalFromPersistedSession"
       },
       "status": "compliant",
@@ -179,7 +285,7 @@
       "behavior": "Tripwired tool input guardrails return GuardrailTriggered and surface the guardrail message on the result.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
-        "line": 110,
+        "line": 120,
         "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_StopsOnToolGuardrailTripwire"
       },
       "status": "compliant",
@@ -195,7 +301,7 @@
       "behavior": "Run-level input guardrails can stop execution before any turn executor output is accepted.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
-        "line": 143,
+        "line": 155,
         "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_UsesRunLevelInputGuardrailsOnFirstTurn"
       },
       "status": "compliant",
@@ -211,8 +317,40 @@
       "behavior": "Rejected approval items use the supplied tool error formatter instead of invoking the tool.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
-        "line": 62,
+        "line": 66,
         "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_UsesToolErrorFormatterForRejectedApprovals"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddAgentSessionStore_RegistersCustomStore",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Verifies custom session stores can replace the default runtime store without being versioned.",
+      "intent": "Protect the extension hook used by future non-file backends.",
+      "scenario": "LIB-EXT-DI-002",
+      "behavior": "A custom \u0060IAgentSessionStore\u0060 is used by the runner and does not require cleanup support.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
+        "line": 76,
+        "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddAgentSessionStore_RegistersCustomStore"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddAzureAgentSessions_RegistersAzureStore",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Verifies the Azure adapter registers the same runtime session store contracts as the file backend.",
+      "intent": "Protect the Azure package DI surface and ensure it can replace the core store cleanly.",
+      "scenario": "LIB-STORAGE-AZURE-001",
+      "behavior": "\u0060AddAzureAgentSessions\u0060 resolves a concrete Azure store and the generic session interfaces to the same instance.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
+        "line": 115,
+        "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddAzureAgentSessions_RegistersAzureStore"
       },
       "status": "compliant",
       "project": "Incursa.OpenAI.Agents.Tests"
@@ -227,8 +365,40 @@
       "behavior": "The container resolves runnable services and persists sessions through the file-backed store.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
-        "line": 17,
+        "line": 24,
         "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddIncursaAgents_AndOpenAiResponses_ResolveRunnableServices"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddOpenAiResponses_AppliesConfiguredApiKeyToHttpClient",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Verifies the configured API key is applied to the named OpenAI HttpClient.",
+      "intent": "Protect direct credential configuration without requiring environment variables.",
+      "scenario": "LIB-EXT-DI-003",
+      "behavior": "\u0060OpenAiResponsesOptions.ApiKey\u0060 sets the bearer token on the configured OpenAI client.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
+        "line": 163,
+        "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddOpenAiResponses_AppliesConfiguredApiKeyToHttpClient"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddS3AgentSessions_RegistersS3Store",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Verifies the S3 adapter registers the same runtime session store contracts as the file backend.",
+      "intent": "Protect the S3 package DI surface and ensure it can replace the core store cleanly.",
+      "scenario": "LIB-STORAGE-S3-001",
+      "behavior": "\u0060AddS3AgentSessions\u0060 resolves a concrete S3 store and the generic session interfaces to the same instance.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
+        "line": 139,
+        "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddS3AgentSessions_RegistersS3Store"
       },
       "status": "compliant",
       "project": "Incursa.OpenAI.Agents.Tests"
@@ -243,7 +413,7 @@
       "behavior": "Each sink receives the same observation exactly once.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
-        "line": 67,
+        "line": 187,
         "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.CompositeAgentRuntimeObserver_FansOutObservationsToAllSinks"
       },
       "status": "compliant",
@@ -275,7 +445,7 @@
       "behavior": "Repeated tool discovery calls reuse the cached result instead of issuing a second HTTP request.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
-        "line": 103,
+        "line": 111,
         "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_CachesToolListWhenEnabled"
       },
       "status": "compliant",
@@ -291,7 +461,7 @@
       "behavior": "Unauthorized responses throw McpAuthenticationException without performing additional attempts.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
-        "line": 198,
+        "line": 218,
         "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_DoesNotRetryAuthenticationFailures"
       },
       "status": "compliant",
@@ -323,7 +493,7 @@
       "behavior": "Retryable failures schedule a retry, eventually succeed, and emit retry and success observations.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
-        "line": 153,
+        "line": 167,
         "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_RetriesTransientHttpFailuresAndObservesAttempts"
       },
       "status": "compliant",
@@ -339,7 +509,7 @@
       "behavior": "JSON-RPC error responses throw McpServerException with the server message included.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
-        "line": 132,
+        "line": 146,
         "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_ThrowsHelpfulErrorForJsonRpcErrors"
       },
       "status": "compliant",
@@ -355,7 +525,7 @@
       "behavior": "Mapped requests preserve model selection, previous-response IDs, tool payloads, MCP payloads, and response-format metadata.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 18,
+        "line": 17,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_MapsToolsHandoffsAndStructuredOutput"
       },
       "status": "compliant",
@@ -371,7 +541,7 @@
       "behavior": "Normalized model input omits pre-handoff function-call and function-call-output items when that mode is enabled.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 165,
+        "line": 167,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_NormalizesHandoffModelInputAfterHandoff"
       },
       "status": "compliant",
@@ -387,7 +557,7 @@
       "behavior": "Mapped reasoning items omit their IDs when the configured reasoning-item policy is Omit.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 235,
+        "line": 237,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_OmitsReasoningIdsWhenConfigured"
       },
       "status": "compliant",
@@ -403,7 +573,7 @@
       "behavior": "Mapped input reflects the filtered conversation instead of the full stored conversation.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 201,
+        "line": 203,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_UsesRunLevelModelInputFilter"
       },
       "status": "compliant",
@@ -419,7 +589,7 @@
       "behavior": "Completed function arguments appear on emitted tool-call run items and on the final response tool-call data.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 265,
+        "line": 269,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse"
       },
       "status": "compliant",
@@ -451,7 +621,7 @@
       "behavior": "Each sink receives the same observation exactly once.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/RuntimeObservabilityTests.cs",
-        "line": 43,
+        "line": 45,
         "member": "Incursa.OpenAI.Agents.Tests.RuntimeObservabilityTests.CompositeMcpClientObserver_FansOutObservationsToAllSinks"
       },
       "status": "compliant",

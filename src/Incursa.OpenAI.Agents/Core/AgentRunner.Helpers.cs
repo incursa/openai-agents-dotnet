@@ -169,7 +169,7 @@ public sealed partial class AgentRunner
                 emitAsync,
                 cancellationToken).ConfigureAwait(false);
 
-            var pendingApproval = new AgentPendingApproval<TContext>(agent, toolCall.ToolName, toolCall.CallId, toolCall.Arguments, toolCall.ApprovalReason, toolCall.ToolType);
+            AgentPendingApproval<TContext> pendingApproval = new(agent, toolCall.ToolName, toolCall.CallId, toolCall.Arguments, toolCall.ApprovalReason, toolCall.ToolType);
             ApprovalDecision approvalDecision = tool.RequiresApproval || toolCall.RequiresApproval
                 ? await approvalService.EvaluateAsync(new AgentApprovalContext<TContext>(agent, context, sessionKey, pendingApproval, tool, conversation.AsReadOnly()), cancellationToken).ConfigureAwait(false)
                 : ApprovalDecision.Allow();
@@ -207,7 +207,7 @@ public sealed partial class AgentRunner
                 return BuildResult(AgentRunStatus.GuardrailTriggered, sessionKey, agent, items, conversation, turns, responseId, guardrailMessage: inputGuardrail);
             }
 
-            var invocation = new AgentToolInvocation<TContext>(agent, context, sessionKey, toolCall.CallId, toolCall.ToolName, toolCall.Arguments, conversation.AsReadOnly());
+            AgentToolInvocation<TContext> invocation = new(agent, context, sessionKey, toolCall.CallId, toolCall.ToolName, toolCall.Arguments, conversation.AsReadOnly());
             AgentToolResult result = await tool.ExecuteAsync(invocation, cancellationToken).ConfigureAwait(false);
 
             var outputGuardrail = await RunToolOutputGuardrailsAsync(agent, context, sessionKey, toolCall, tool, result, conversation, items, emitAsync, cancellationToken).ConfigureAwait(false);
@@ -266,7 +266,7 @@ public sealed partial class AgentRunner
                     pendingApprovals.ToList()));
         }
 
-        var responseMap = request.ApprovalResponses.ToDictionary(item => item.ToolCallId, StringComparer.Ordinal);
+        Dictionary<string, AgentApprovalResponse> responseMap = request.ApprovalResponses.ToDictionary(item => item.ToolCallId, StringComparer.Ordinal);
         foreach (AgentPendingApproval<TContext> pending in pendingApprovals)
         {
             if (!responseMap.TryGetValue(pending.ToolCallId, out AgentApprovalResponse? response))
@@ -323,14 +323,14 @@ public sealed partial class AgentRunner
             IAgentTool<TContext> tool = await FindToolAsync(currentAgent, request.Context, sessionKey, conversation, pending.ToolName, cancellationToken).ConfigureAwait(false)
                 ?? throw new InvalidOperationException($"Approved tool '{pending.ToolName}' no longer exists on agent '{currentAgent.Name}'.");
 
-            var call = new AgentToolCall<TContext>(pending.ToolCallId, pending.ToolName, pending.Arguments) { ToolType = pending.ToolType };
+            AgentToolCall<TContext> call = new(pending.ToolCallId, pending.ToolName, pending.Arguments) { ToolType = pending.ToolType };
             var inputGuardrail = await RunToolInputGuardrailsAsync(currentAgent, request.Context, sessionKey, call, tool, conversation, items, emitAsync, cancellationToken).ConfigureAwait(false);
             if (inputGuardrail is not null)
             {
                 return BuildResult(AgentRunStatus.GuardrailTriggered, sessionKey, currentAgent, items, conversation, request.ResumeState?.TurnsExecuted ?? 0, request.ResumeState?.LastResponseId, guardrailMessage: inputGuardrail);
             }
 
-            var invocation = new AgentToolInvocation<TContext>(currentAgent, request.Context, sessionKey, pending.ToolCallId, pending.ToolName, pending.Arguments, conversation.AsReadOnly());
+            AgentToolInvocation<TContext> invocation = new(currentAgent, request.Context, sessionKey, pending.ToolCallId, pending.ToolName, pending.Arguments, conversation.AsReadOnly());
             AgentToolResult result = await tool.ExecuteAsync(invocation, cancellationToken).ConfigureAwait(false);
             var outputGuardrail = await RunToolOutputGuardrailsAsync(currentAgent, request.Context, sessionKey, call, tool, result, conversation, items, emitAsync, cancellationToken).ConfigureAwait(false);
             if (outputGuardrail is not null)

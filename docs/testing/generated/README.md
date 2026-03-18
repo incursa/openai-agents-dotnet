@@ -1,22 +1,13 @@
----
-workbench:
-  type: doc
-  workItems: []
-  codeRefs: []
-  pathHistory: []
-  path: /docs/testing/generated/README.md
----
-
 # Test Documentation
 
-- Total tests: 34
-- Compliant: 34 (100.0%)
+- Total tests: 44
+- Compliant: 44 (100.0%)
 - Missing required: 0
 - Invalid format: 0
 
 ## Top categories
 
-- Incursa.OpenAI.Agents (34)
+- Incursa.OpenAI.Agents (44)
 
 ## Browse
 

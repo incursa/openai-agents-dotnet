@@ -30,7 +30,8 @@ The .NET flavor keeps core orchestration concepts intact:
 - OpenAI API key
 - A terminal with this repo checked out
 
-Set the key for your shell:
+You can either pass the key directly through `AddOpenAiResponses(options => options.ApiKey = "...")`
+or set it for your shell:
 
 ```bash
 export OPENAI_API_KEY=sk-...
@@ -57,6 +58,7 @@ This sample demonstrates:
 - approvals
 - streamable MCP invocation
 - file-backed session persistence
+- Azure Blob or S3 session persistence are available through separate provider packages for production deployments
 
 ### Run the host sample
 

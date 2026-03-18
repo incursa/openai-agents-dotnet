@@ -73,6 +73,8 @@ If consuming published packages:
 ```bash
 dotnet add package Incursa.OpenAI.Agents
 dotnet add package Incursa.OpenAI.Agents.Extensions
+dotnet add package Incursa.OpenAI.Agents.Storage.Azure
+dotnet add package Incursa.OpenAI.Agents.Storage.S3
 ```
 
 If working in this repository:
@@ -80,6 +82,15 @@ If working in this repository:
 ```bash
 dotnet restore
 dotnet build
+```
+
+Or pass the key directly in configuration:
+
+```csharp
+services.AddOpenAiResponses(options =>
+{
+    options.ApiKey = "sk-...";
+});
 ```
 
 ## Configuration

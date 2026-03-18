@@ -9,7 +9,7 @@ Included in this package:
 - resumable `AgentRunState<TContext>` for approval workflows
 - per-user MCP auth abstractions through `McpAuthContext` and `IUserScopedMcpAuthResolver`
 - typed `AgentRunOptions<TContext>` for previous-response continuation, handoff input normalization, model input filtering, reasoning item ID policy, and run-level guardrails
-- `FileAgentSessionStore`, `IVersionedAgentSessionStore`, and `AgentSessionStoreOptions` for lightweight durable sessions with optimistic concurrency
+- `IAgentSessionStore` as the session persistence seam, `FileAgentSessionStore` as the built-in durable implementation, and `IVersionedAgentSessionStore`/`AgentSessionStoreOptions` for optimistic concurrency and retention
 - `AgentSessionRecovery` helpers for persisted approval resume flows
 - `IAgentRuntimeObserver` and runtime observation events for host-level logging/metrics adapters
 - `AgentBuilder<TContext>` and `AgentRunRequest<TContext>` helper methods for lower-ceremony app code

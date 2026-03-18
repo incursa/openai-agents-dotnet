@@ -55,7 +55,7 @@ public sealed class AgentBuilderTests
     public void AgentRunRequest_HelpersCreateResumeAndPreviousResponseRequests()
     {
         Agent<TestContext> agent = AgentBuilder.Create<TestContext>("triage").Build();
-        var state = new AgentRunState<TestContext>(
+        AgentRunState<TestContext> state = new(
             "session-1",
             agent,
             [new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "hello" }],
@@ -68,8 +68,8 @@ public sealed class AgentBuilderTests
             .WithSession("session-1")
             .WithPreviousResponse("resp-2");
 
-        var resumedApproved = AgentRunRequest<TestContext>.ResumeApproved(state, new TestContext(), "call-1");
-        var resumedRejected = AgentRunRequest<TestContext>.ResumeRejected(state, new TestContext(), "call-1", "denied");
+        AgentRunRequest<TestContext> resumedApproved = AgentRunRequest<TestContext>.ResumeApproved(state, new TestContext(), "call-1");
+        AgentRunRequest<TestContext> resumedRejected = AgentRunRequest<TestContext>.ResumeRejected(state, new TestContext(), "call-1", "denied");
 
         Assert.Equal("session-1", request.SessionKey);
         Assert.Equal("resp-2", request.Options?.PreviousResponseId);

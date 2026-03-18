@@ -16,7 +16,7 @@ public sealed class OpenAiResponsesTests
     [Fact]
     public async Task RequestMapper_MapsToolsHandoffsAndStructuredOutput()
     {
-        var mailAgent = new Agent<TestContext>
+        Agent<TestContext> mailAgent = new()
         {
             Name = "mail specialist",
             Model = "gpt-5.4",
@@ -24,7 +24,7 @@ public sealed class OpenAiResponsesTests
             HandoffDescription = "Handles mailbox work.",
         };
 
-        var triage = new Agent<TestContext>
+        Agent<TestContext> triage = new()
         {
             Name = "triage",
             Model = "gpt-5.4",
@@ -63,7 +63,7 @@ public sealed class OpenAiResponsesTests
             ],
         };
 
-        var mapper = new OpenAiResponsesRequestMapper();
+        OpenAiResponsesRequestMapper mapper = new();
         OpenAiResponsesTurnPlan<TestContext> plan = await mapper.CreateAsync(new AgentTurnRequest<TestContext>(
             triage,
             new TestContext("user-1", "tenant-1"),
@@ -92,8 +92,8 @@ public sealed class OpenAiResponsesTests
     [Fact]
     public async Task TurnExecutor_AddsLocalMcpToolsToRequestBody()
     {
-        var requests = new List<JsonObject>();
-        var responses = new Queue<OpenAiResponsesResponse>([
+        List<JsonObject> requests = new();
+        Queue<OpenAiResponsesResponse> responses = new([
             new OpenAiResponsesResponse("resp-1", new JsonObject
             {
                 ["id"] = "resp-1",
@@ -115,8 +115,8 @@ public sealed class OpenAiResponsesTests
             }),
         ]);
 
-        var client = new RecordingResponsesClient(requests, responses);
-        var mcpHandler = new RecordingHandler((_, count) =>
+        RecordingResponsesClient client = new(requests, responses);
+        RecordingHandler mcpHandler = new((_, count) =>
         {
             var payload = count == 1
                 ? """{"jsonrpc":"2.0","id":"1","result":{"tools":[{"name":"list_messages","description":"List mail","inputSchema":{"type":"object"}}]}}"""
@@ -127,11 +127,11 @@ public sealed class OpenAiResponsesTests
             };
         });
 
-        var executor = new OpenAiResponsesTurnExecutor<TestContext>(
+        OpenAiResponsesTurnExecutor<TestContext> executor = new(
             client,
             new HttpClient(mcpHandler));
 
-        var agent = new Agent<TestContext>
+        Agent<TestContext> agent = new()
         {
             Name = "triage",
             Model = "gpt-5.4",
@@ -166,14 +166,14 @@ public sealed class OpenAiResponsesTests
     [Fact]
     public async Task RequestMapper_NormalizesHandoffModelInputAfterHandoff()
     {
-        var delegateAgent = new Agent<TestContext>
+        Agent<TestContext> delegateAgent = new()
         {
             Name = "delegate",
             Model = "gpt-5.4",
             Instructions = "Handle the delegated task.",
         };
 
-        var mapper = new OpenAiResponsesRequestMapper();
+        OpenAiResponsesRequestMapper mapper = new();
         OpenAiResponsesTurnPlan<TestContext> plan = await mapper.CreateAsync(new AgentTurnRequest<TestContext>(
             delegateAgent,
             new TestContext("user-1", "tenant-1"),
@@ -202,14 +202,14 @@ public sealed class OpenAiResponsesTests
     [Fact]
     public async Task RequestMapper_UsesRunLevelModelInputFilter()
     {
-        var agent = new Agent<TestContext>
+        Agent<TestContext> agent = new()
         {
             Name = "delegate",
             Model = "gpt-5.4",
             Instructions = "Handle the delegated task.",
         };
 
-        var mapper = new OpenAiResponsesRequestMapper();
+        OpenAiResponsesRequestMapper mapper = new();
         OpenAiResponsesTurnPlan<TestContext> plan = await mapper.CreateAsync(new AgentTurnRequest<TestContext>(
             agent,
             new TestContext("user-1", "tenant-1"),
@@ -236,14 +236,14 @@ public sealed class OpenAiResponsesTests
     [Fact]
     public async Task RequestMapper_OmitsReasoningIdsWhenConfigured()
     {
-        var agent = new Agent<TestContext>
+        Agent<TestContext> agent = new()
         {
             Name = "delegate",
             Model = "gpt-5.4",
             Instructions = "Handle the delegated task.",
         };
 
-        var mapper = new OpenAiResponsesRequestMapper();
+        OpenAiResponsesRequestMapper mapper = new();
         OpenAiResponsesTurnPlan<TestContext> plan = await mapper.CreateAsync(new AgentTurnRequest<TestContext>(
             agent,
             new TestContext("user-1", "tenant-1"),
@@ -268,7 +268,7 @@ public sealed class OpenAiResponsesTests
     [Fact]
     public async Task StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse()
     {
-        var streamClient = new StreamingResponsesClient([
+        StreamingResponsesClient streamClient = new([
             [
                 new OpenAiResponsesStreamEvent("response.output_item.added", new JsonObject
                 {
@@ -324,8 +324,8 @@ public sealed class OpenAiResponsesTests
             ],
         ]);
 
-        var executor = new OpenAiResponsesTurnExecutor<TestContext>(streamClient);
-        var events = new List<AgentStreamEvent>();
+        OpenAiResponsesTurnExecutor<TestContext> executor = new(streamClient);
+        List<AgentStreamEvent> events = new();
         AgentTurnResponse<TestContext> response = await executor.ExecuteStreamingTurnAsync(
             new AgentTurnRequest<TestContext>(
                 new Agent<TestContext>

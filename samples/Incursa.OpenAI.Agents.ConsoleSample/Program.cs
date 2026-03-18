@@ -5,7 +5,7 @@ using Incursa.OpenAI.Agents;
 using Incursa.OpenAI.Agents.Mcp;
 
 var sessionDirectory = Path.Combine(global::System.AppContext.BaseDirectory, "sessions");
-var sessionStore = new FileAgentSessionStore(
+FileAgentSessionStore sessionStore = new(
     sessionDirectory,
     new AgentSessionStoreOptions
     {
@@ -32,7 +32,7 @@ Agent<AppContext> triageAgent = AgentBuilder
     .AddHandoff("mail", mailAgent, "Delegate mailbox work.")
     .Build();
 
-var runner = new OpenAiResponsesRunner(
+OpenAiResponsesRunner runner = new(
     new SampleResponsesClient(),
     sessionStore,
     new ApprovalRequiredForSensitiveToolsService(),
@@ -46,7 +46,7 @@ var runner = new OpenAiResponsesRunner(
     },
     observer: null);
 
-var context = new AppContext(new AppUser("user-1", "tenant-1", "mailbox-1", "conn-1"));
+AppContext context = new(new AppUser("user-1", "tenant-1", "mailbox-1", "conn-1"));
 AgentRunRequest<AppContext> request = AgentRunRequest<AppContext>
     .FromUserInput(triageAgent, "Check my inbox for unread messages.", context)
     .WithSession("sample-session");

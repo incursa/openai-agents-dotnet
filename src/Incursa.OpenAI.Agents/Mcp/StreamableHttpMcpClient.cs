@@ -93,11 +93,11 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
             return Array.Empty<McpToolDescriptor>();
         }
 
-        var tools = new List<McpToolDescriptor>();
+        List<McpToolDescriptor> tools = new();
         foreach (JsonObject toolNode in toolsArray.OfType<JsonObject>())
         {
             // Convert raw tool RPC payload into a strongly typed descriptor.
-            var descriptor = new McpToolDescriptor(
+            McpToolDescriptor descriptor = new(
                 toolNode["name"]?.GetValue<string>() ?? string.Empty,
                 toolNode["description"]?.GetValue<string>(),
                 toolNode["inputSchema"],
@@ -227,7 +227,7 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
                 if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
                 {
                     // Auth failures are terminal for this call and surfaced as explicit auth exceptions.
-                    var authException = new McpAuthenticationException(
+                    McpAuthenticationException authException = new(
                         ServerLabel,
                         method,
                         toolName,
@@ -247,7 +247,7 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
                         continue;
                     }
 
-                    var serverException = new McpServerException(
+                    McpServerException serverException = new(
                         ServerLabel,
                         method,
                         toolName,
@@ -262,7 +262,7 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
                     // JSON-RPC error envelopes are mapped to server exceptions with error code context.
                     var code = error["code"]?.GetValue<int?>();
                     var messageText = error["message"]?.GetValue<string>() ?? "Unknown MCP error.";
-                    var serverException = new McpServerException(
+                    McpServerException serverException = new(
                         ServerLabel,
                         method,
                         toolName,
@@ -283,7 +283,7 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
             }
             catch (HttpRequestException ex) when (!cancellationToken.IsCancellationRequested)
             {
-                var transportException = new McpTransportException(
+                McpTransportException transportException = new(
                     ServerLabel,
                     method,
                     toolName,
@@ -294,7 +294,7 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
             }
             catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
             {
-                var transportException = new McpTransportException(
+                McpTransportException transportException = new(
                     ServerLabel,
                     method,
                     toolName,
@@ -309,7 +309,7 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
     private async Task<HttpRequestMessage> CreateRequestMessageAsync(StreamableHttpMcpRequest request, CancellationToken cancellationToken)
     {
         // Build a JSON-RPC request and combine static headers + resolved auth resolver headers.
-        var message = new HttpRequestMessage(HttpMethod.Post, ServerUrl)
+        HttpRequestMessage message = new(HttpMethod.Post, ServerUrl)
         {
             Content = JsonContent.Create(new JsonObject
             {

@@ -23,12 +23,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
+    <ProjectReference Include="..\..\src\Incursa.OpenAI.Agents.Extensions\Incursa.OpenAI.Agents.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\Incursa.OpenAI.Agents.Storage.Azure\Incursa.OpenAI.Agents.Storage.Azure.csproj" />
+    <ProjectReference Include="..\..\src\Incursa.OpenAI.Agents.Storage.S3\Incursa.OpenAI.Agents.Storage.S3.csproj" />
+    <ProjectReference Include="..\..\src\Incursa.OpenAI.Agents\Incursa.OpenAI.Agents.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Incursa.OpenAI.Agents\Incursa.OpenAI.Agents.csproj" />
-    <ProjectReference Include="..\..\src\Incursa.OpenAI.Agents.Extensions\Incursa.OpenAI.Agents.Extensions.csproj" />
+    <Using Include="Xunit" />
   </ItemGroup>
 
 </Project>

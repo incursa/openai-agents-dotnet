@@ -1,22 +1,13 @@
----
-workbench:
-  type: doc
-  workItems: []
-  codeRefs: []
-  pathHistory: []
-  path: /docs/testing/generated/stats.md
----
-
 # Test documentation stats
 
-Generated at (UTC): 2026-03-18T05:32:47.4041305Z
+Generated at (UTC): 1970-01-01T00:00:00Z
 
 ## Summary
 
 | Metric | Count |
 | --- | ---: |
-| Total | 34 |
-| Compliant | 34 |
+| Total | 44 |
+| Compliant | 44 |
 | Missing required | 0 |
 | Invalid format | 0 |
 
@@ -24,7 +15,7 @@ Generated at (UTC): 2026-03-18T05:32:47.4041305Z
 
 | Category | Total | Compliant |
 | --- | ---: | ---: |
-| Incursa.OpenAI.Agents | 34 | 34 |
+| Incursa.OpenAI.Agents | 44 | 44 |
 
 ## By tag
 
@@ -35,4 +26,6 @@ Generated at (UTC): 2026-03-18T05:32:47.4041305Z
 
 | Project | Total | Compliant |
 | --- | ---: | ---: |
-| Incursa.OpenAI.Agents.Tests | 34 | 34 |
+| Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests | 3 | 3 |
+| Incursa.OpenAI.Agents.Storage.S3.IntegrationTests | 3 | 3 |
+| Incursa.OpenAI.Agents.Tests | 38 | 38 |

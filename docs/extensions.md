@@ -21,14 +21,17 @@ runtime integration surface implemented specifically for this repository.
 `Incursa.OpenAI.Agents.Extensions` standardizes startup for host-based applications:
 
 - Runner and session registration in DI.
-- Optional file-backed sessions.
+- Optional file-backed sessions or custom `IAgentSessionStore` implementations.
+- Optional production adapters live in separate packages, including Azure Blob and S3-backed session stores.
 - OpenAI Responses + MCP wiring in one hosted step.
 
 ## API surface
 
 - `AddIncursaAgents(IServiceCollection)` registers the baseline runtime services.
 - `AddIncursaAgents(IServiceCollection, Action<AgentRuntimeOptions>?)` accepts runtime-level configuration.
+- `AddAgentSessionStore(IServiceCollection, IAgentSessionStore)` and `AddVersionedAgentSessionStore(IServiceCollection, IVersionedAgentSessionStore)` replace the default store with a custom backend.
 - `AddFileAgentSessions(IServiceCollection, string directoryPath, Action<AgentSessionRetentionOptions>?)` configures durable, file-backed state.
+- `AddAzureAgentSessions(IServiceCollection, Action<AzureAgentSessionStoreOptions>?)` and `AddS3AgentSessions(IServiceCollection, Action<S3AgentSessionStoreOptions>?)` live in the provider packages for cloud-backed durable state.
 - `AddOpenAiResponses(IServiceCollection, Action<OpenAiResponsesOptions>?)` registers responses + runner dependencies.
 
 ## Option surface
@@ -47,6 +50,8 @@ runtime integration surface implemented specifically for this repository.
   - `McpRetryCount`
   - `McpRetryDelay`
   - `EnableMcpLoggingObserver`
+
+`ApiKey` can be supplied directly in code, through configuration binding, or from an environment variable if that is more convenient for local execution.
 
 ## Minimal host sample
 
@@ -71,7 +76,7 @@ services.AddFileAgentSessions("sessions", options =>
 });
 services.AddOpenAiResponses(options =>
 {
-    options.ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+    options.ApiKey = "sk-..."; // or load from configuration/environment
     options.McpRetryCount = 3;
     options.McpRetryDelay = TimeSpan.FromMilliseconds(250);
 });
