@@ -46,7 +46,7 @@ jobs:
           if (-not $tag) {
             throw "Manual publish requires 'version' input."
           }
-          pwsh -File scripts/release/validate-public-api-versioning.ps1 -Tag $tag
+          & "./scripts/release/validate-public-api-versioning.ps1" -Tag $tag
 
       - name: Build
         run: dotnet build Incursa.OpenAI.Agents.slnx --no-restore --configuration Release -p:ContinuousIntegrationBuild=true
