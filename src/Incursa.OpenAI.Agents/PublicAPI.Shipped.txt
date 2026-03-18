@@ -1,0 +1,1427 @@
+#nullable enable
+const Incursa.OpenAI.Agents.AgentItemTypes.ApprovalRejected = "approval_rejected" -> string!
+const Incursa.OpenAI.Agents.AgentItemTypes.ApprovalRequired = "approval_required" -> string!
+const Incursa.OpenAI.Agents.AgentItemTypes.FinalOutput = "final_output" -> string!
+const Incursa.OpenAI.Agents.AgentItemTypes.GuardrailTripwire = "guardrail_tripwire" -> string!
+const Incursa.OpenAI.Agents.AgentItemTypes.HandoffOccurred = "handoff_occurred" -> string!
+const Incursa.OpenAI.Agents.AgentItemTypes.HandoffRequested = "handoff_requested" -> string!
+const Incursa.OpenAI.Agents.AgentItemTypes.McpListTools = "mcp_list_tools" -> string!
+const Incursa.OpenAI.Agents.AgentItemTypes.MessageOutput = "message_output" -> string!
+const Incursa.OpenAI.Agents.AgentItemTypes.Reasoning = "reasoning" -> string!
+const Incursa.OpenAI.Agents.AgentItemTypes.ToolCall = "tool_call" -> string!
+const Incursa.OpenAI.Agents.AgentItemTypes.ToolOutput = "tool_output" -> string!
+const Incursa.OpenAI.Agents.AgentItemTypes.UserInput = "user_input" -> string!
+const Incursa.OpenAI.Agents.AgentRuntimeEventNames.ApprovalRejected = "approval_rejected" -> string!
+const Incursa.OpenAI.Agents.AgentRuntimeEventNames.ApprovalRequired = "approval_required" -> string!
+const Incursa.OpenAI.Agents.AgentRuntimeEventNames.ApprovalResumed = "approval_resumed" -> string!
+const Incursa.OpenAI.Agents.AgentRuntimeEventNames.GuardrailTriggered = "guardrail_triggered" -> string!
+const Incursa.OpenAI.Agents.AgentRuntimeEventNames.HandoffApplied = "handoff_applied" -> string!
+const Incursa.OpenAI.Agents.AgentRuntimeEventNames.MaxTurnsExceeded = "max_turns_exceeded" -> string!
+const Incursa.OpenAI.Agents.AgentRuntimeEventNames.RunCompleted = "run_completed" -> string!
+const Incursa.OpenAI.Agents.AgentRuntimeEventNames.RunFailed = "run_failed" -> string!
+const Incursa.OpenAI.Agents.AgentRuntimeEventNames.RunStarted = "run_started" -> string!
+const Incursa.OpenAI.Agents.AgentRuntimeEventNames.TurnCompleted = "turn_completed" -> string!
+const Incursa.OpenAI.Agents.AgentRuntimeEventNames.TurnStarted = "turn_started" -> string!
+const Incursa.OpenAI.Agents.AgentStreamEventTypes.AgentUpdated = "agent_updated" -> string!
+const Incursa.OpenAI.Agents.AgentStreamEventTypes.RawModelEvent = "raw_model_event" -> string!
+const Incursa.OpenAI.Agents.AgentStreamEventTypes.RunItem = "run_item" -> string!
+Incursa.OpenAI.Agents.Agent<TContext>
+Incursa.OpenAI.Agents.Agent<TContext>.Agent() -> void
+Incursa.OpenAI.Agents.Agent<TContext>.CloneWith(System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IAgentTool<TContext>!>? tools, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition!>? hostedMcpTools, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition!>? streamableMcpServers) -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.Agent<TContext>.CloneWith(System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IAgentTool<TContext>!>? tools, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition!>? hostedMcpTools) -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.Agent<TContext>.CloneWith(System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IAgentTool<TContext>!>? tools) -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.Agent<TContext>.HandoffDescription.get -> string?
+Incursa.OpenAI.Agents.Agent<TContext>.HandoffDescription.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.Handoffs.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentHandoff<TContext>!>!
+Incursa.OpenAI.Agents.Agent<TContext>.Handoffs.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.HostedMcpTools.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition!>!
+Incursa.OpenAI.Agents.Agent<TContext>.HostedMcpTools.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.InputGuardrails.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IInputGuardrail<TContext>!>!
+Incursa.OpenAI.Agents.Agent<TContext>.InputGuardrails.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.Instructions.get -> Incursa.OpenAI.Agents.AgentInstructions<TContext>?
+Incursa.OpenAI.Agents.Agent<TContext>.Instructions.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>!
+Incursa.OpenAI.Agents.Agent<TContext>.Metadata.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.Model.get -> string?
+Incursa.OpenAI.Agents.Agent<TContext>.Model.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.ModelSettings.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>!
+Incursa.OpenAI.Agents.Agent<TContext>.ModelSettings.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.Name.get -> string!
+Incursa.OpenAI.Agents.Agent<TContext>.Name.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.OutputContract.get -> Incursa.OpenAI.Agents.AgentOutputContract?
+Incursa.OpenAI.Agents.Agent<TContext>.OutputContract.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.OutputGuardrails.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IOutputGuardrail<TContext>!>!
+Incursa.OpenAI.Agents.Agent<TContext>.OutputGuardrails.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.StreamableMcpServers.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition!>!
+Incursa.OpenAI.Agents.Agent<TContext>.StreamableMcpServers.init -> void
+Incursa.OpenAI.Agents.Agent<TContext>.Tools.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IAgentTool<TContext>!>!
+Incursa.OpenAI.Agents.Agent<TContext>.Tools.init -> void
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentApprovalContext<TContext>!
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.AgentApprovalContext(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, Incursa.OpenAI.Agents.AgentPendingApproval<TContext>! pendingApproval, Incursa.OpenAI.Agents.IAgentTool<TContext>! tool, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.Equals(Incursa.OpenAI.Agents.AgentApprovalContext<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.PendingApproval.get -> Incursa.OpenAI.Agents.AgentPendingApproval<TContext>!
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.PendingApproval.init -> void
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.Tool.get -> Incursa.OpenAI.Agents.IAgentTool<TContext>!
+Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.Tool.init -> void
+Incursa.OpenAI.Agents.AgentApprovalRequest
+Incursa.OpenAI.Agents.AgentApprovalRequest.<Clone>$() -> Incursa.OpenAI.Agents.AgentApprovalRequest!
+Incursa.OpenAI.Agents.AgentApprovalRequest.AgentApprovalRequest(string! agentName, string! toolName, string! toolCallId, string? reason, System.Text.Json.Nodes.JsonNode? arguments) -> void
+Incursa.OpenAI.Agents.AgentApprovalRequest.AgentName.get -> string!
+Incursa.OpenAI.Agents.AgentApprovalRequest.AgentName.init -> void
+Incursa.OpenAI.Agents.AgentApprovalRequest.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentApprovalRequest.Arguments.init -> void
+Incursa.OpenAI.Agents.AgentApprovalRequest.Equals(Incursa.OpenAI.Agents.AgentApprovalRequest? other) -> bool
+Incursa.OpenAI.Agents.AgentApprovalRequest.Reason.get -> string?
+Incursa.OpenAI.Agents.AgentApprovalRequest.Reason.init -> void
+Incursa.OpenAI.Agents.AgentApprovalRequest.ToolCallId.get -> string!
+Incursa.OpenAI.Agents.AgentApprovalRequest.ToolCallId.init -> void
+Incursa.OpenAI.Agents.AgentApprovalRequest.ToolName.get -> string!
+Incursa.OpenAI.Agents.AgentApprovalRequest.ToolName.init -> void
+Incursa.OpenAI.Agents.AgentApprovalResponse
+Incursa.OpenAI.Agents.AgentApprovalResponse.<Clone>$() -> Incursa.OpenAI.Agents.AgentApprovalResponse!
+Incursa.OpenAI.Agents.AgentApprovalResponse.AgentApprovalResponse(string! toolCallId, bool approved, string? reason) -> void
+Incursa.OpenAI.Agents.AgentApprovalResponse.AgentApprovalResponse(string! toolCallId, bool approved) -> void
+Incursa.OpenAI.Agents.AgentApprovalResponse.Approved.get -> bool
+Incursa.OpenAI.Agents.AgentApprovalResponse.Approved.init -> void
+Incursa.OpenAI.Agents.AgentApprovalResponse.Equals(Incursa.OpenAI.Agents.AgentApprovalResponse? other) -> bool
+Incursa.OpenAI.Agents.AgentApprovalResponse.Reason.get -> string?
+Incursa.OpenAI.Agents.AgentApprovalResponse.Reason.init -> void
+Incursa.OpenAI.Agents.AgentApprovalResponse.ToolCallId.get -> string!
+Incursa.OpenAI.Agents.AgentApprovalResponse.ToolCallId.init -> void
+Incursa.OpenAI.Agents.AgentBuilder
+Incursa.OpenAI.Agents.AgentBuilder<TContext>
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.AddHandoff(string! name, Incursa.OpenAI.Agents.Agent<TContext>! targetAgent, string? description, string? toolNameOverride, System.Text.Json.Nodes.JsonNode? inputSchema) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.AddHandoff(string! name, Incursa.OpenAI.Agents.Agent<TContext>! targetAgent, string? description, string? toolNameOverride) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.AddHandoff(string! name, Incursa.OpenAI.Agents.Agent<TContext>! targetAgent, string? description) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.AddHandoff(string! name, Incursa.OpenAI.Agents.Agent<TContext>! targetAgent) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.AddTool(string! name, System.Func<Incursa.OpenAI.Agents.AgentToolInvocation<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentToolResult!>>! executeAsync, string? description, bool requiresApproval) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.AddTool(string! name, System.Func<Incursa.OpenAI.Agents.AgentToolInvocation<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentToolResult!>>! executeAsync, string? description, System.Text.Json.Nodes.JsonNode? inputSchema, bool requiresApproval) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.AddTool(string! name, System.Func<Incursa.OpenAI.Agents.AgentToolInvocation<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentToolResult!>>! executeAsync, string? description, System.Text.Json.Nodes.JsonNode? inputSchema) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.AddTool(string! name, System.Func<Incursa.OpenAI.Agents.AgentToolInvocation<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentToolResult!>>! executeAsync, string? description) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.AddTool(string! name, System.Func<Incursa.OpenAI.Agents.AgentToolInvocation<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentToolResult!>>! executeAsync) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.AgentBuilder(string! name) -> void
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.Build() -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithHandoff(Incursa.OpenAI.Agents.AgentHandoff<TContext>! handoff) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithHandoffDescription(string! handoffDescription) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithHostedMcpTool(Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition! tool) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithInputGuardrail(Incursa.OpenAI.Agents.IInputGuardrail<TContext>! guardrail) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithInstructions(Incursa.OpenAI.Agents.AgentInstructions<TContext>! instructions) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithInstructions(string! instructions) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithMetadata(string! key, object? value) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithModel(string! model) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithModelSetting(string! key, object? value) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithOutputContract(Incursa.OpenAI.Agents.AgentOutputContract! outputContract) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithOutputGuardrail(Incursa.OpenAI.Agents.IOutputGuardrail<TContext>! guardrail) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithStreamableMcpServer(Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition! server) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentBuilder<TContext>.WithTool(Incursa.OpenAI.Agents.IAgentTool<TContext>! tool) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+Incursa.OpenAI.Agents.AgentConversationItem
+Incursa.OpenAI.Agents.AgentConversationItem.<Clone>$() -> Incursa.OpenAI.Agents.AgentConversationItem!
+Incursa.OpenAI.Agents.AgentConversationItem.AgentConversationItem(string! itemType, string! role, string! agentName, string? name, string? text, string? toolCallId, System.Text.Json.Nodes.JsonNode? data, string? status, System.DateTimeOffset? timestampUtc) -> void
+Incursa.OpenAI.Agents.AgentConversationItem.AgentConversationItem(string! itemType, string! role, string! agentName) -> void
+Incursa.OpenAI.Agents.AgentConversationItem.AgentName.get -> string!
+Incursa.OpenAI.Agents.AgentConversationItem.AgentName.init -> void
+Incursa.OpenAI.Agents.AgentConversationItem.Data.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentConversationItem.Data.init -> void
+Incursa.OpenAI.Agents.AgentConversationItem.Equals(Incursa.OpenAI.Agents.AgentConversationItem? other) -> bool
+Incursa.OpenAI.Agents.AgentConversationItem.ItemType.get -> string!
+Incursa.OpenAI.Agents.AgentConversationItem.ItemType.init -> void
+Incursa.OpenAI.Agents.AgentConversationItem.Name.get -> string?
+Incursa.OpenAI.Agents.AgentConversationItem.Name.init -> void
+Incursa.OpenAI.Agents.AgentConversationItem.Role.get -> string!
+Incursa.OpenAI.Agents.AgentConversationItem.Role.init -> void
+Incursa.OpenAI.Agents.AgentConversationItem.Status.get -> string?
+Incursa.OpenAI.Agents.AgentConversationItem.Status.init -> void
+Incursa.OpenAI.Agents.AgentConversationItem.Text.get -> string?
+Incursa.OpenAI.Agents.AgentConversationItem.Text.init -> void
+Incursa.OpenAI.Agents.AgentConversationItem.TimestampUtc.get -> System.DateTimeOffset?
+Incursa.OpenAI.Agents.AgentConversationItem.TimestampUtc.init -> void
+Incursa.OpenAI.Agents.AgentConversationItem.ToolCallId.get -> string?
+Incursa.OpenAI.Agents.AgentConversationItem.ToolCallId.init -> void
+Incursa.OpenAI.Agents.AgentConversationItem.ToRunItem() -> Incursa.OpenAI.Agents.AgentRunItem!
+Incursa.OpenAI.Agents.AgentFinalOutput
+Incursa.OpenAI.Agents.AgentFinalOutput.<Clone>$() -> Incursa.OpenAI.Agents.AgentFinalOutput!
+Incursa.OpenAI.Agents.AgentFinalOutput.AgentFinalOutput() -> void
+Incursa.OpenAI.Agents.AgentFinalOutput.AgentFinalOutput(string? text, System.Text.Json.Nodes.JsonNode? structuredValue, System.Type? outputType, string? responseId) -> void
+Incursa.OpenAI.Agents.AgentFinalOutput.AgentFinalOutput(string? text) -> void
+Incursa.OpenAI.Agents.AgentFinalOutput.Equals(Incursa.OpenAI.Agents.AgentFinalOutput? other) -> bool
+Incursa.OpenAI.Agents.AgentFinalOutput.OutputType.get -> System.Type?
+Incursa.OpenAI.Agents.AgentFinalOutput.OutputType.init -> void
+Incursa.OpenAI.Agents.AgentFinalOutput.ResponseId.get -> string?
+Incursa.OpenAI.Agents.AgentFinalOutput.ResponseId.init -> void
+Incursa.OpenAI.Agents.AgentFinalOutput.StructuredValue.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentFinalOutput.StructuredValue.init -> void
+Incursa.OpenAI.Agents.AgentFinalOutput.Text.get -> string?
+Incursa.OpenAI.Agents.AgentFinalOutput.Text.init -> void
+Incursa.OpenAI.Agents.AgentHandoff<TContext>
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.AgentHandoff() -> void
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.Description.get -> string?
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.Description.init -> void
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.HistoryTransformerAsync.get -> System.Func<Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!>>?
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.HistoryTransformerAsync.init -> void
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.InputSchema.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.InputSchema.init -> void
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.IsEnabledAsync.get -> System.Func<Incursa.OpenAI.Agents.AgentHandoffContext<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<bool>>?
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.IsEnabledAsync.init -> void
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.Name.get -> string!
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.Name.init -> void
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.OnHandoffAsync.get -> System.Func<Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>?
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.OnHandoffAsync.init -> void
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.TargetAgent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.TargetAgent.init -> void
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.ToolNameOverride.get -> string?
+Incursa.OpenAI.Agents.AgentHandoff<TContext>.ToolNameOverride.init -> void
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentHandoffContext<TContext>!
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.AgentHandoffContext(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.Equals(Incursa.OpenAI.Agents.AgentHandoffContext<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>!
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.AgentHandoffHistoryContext(Incursa.OpenAI.Agents.Agent<TContext>! agent, Incursa.OpenAI.Agents.Agent<TContext>! targetAgent, TContext context, string! sessionKey, System.Text.Json.Nodes.JsonNode? arguments, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.Arguments.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.Equals(Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.TargetAgent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.TargetAgent.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryMode
+Incursa.OpenAI.Agents.AgentHandoffHistoryMode.NormalizeModelInputAfterHandoff = 1 -> Incursa.OpenAI.Agents.AgentHandoffHistoryMode
+Incursa.OpenAI.Agents.AgentHandoffHistoryMode.PreserveFullHistory = 0 -> Incursa.OpenAI.Agents.AgentHandoffHistoryMode
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>!
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.AgentHandoffHistoryTransformContext(string! currentAgentName, string! targetAgentName, TContext context, string! sessionKey, System.Text.Json.Nodes.JsonNode? arguments, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.Arguments.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.CurrentAgentName.get -> string!
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.CurrentAgentName.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.Equals(Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.TargetAgentName.get -> string!
+Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.TargetAgentName.init -> void
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>!
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.AgentHandoffInvocation(Incursa.OpenAI.Agents.Agent<TContext>! agent, Incursa.OpenAI.Agents.Agent<TContext>! targetAgent, TContext context, string! sessionKey, System.Text.Json.Nodes.JsonNode? arguments, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.Arguments.init -> void
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.Equals(Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.TargetAgent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.TargetAgent.init -> void
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>!
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.AgentHandoffRequest(string! handoffName, Incursa.OpenAI.Agents.Agent<TContext>! targetAgent, System.Text.Json.Nodes.JsonNode? arguments, string? reason) -> void
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.AgentHandoffRequest(string! handoffName, Incursa.OpenAI.Agents.Agent<TContext>! targetAgent, System.Text.Json.Nodes.JsonNode? arguments) -> void
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.AgentHandoffRequest(string! handoffName, Incursa.OpenAI.Agents.Agent<TContext>! targetAgent) -> void
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.Arguments.init -> void
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.Equals(Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.HandoffName.get -> string!
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.HandoffName.init -> void
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.Reason.get -> string?
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.Reason.init -> void
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.TargetAgent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.TargetAgent.init -> void
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentInstructionContext<TContext>!
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.AgentInstructionContext(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.Equals(Incursa.OpenAI.Agents.AgentInstructionContext<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentInstructions<TContext>
+Incursa.OpenAI.Agents.AgentInstructions<TContext>.ResolveAsync(Incursa.OpenAI.Agents.AgentInstructionContext<TContext>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<string?>
+Incursa.OpenAI.Agents.AgentInstructions<TContext>.ResolveAsync(Incursa.OpenAI.Agents.AgentInstructionContext<TContext>! context) -> System.Threading.Tasks.ValueTask<string?>
+Incursa.OpenAI.Agents.AgentItemTypes
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>!
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.AgentModelInputFilterContext(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, int turnNumber, string? previousResponseId, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.Equals(Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.PreviousResponseId.get -> string?
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.PreviousResponseId.init -> void
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.TurnNumber.get -> int
+Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.TurnNumber.init -> void
+Incursa.OpenAI.Agents.AgentOutputContract
+Incursa.OpenAI.Agents.AgentOutputContract.<Clone>$() -> Incursa.OpenAI.Agents.AgentOutputContract!
+Incursa.OpenAI.Agents.AgentOutputContract.AgentOutputContract(System.Type! clrType, string? name) -> void
+Incursa.OpenAI.Agents.AgentOutputContract.AgentOutputContract(System.Type! clrType) -> void
+Incursa.OpenAI.Agents.AgentOutputContract.ClrType.get -> System.Type!
+Incursa.OpenAI.Agents.AgentOutputContract.ClrType.init -> void
+Incursa.OpenAI.Agents.AgentOutputContract.Equals(Incursa.OpenAI.Agents.AgentOutputContract? other) -> bool
+Incursa.OpenAI.Agents.AgentOutputContract.Name.get -> string?
+Incursa.OpenAI.Agents.AgentOutputContract.Name.init -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentPendingApproval<TContext>!
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.AgentPendingApproval(Incursa.OpenAI.Agents.Agent<TContext>! agent, string! toolName, string! toolCallId, System.Text.Json.Nodes.JsonNode? arguments, string? reason, string! toolType) -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.AgentPendingApproval(Incursa.OpenAI.Agents.Agent<TContext>! agent, string! toolName, string! toolCallId, System.Text.Json.Nodes.JsonNode? arguments, string? reason) -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.AgentPendingApproval(Incursa.OpenAI.Agents.Agent<TContext>! agent, string! toolName, string! toolCallId, System.Text.Json.Nodes.JsonNode? arguments) -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.AgentPendingApproval(Incursa.OpenAI.Agents.Agent<TContext>! agent, string! toolName, string! toolCallId) -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.Arguments.init -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.Equals(Incursa.OpenAI.Agents.AgentPendingApproval<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.Reason.get -> string?
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.Reason.init -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.ToolCallId.get -> string!
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.ToolCallId.init -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.ToolName.get -> string!
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.ToolName.init -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.ToolType.get -> string!
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.ToolType.init -> void
+Incursa.OpenAI.Agents.AgentRunItem
+Incursa.OpenAI.Agents.AgentRunItem.<Clone>$() -> Incursa.OpenAI.Agents.AgentRunItem!
+Incursa.OpenAI.Agents.AgentRunItem.AgentName.get -> string!
+Incursa.OpenAI.Agents.AgentRunItem.AgentName.init -> void
+Incursa.OpenAI.Agents.AgentRunItem.AgentRunItem(string! itemType, string! role, string! agentName, string? name, string? text, string? toolCallId, System.Text.Json.Nodes.JsonNode? data, string? status, System.DateTimeOffset? timestampUtc) -> void
+Incursa.OpenAI.Agents.AgentRunItem.AgentRunItem(string! itemType, string! role, string! agentName) -> void
+Incursa.OpenAI.Agents.AgentRunItem.Data.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentRunItem.Data.init -> void
+Incursa.OpenAI.Agents.AgentRunItem.Equals(Incursa.OpenAI.Agents.AgentRunItem? other) -> bool
+Incursa.OpenAI.Agents.AgentRunItem.ItemType.get -> string!
+Incursa.OpenAI.Agents.AgentRunItem.ItemType.init -> void
+Incursa.OpenAI.Agents.AgentRunItem.Name.get -> string?
+Incursa.OpenAI.Agents.AgentRunItem.Name.init -> void
+Incursa.OpenAI.Agents.AgentRunItem.Role.get -> string!
+Incursa.OpenAI.Agents.AgentRunItem.Role.init -> void
+Incursa.OpenAI.Agents.AgentRunItem.Status.get -> string?
+Incursa.OpenAI.Agents.AgentRunItem.Status.init -> void
+Incursa.OpenAI.Agents.AgentRunItem.Text.get -> string?
+Incursa.OpenAI.Agents.AgentRunItem.Text.init -> void
+Incursa.OpenAI.Agents.AgentRunItem.TimestampUtc.get -> System.DateTimeOffset?
+Incursa.OpenAI.Agents.AgentRunItem.TimestampUtc.init -> void
+Incursa.OpenAI.Agents.AgentRunItem.ToConversationItem() -> Incursa.OpenAI.Agents.AgentConversationItem!
+Incursa.OpenAI.Agents.AgentRunItem.ToolCallId.get -> string?
+Incursa.OpenAI.Agents.AgentRunItem.ToolCallId.init -> void
+Incursa.OpenAI.Agents.AgentRunner
+Incursa.OpenAI.Agents.AgentRunner.AgentRunner() -> void
+Incursa.OpenAI.Agents.AgentRunner.AgentRunner(Incursa.OpenAI.Agents.IAgentApprovalService? approvalService) -> void
+Incursa.OpenAI.Agents.AgentRunner.AgentRunner(Incursa.OpenAI.Agents.IAgentRuntimeObserver? observer) -> void
+Incursa.OpenAI.Agents.AgentRunner.AgentRunner(Incursa.OpenAI.Agents.IAgentSessionStore? sessionStore, Incursa.OpenAI.Agents.IAgentApprovalService? approvalService, Incursa.OpenAI.Agents.IAgentRuntimeObserver? observer) -> void
+Incursa.OpenAI.Agents.AgentRunner.AgentRunner(Incursa.OpenAI.Agents.IAgentSessionStore? sessionStore, Incursa.OpenAI.Agents.IAgentApprovalService? approvalService) -> void
+Incursa.OpenAI.Agents.AgentRunner.AgentRunner(Incursa.OpenAI.Agents.IAgentSessionStore? sessionStore) -> void
+Incursa.OpenAI.Agents.AgentRunner.RunAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request, Incursa.OpenAI.Agents.IAgentTurnExecutor<TContext>! turnExecutor, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.AgentRunResult<TContext>!>!
+Incursa.OpenAI.Agents.AgentRunner.RunAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request, Incursa.OpenAI.Agents.IAgentTurnExecutor<TContext>! turnExecutor) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.AgentRunResult<TContext>!>!
+Incursa.OpenAI.Agents.AgentRunner.RunStreamingAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request, Incursa.OpenAI.Agents.IAgentTurnExecutor<TContext>! turnExecutor, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<Incursa.OpenAI.Agents.AgentStreamEvent!>!
+Incursa.OpenAI.Agents.AgentRunner.RunStreamingAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request, Incursa.OpenAI.Agents.IAgentTurnExecutor<TContext>! turnExecutor) -> System.Collections.Generic.IAsyncEnumerable<Incursa.OpenAI.Agents.AgentStreamEvent!>!
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentRunOptions<TContext>!
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.AgentRunOptions() -> void
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.AgentRunOptions(string? previousResponseId, System.Func<Incursa.OpenAI.Agents.AgentToolErrorContext!, string?>? toolErrorFormatter, Incursa.OpenAI.Agents.AgentHandoffHistoryMode handoffHistoryMode, System.Func<Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!>>? handoffHistoryTransformerAsync, System.Func<Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!>>? modelInputFilterAsync, Incursa.OpenAI.Agents.ReasoningItemIdPolicy reasoningItemIdPolicy, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IInputGuardrail<TContext>!>? inputGuardrails, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IOutputGuardrail<TContext>!>? outputGuardrails) -> void
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.Equals(Incursa.OpenAI.Agents.AgentRunOptions<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.HandoffHistoryMode.get -> Incursa.OpenAI.Agents.AgentHandoffHistoryMode
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.HandoffHistoryMode.init -> void
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.HandoffHistoryTransformerAsync.get -> System.Func<Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!>>?
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.HandoffHistoryTransformerAsync.init -> void
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.InputGuardrails.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IInputGuardrail<TContext>!>?
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.InputGuardrails.init -> void
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.ModelInputFilterAsync.get -> System.Func<Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!>>?
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.ModelInputFilterAsync.init -> void
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.OutputGuardrails.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IOutputGuardrail<TContext>!>?
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.OutputGuardrails.init -> void
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.PreviousResponseId.get -> string?
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.PreviousResponseId.init -> void
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.ReasoningItemIdPolicy.get -> Incursa.OpenAI.Agents.ReasoningItemIdPolicy
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.ReasoningItemIdPolicy.init -> void
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.ToolErrorFormatter.get -> System.Func<Incursa.OpenAI.Agents.AgentToolErrorContext!, string?>?
+Incursa.OpenAI.Agents.AgentRunOptions<TContext>.ToolErrorFormatter.init -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.AgentRunRequest(Incursa.OpenAI.Agents.Agent<TContext>! startingAgent, TContext context, string? userInput, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>? inputItems, Incursa.OpenAI.Agents.AgentRunState<TContext>? resumeState, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentApprovalResponse!>? approvalResponses, string? sessionKey, int maxTurns, Incursa.OpenAI.Agents.AgentRunOptions<TContext>? options, long? expectedSessionVersion) -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.AgentRunRequest(Incursa.OpenAI.Agents.Agent<TContext>! startingAgent, TContext context) -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ApprovalResponses.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentApprovalResponse!>?
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ApprovalResponses.init -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.Equals(Incursa.OpenAI.Agents.AgentRunRequest<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ExpectedSessionVersion.get -> long?
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ExpectedSessionVersion.init -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.InputItems.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>?
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.InputItems.init -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.MaxTurns.get -> int
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.MaxTurns.init -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.Options.get -> Incursa.OpenAI.Agents.AgentRunOptions<TContext>?
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.Options.init -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ResumeState.get -> Incursa.OpenAI.Agents.AgentRunState<TContext>?
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ResumeState.init -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.SessionKey.get -> string?
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.StartingAgent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.StartingAgent.init -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.UserInput.get -> string?
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.UserInput.init -> void
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.WithExpectedSessionVersion(long? expectedSessionVersion) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.WithPreviousResponse(string? previousResponseId) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+Incursa.OpenAI.Agents.AgentRunRequest<TContext>.WithSession(string! sessionKey) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+Incursa.OpenAI.Agents.AgentRunResult<TContext>
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentRunResult<TContext>!
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.AgentRunResult(Incursa.OpenAI.Agents.AgentRunStatus status, string! sessionKey, Incursa.OpenAI.Agents.Agent<TContext>! finalAgent, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentRunItem!>! items, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation, int turnsExecuted, Incursa.OpenAI.Agents.AgentFinalOutput? finalOutput, Incursa.OpenAI.Agents.AgentApprovalRequest? approvalRequest, string? guardrailMessage, string? responseId, Incursa.OpenAI.Agents.AgentRunState<TContext>? state) -> void
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.ApprovalRequest.get -> Incursa.OpenAI.Agents.AgentApprovalRequest?
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.ApprovalRequest.init -> void
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.Equals(Incursa.OpenAI.Agents.AgentRunResult<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.FinalAgent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.FinalAgent.init -> void
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.FinalOutput.get -> Incursa.OpenAI.Agents.AgentFinalOutput?
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.FinalOutput.init -> void
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.GuardrailMessage.get -> string?
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.GuardrailMessage.init -> void
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.HasFinalOutput.get -> bool
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.IsInterrupted.get -> bool
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.Items.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentRunItem!>!
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.Items.init -> void
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.RequiresApproval.get -> bool
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.ResponseId.get -> string?
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.ResponseId.init -> void
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.State.get -> Incursa.OpenAI.Agents.AgentRunState<TContext>?
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.State.init -> void
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.Status.get -> Incursa.OpenAI.Agents.AgentRunStatus
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.Status.init -> void
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.TurnsExecuted.get -> int
+Incursa.OpenAI.Agents.AgentRunResult<TContext>.TurnsExecuted.init -> void
+Incursa.OpenAI.Agents.AgentRunState<TContext>
+Incursa.OpenAI.Agents.AgentRunState<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentRunState<TContext>!
+Incursa.OpenAI.Agents.AgentRunState<TContext>.AgentRunState(string! sessionKey, Incursa.OpenAI.Agents.Agent<TContext>! currentAgent, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation, int turnsExecuted, string? lastResponseId, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentPendingApproval<TContext>!>! pendingApprovals) -> void
+Incursa.OpenAI.Agents.AgentRunState<TContext>.AgentRunState(string! sessionKey, Incursa.OpenAI.Agents.Agent<TContext>! currentAgent, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation, int turnsExecuted, string? lastResponseId) -> void
+Incursa.OpenAI.Agents.AgentRunState<TContext>.AgentRunState(string! sessionKey, Incursa.OpenAI.Agents.Agent<TContext>! currentAgent, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation, int turnsExecuted) -> void
+Incursa.OpenAI.Agents.AgentRunState<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentRunState<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentRunState<TContext>.CurrentAgent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentRunState<TContext>.CurrentAgent.init -> void
+Incursa.OpenAI.Agents.AgentRunState<TContext>.Equals(Incursa.OpenAI.Agents.AgentRunState<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentRunState<TContext>.LastResponseId.get -> string?
+Incursa.OpenAI.Agents.AgentRunState<TContext>.LastResponseId.init -> void
+Incursa.OpenAI.Agents.AgentRunState<TContext>.PendingApprovals.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentPendingApproval<TContext>!>!
+Incursa.OpenAI.Agents.AgentRunState<TContext>.PendingApprovals.init -> void
+Incursa.OpenAI.Agents.AgentRunState<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentRunState<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentRunState<TContext>.TurnsExecuted.get -> int
+Incursa.OpenAI.Agents.AgentRunState<TContext>.TurnsExecuted.init -> void
+Incursa.OpenAI.Agents.AgentRunStatus
+Incursa.OpenAI.Agents.AgentRunStatus.ApprovalRequired = 1 -> Incursa.OpenAI.Agents.AgentRunStatus
+Incursa.OpenAI.Agents.AgentRunStatus.Cancelled = 4 -> Incursa.OpenAI.Agents.AgentRunStatus
+Incursa.OpenAI.Agents.AgentRunStatus.Completed = 0 -> Incursa.OpenAI.Agents.AgentRunStatus
+Incursa.OpenAI.Agents.AgentRunStatus.GuardrailTriggered = 2 -> Incursa.OpenAI.Agents.AgentRunStatus
+Incursa.OpenAI.Agents.AgentRunStatus.MaxTurnsExceeded = 3 -> Incursa.OpenAI.Agents.AgentRunStatus
+Incursa.OpenAI.Agents.AgentRuntimeEventNames
+Incursa.OpenAI.Agents.AgentRuntimeObservation
+Incursa.OpenAI.Agents.AgentRuntimeObservation.<Clone>$() -> Incursa.OpenAI.Agents.AgentRuntimeObservation!
+Incursa.OpenAI.Agents.AgentRuntimeObservation.AgentName.get -> string!
+Incursa.OpenAI.Agents.AgentRuntimeObservation.AgentName.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.AgentRuntimeObservation(string! eventName, string! sessionKey, string! agentName, int? turnNumber, Incursa.OpenAI.Agents.AgentRunStatus? status, string? toolName, string? toolCallId, string? fromAgentName, string? toAgentName, string? responseId, string? detail, System.TimeSpan? duration, System.Exception? exception) -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.AgentRuntimeObservation(string! eventName, string! sessionKey, string! agentName) -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.Detail.get -> string?
+Incursa.OpenAI.Agents.AgentRuntimeObservation.Detail.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.Duration.get -> System.TimeSpan?
+Incursa.OpenAI.Agents.AgentRuntimeObservation.Duration.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.Equals(Incursa.OpenAI.Agents.AgentRuntimeObservation? other) -> bool
+Incursa.OpenAI.Agents.AgentRuntimeObservation.EventName.get -> string!
+Incursa.OpenAI.Agents.AgentRuntimeObservation.EventName.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.Exception.get -> System.Exception?
+Incursa.OpenAI.Agents.AgentRuntimeObservation.Exception.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.FromAgentName.get -> string?
+Incursa.OpenAI.Agents.AgentRuntimeObservation.FromAgentName.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.ResponseId.get -> string?
+Incursa.OpenAI.Agents.AgentRuntimeObservation.ResponseId.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentRuntimeObservation.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.Status.get -> Incursa.OpenAI.Agents.AgentRunStatus?
+Incursa.OpenAI.Agents.AgentRuntimeObservation.Status.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.ToAgentName.get -> string?
+Incursa.OpenAI.Agents.AgentRuntimeObservation.ToAgentName.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.ToolCallId.get -> string?
+Incursa.OpenAI.Agents.AgentRuntimeObservation.ToolCallId.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.ToolName.get -> string?
+Incursa.OpenAI.Agents.AgentRuntimeObservation.ToolName.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObservation.TurnNumber.get -> int?
+Incursa.OpenAI.Agents.AgentRuntimeObservation.TurnNumber.init -> void
+Incursa.OpenAI.Agents.AgentRuntimeObserverExtensions
+Incursa.OpenAI.Agents.AgentSession
+Incursa.OpenAI.Agents.AgentSession.AgentSession() -> void
+Incursa.OpenAI.Agents.AgentSession.Clone() -> Incursa.OpenAI.Agents.AgentSession!
+Incursa.OpenAI.Agents.AgentSession.Conversation.get -> System.Collections.Generic.List<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentSession.Conversation.set -> void
+Incursa.OpenAI.Agents.AgentSession.CreatedUtc.get -> System.DateTimeOffset
+Incursa.OpenAI.Agents.AgentSession.CreatedUtc.set -> void
+Incursa.OpenAI.Agents.AgentSession.CurrentAgentName.get -> string?
+Incursa.OpenAI.Agents.AgentSession.CurrentAgentName.set -> void
+Incursa.OpenAI.Agents.AgentSession.ExpiresUtc.get -> System.DateTimeOffset?
+Incursa.OpenAI.Agents.AgentSession.ExpiresUtc.set -> void
+Incursa.OpenAI.Agents.AgentSession.LastResponseId.get -> string?
+Incursa.OpenAI.Agents.AgentSession.LastResponseId.set -> void
+Incursa.OpenAI.Agents.AgentSession.PendingApprovals.get -> System.Collections.Generic.List<Incursa.OpenAI.Agents.AgentSessionPendingApproval!>!
+Incursa.OpenAI.Agents.AgentSession.PendingApprovals.set -> void
+Incursa.OpenAI.Agents.AgentSession.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentSession.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentSession.TrimmedItemCount.get -> int
+Incursa.OpenAI.Agents.AgentSession.TrimmedItemCount.set -> void
+Incursa.OpenAI.Agents.AgentSession.TurnsExecuted.get -> int
+Incursa.OpenAI.Agents.AgentSession.TurnsExecuted.set -> void
+Incursa.OpenAI.Agents.AgentSession.UpdatedUtc.get -> System.DateTimeOffset
+Incursa.OpenAI.Agents.AgentSession.UpdatedUtc.set -> void
+Incursa.OpenAI.Agents.AgentSession.Version.get -> long
+Incursa.OpenAI.Agents.AgentSession.Version.set -> void
+Incursa.OpenAI.Agents.AgentSessionPendingApproval
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.<Clone>$() -> Incursa.OpenAI.Agents.AgentSessionPendingApproval!
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.AgentSessionPendingApproval(string! toolName, string! toolCallId, System.Text.Json.Nodes.JsonNode? arguments, string? reason, string! toolType) -> void
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.AgentSessionPendingApproval(string! toolName, string! toolCallId, System.Text.Json.Nodes.JsonNode? arguments, string? reason) -> void
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.AgentSessionPendingApproval(string! toolName, string! toolCallId, System.Text.Json.Nodes.JsonNode? arguments) -> void
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.AgentSessionPendingApproval(string! toolName, string! toolCallId) -> void
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.Arguments.init -> void
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.Equals(Incursa.OpenAI.Agents.AgentSessionPendingApproval? other) -> bool
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.Reason.get -> string?
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.Reason.init -> void
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.ToolCallId.get -> string!
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.ToolCallId.init -> void
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.ToolName.get -> string!
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.ToolName.init -> void
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.ToolType.get -> string!
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.ToolType.init -> void
+Incursa.OpenAI.Agents.AgentSessionRecovery
+Incursa.OpenAI.Agents.AgentSessionStoreExtensions
+Incursa.OpenAI.Agents.AgentSessionStoreOptions
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.AbsoluteLifetime.get -> System.TimeSpan?
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.AbsoluteLifetime.init -> void
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.AgentSessionStoreOptions() -> void
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.CleanupExpiredOnLoad.get -> bool
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.CleanupExpiredOnLoad.init -> void
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.CleanupExpiredOnSave.get -> bool
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.CleanupExpiredOnSave.init -> void
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.CompactionMode.get -> Incursa.OpenAI.Agents.Sessions
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.CompactionMode.init -> void
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.MaxConversationItems.get -> int?
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.MaxConversationItems.init -> void
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.MaxTurns.get -> int?
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.MaxTurns.init -> void
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.SlidingExpiration.get -> System.TimeSpan?
+Incursa.OpenAI.Agents.AgentSessionStoreOptions.SlidingExpiration.init -> void
+Incursa.OpenAI.Agents.AgentSessionVersionMismatchException
+Incursa.OpenAI.Agents.AgentSessionVersionMismatchException.ActualVersion.get -> long
+Incursa.OpenAI.Agents.AgentSessionVersionMismatchException.AgentSessionVersionMismatchException(string! sessionKey, long expectedVersion, long actualVersion) -> void
+Incursa.OpenAI.Agents.AgentSessionVersionMismatchException.ExpectedVersion.get -> long
+Incursa.OpenAI.Agents.AgentSessionVersionMismatchException.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentStreamEvent
+Incursa.OpenAI.Agents.AgentStreamEvent.<Clone>$() -> Incursa.OpenAI.Agents.AgentStreamEvent!
+Incursa.OpenAI.Agents.AgentStreamEvent.AgentName.get -> string!
+Incursa.OpenAI.Agents.AgentStreamEvent.AgentName.init -> void
+Incursa.OpenAI.Agents.AgentStreamEvent.AgentStreamEvent(string! eventType, string! agentName, Incursa.OpenAI.Agents.AgentRunItem? item, System.Text.Json.Nodes.JsonNode? data, string? message, System.DateTimeOffset? timestampUtc) -> void
+Incursa.OpenAI.Agents.AgentStreamEvent.AgentStreamEvent(string! eventType, string! agentName) -> void
+Incursa.OpenAI.Agents.AgentStreamEvent.Data.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentStreamEvent.Data.init -> void
+Incursa.OpenAI.Agents.AgentStreamEvent.Equals(Incursa.OpenAI.Agents.AgentStreamEvent? other) -> bool
+Incursa.OpenAI.Agents.AgentStreamEvent.EventType.get -> string!
+Incursa.OpenAI.Agents.AgentStreamEvent.EventType.init -> void
+Incursa.OpenAI.Agents.AgentStreamEvent.Item.get -> Incursa.OpenAI.Agents.AgentRunItem?
+Incursa.OpenAI.Agents.AgentStreamEvent.Item.init -> void
+Incursa.OpenAI.Agents.AgentStreamEvent.Message.get -> string?
+Incursa.OpenAI.Agents.AgentStreamEvent.Message.init -> void
+Incursa.OpenAI.Agents.AgentStreamEvent.TimestampUtc.get -> System.DateTimeOffset?
+Incursa.OpenAI.Agents.AgentStreamEvent.TimestampUtc.init -> void
+Incursa.OpenAI.Agents.AgentStreamEventTypes
+Incursa.OpenAI.Agents.AgentTool<TContext>
+Incursa.OpenAI.Agents.AgentTool<TContext>.AgentTool() -> void
+Incursa.OpenAI.Agents.AgentTool<TContext>.Description.get -> string?
+Incursa.OpenAI.Agents.AgentTool<TContext>.Description.init -> void
+Incursa.OpenAI.Agents.AgentTool<TContext>.ExecuteAsync.get -> System.Func<Incursa.OpenAI.Agents.AgentToolInvocation<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentToolResult!>>!
+Incursa.OpenAI.Agents.AgentTool<TContext>.ExecuteAsync.init -> void
+Incursa.OpenAI.Agents.AgentTool<TContext>.InputGuardrails.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IToolInputGuardrail<TContext>!>!
+Incursa.OpenAI.Agents.AgentTool<TContext>.InputGuardrails.init -> void
+Incursa.OpenAI.Agents.AgentTool<TContext>.InputSchema.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentTool<TContext>.InputSchema.init -> void
+Incursa.OpenAI.Agents.AgentTool<TContext>.IsEnabledAsync.get -> System.Func<Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<bool>>?
+Incursa.OpenAI.Agents.AgentTool<TContext>.IsEnabledAsync.init -> void
+Incursa.OpenAI.Agents.AgentTool<TContext>.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>!
+Incursa.OpenAI.Agents.AgentTool<TContext>.Metadata.init -> void
+Incursa.OpenAI.Agents.AgentTool<TContext>.Name.get -> string!
+Incursa.OpenAI.Agents.AgentTool<TContext>.Name.init -> void
+Incursa.OpenAI.Agents.AgentTool<TContext>.OutputGuardrails.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IToolOutputGuardrail<TContext>!>!
+Incursa.OpenAI.Agents.AgentTool<TContext>.OutputGuardrails.init -> void
+Incursa.OpenAI.Agents.AgentTool<TContext>.RequiresApproval.get -> bool
+Incursa.OpenAI.Agents.AgentTool<TContext>.RequiresApproval.init -> void
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>!
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.AgentToolAvailabilityContext(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.Equals(Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentToolCall<TContext>!
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.AgentToolCall(string! callId, string! toolName, System.Text.Json.Nodes.JsonNode? arguments, bool requiresApproval, string? approvalReason, string! toolType) -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.AgentToolCall(string! callId, string! toolName, System.Text.Json.Nodes.JsonNode? arguments, bool requiresApproval, string? approvalReason) -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.AgentToolCall(string! callId, string! toolName, System.Text.Json.Nodes.JsonNode? arguments, bool requiresApproval) -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.AgentToolCall(string! callId, string! toolName, System.Text.Json.Nodes.JsonNode? arguments) -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.AgentToolCall(string! callId, string! toolName) -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.ApprovalReason.get -> string?
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.ApprovalReason.init -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.Arguments.init -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.CallId.get -> string!
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.CallId.init -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.Equals(Incursa.OpenAI.Agents.AgentToolCall<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.RequiresApproval.get -> bool
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.RequiresApproval.init -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.ToolName.get -> string!
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.ToolName.init -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.ToolType.get -> string!
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.ToolType.init -> void
+Incursa.OpenAI.Agents.AgentToolErrorContext
+Incursa.OpenAI.Agents.AgentToolErrorContext.<Clone>$() -> Incursa.OpenAI.Agents.AgentToolErrorContext!
+Incursa.OpenAI.Agents.AgentToolErrorContext.AgentToolErrorContext(string! kind, string! toolType, string! toolName, string! callId, string! defaultMessage) -> void
+Incursa.OpenAI.Agents.AgentToolErrorContext.CallId.get -> string!
+Incursa.OpenAI.Agents.AgentToolErrorContext.CallId.init -> void
+Incursa.OpenAI.Agents.AgentToolErrorContext.DefaultMessage.get -> string!
+Incursa.OpenAI.Agents.AgentToolErrorContext.DefaultMessage.init -> void
+Incursa.OpenAI.Agents.AgentToolErrorContext.Equals(Incursa.OpenAI.Agents.AgentToolErrorContext? other) -> bool
+Incursa.OpenAI.Agents.AgentToolErrorContext.Kind.get -> string!
+Incursa.OpenAI.Agents.AgentToolErrorContext.Kind.init -> void
+Incursa.OpenAI.Agents.AgentToolErrorContext.ToolName.get -> string!
+Incursa.OpenAI.Agents.AgentToolErrorContext.ToolName.init -> void
+Incursa.OpenAI.Agents.AgentToolErrorContext.ToolType.get -> string!
+Incursa.OpenAI.Agents.AgentToolErrorContext.ToolType.init -> void
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentToolInvocation<TContext>!
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.AgentToolInvocation(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, string! toolCallId, string! toolName, System.Text.Json.Nodes.JsonNode? arguments, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.Arguments.init -> void
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.Equals(Incursa.OpenAI.Agents.AgentToolInvocation<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.ToolCallId.get -> string!
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.ToolCallId.init -> void
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.ToolName.get -> string!
+Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.ToolName.init -> void
+Incursa.OpenAI.Agents.AgentToolResult
+Incursa.OpenAI.Agents.AgentToolResult.<Clone>$() -> Incursa.OpenAI.Agents.AgentToolResult!
+Incursa.OpenAI.Agents.AgentToolResult.AgentToolResult() -> void
+Incursa.OpenAI.Agents.AgentToolResult.AgentToolResult(string? text, System.Text.Json.Nodes.JsonNode? structuredValue, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentRunItem!>? items) -> void
+Incursa.OpenAI.Agents.AgentToolResult.AgentToolResult(string? text, System.Text.Json.Nodes.JsonNode? structuredValue) -> void
+Incursa.OpenAI.Agents.AgentToolResult.AgentToolResult(string? text) -> void
+Incursa.OpenAI.Agents.AgentToolResult.Equals(Incursa.OpenAI.Agents.AgentToolResult? other) -> bool
+Incursa.OpenAI.Agents.AgentToolResult.Items.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentRunItem!>?
+Incursa.OpenAI.Agents.AgentToolResult.Items.init -> void
+Incursa.OpenAI.Agents.AgentToolResult.StructuredValue.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.AgentToolResult.StructuredValue.init -> void
+Incursa.OpenAI.Agents.AgentToolResult.Text.get -> string?
+Incursa.OpenAI.Agents.AgentToolResult.Text.init -> void
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentTurnRequest<TContext>!
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.AgentTurnRequest(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, int turnNumber, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation, string? userInput, string? previousResponseId, Incursa.OpenAI.Agents.AgentRunOptions<TContext>? options) -> void
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.AgentTurnRequest(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, int turnNumber, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.Equals(Incursa.OpenAI.Agents.AgentTurnRequest<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.Options.get -> Incursa.OpenAI.Agents.AgentRunOptions<TContext>?
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.Options.init -> void
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.PreviousResponseId.get -> string?
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.PreviousResponseId.init -> void
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.TurnNumber.get -> int
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.TurnNumber.init -> void
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.UserInput.get -> string?
+Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.UserInput.init -> void
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentTurnResponse<TContext>!
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.AgentTurnResponse() -> void
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.AgentTurnResponse(Incursa.OpenAI.Agents.AgentFinalOutput? finalOutput, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentToolCall<TContext>!>! toolCalls, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>!>! handoffs, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentRunItem!>? items, string? responseId, Incursa.OpenAI.Agents.Agent<TContext>? effectiveAgent) -> void
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.EffectiveAgent.get -> Incursa.OpenAI.Agents.Agent<TContext>?
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.EffectiveAgent.init -> void
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.Equals(Incursa.OpenAI.Agents.AgentTurnResponse<TContext>? other) -> bool
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.FinalOutput.get -> Incursa.OpenAI.Agents.AgentFinalOutput?
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.FinalOutput.init -> void
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.Handoffs.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>!>!
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.Handoffs.init -> void
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.Items.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentRunItem!>?
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.Items.init -> void
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.ResponseId.get -> string?
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.ResponseId.init -> void
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.ToolCalls.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentToolCall<TContext>!>!
+Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.ToolCalls.init -> void
+Incursa.OpenAI.Agents.AllowAllAgentApprovalService
+Incursa.OpenAI.Agents.AllowAllAgentApprovalService.AllowAllAgentApprovalService() -> void
+Incursa.OpenAI.Agents.AllowAllAgentApprovalService.EvaluateAsync<TContext>(Incursa.OpenAI.Agents.AgentApprovalContext<TContext>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.ApprovalDecision!>
+Incursa.OpenAI.Agents.ApprovalDecision
+Incursa.OpenAI.Agents.ApprovalDecision.<Clone>$() -> Incursa.OpenAI.Agents.ApprovalDecision!
+Incursa.OpenAI.Agents.ApprovalDecision.ApprovalDecision(bool requiresApproval, string? reason) -> void
+Incursa.OpenAI.Agents.ApprovalDecision.ApprovalDecision(bool requiresApproval) -> void
+Incursa.OpenAI.Agents.ApprovalDecision.Equals(Incursa.OpenAI.Agents.ApprovalDecision? other) -> bool
+Incursa.OpenAI.Agents.ApprovalDecision.Reason.get -> string?
+Incursa.OpenAI.Agents.ApprovalDecision.Reason.init -> void
+Incursa.OpenAI.Agents.ApprovalDecision.RequiresApproval.get -> bool
+Incursa.OpenAI.Agents.ApprovalDecision.RequiresApproval.init -> void
+Incursa.OpenAI.Agents.FileAgentSessionStore
+Incursa.OpenAI.Agents.FileAgentSessionStore.CleanupExpiredSessionsAsync() -> System.Threading.Tasks.ValueTask<int>
+Incursa.OpenAI.Agents.FileAgentSessionStore.CleanupExpiredSessionsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<int>
+Incursa.OpenAI.Agents.FileAgentSessionStore.FileAgentSessionStore(string! directoryPath, Incursa.OpenAI.Agents.AgentSessionStoreOptions? options) -> void
+Incursa.OpenAI.Agents.FileAgentSessionStore.FileAgentSessionStore(string! directoryPath) -> void
+Incursa.OpenAI.Agents.FileAgentSessionStore.LoadAsync(string! sessionKey, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentSession?>
+Incursa.OpenAI.Agents.FileAgentSessionStore.LoadAsync(string! sessionKey) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentSession?>
+Incursa.OpenAI.Agents.FileAgentSessionStore.SaveAsync(Incursa.OpenAI.Agents.AgentSession! session, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.FileAgentSessionStore.SaveAsync(Incursa.OpenAI.Agents.AgentSession! session) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.GuardrailContext<TContext>
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.GuardrailContext<TContext>!
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.Equals(Incursa.OpenAI.Agents.GuardrailContext<TContext>? other) -> bool
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.GuardrailContext(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, string! userInput, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.UserInput.get -> string!
+Incursa.OpenAI.Agents.GuardrailContext<TContext>.UserInput.init -> void
+Incursa.OpenAI.Agents.GuardrailResult
+Incursa.OpenAI.Agents.GuardrailResult.<Clone>$() -> Incursa.OpenAI.Agents.GuardrailResult!
+Incursa.OpenAI.Agents.GuardrailResult.Equals(Incursa.OpenAI.Agents.GuardrailResult? other) -> bool
+Incursa.OpenAI.Agents.GuardrailResult.GuardrailResult(bool tripwireTriggered, string? reason, System.Collections.Generic.IReadOnlyDictionary<string!, object?>? metadata, System.Text.Json.Nodes.JsonNode? replacementData) -> void
+Incursa.OpenAI.Agents.GuardrailResult.GuardrailResult(bool tripwireTriggered, string? reason, System.Collections.Generic.IReadOnlyDictionary<string!, object?>? metadata) -> void
+Incursa.OpenAI.Agents.GuardrailResult.GuardrailResult(bool tripwireTriggered, string? reason) -> void
+Incursa.OpenAI.Agents.GuardrailResult.GuardrailResult(bool tripwireTriggered) -> void
+Incursa.OpenAI.Agents.GuardrailResult.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>?
+Incursa.OpenAI.Agents.GuardrailResult.Metadata.init -> void
+Incursa.OpenAI.Agents.GuardrailResult.Reason.get -> string?
+Incursa.OpenAI.Agents.GuardrailResult.Reason.init -> void
+Incursa.OpenAI.Agents.GuardrailResult.ReplacementData.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.GuardrailResult.ReplacementData.init -> void
+Incursa.OpenAI.Agents.GuardrailResult.TripwireTriggered.get -> bool
+Incursa.OpenAI.Agents.GuardrailResult.TripwireTriggered.init -> void
+Incursa.OpenAI.Agents.IAgentApprovalService
+Incursa.OpenAI.Agents.IAgentApprovalService.EvaluateAsync<TContext>(Incursa.OpenAI.Agents.AgentApprovalContext<TContext>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.ApprovalDecision!>
+Incursa.OpenAI.Agents.IAgentRuntimeObserver
+Incursa.OpenAI.Agents.IAgentRuntimeObserver.ObserveAsync(Incursa.OpenAI.Agents.AgentRuntimeObservation! observation, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.IAgentSessionStore
+Incursa.OpenAI.Agents.IAgentSessionStore.LoadAsync(string! sessionKey, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentSession?>
+Incursa.OpenAI.Agents.IAgentSessionStore.SaveAsync(Incursa.OpenAI.Agents.AgentSession! session, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.IAgentTool<TContext>
+Incursa.OpenAI.Agents.IAgentTool<TContext>.Description.get -> string?
+Incursa.OpenAI.Agents.IAgentTool<TContext>.ExecuteAsync(Incursa.OpenAI.Agents.AgentToolInvocation<TContext>! invocation, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentToolResult!>
+Incursa.OpenAI.Agents.IAgentTool<TContext>.InputGuardrails.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IToolInputGuardrail<TContext>!>!
+Incursa.OpenAI.Agents.IAgentTool<TContext>.InputSchema.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.IAgentTool<TContext>.IsEnabledAsync(Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<bool>
+Incursa.OpenAI.Agents.IAgentTool<TContext>.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>!
+Incursa.OpenAI.Agents.IAgentTool<TContext>.Name.get -> string!
+Incursa.OpenAI.Agents.IAgentTool<TContext>.OutputGuardrails.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.IToolOutputGuardrail<TContext>!>!
+Incursa.OpenAI.Agents.IAgentTool<TContext>.RequiresApproval.get -> bool
+Incursa.OpenAI.Agents.IAgentTurnExecutor<TContext>
+Incursa.OpenAI.Agents.IAgentTurnExecutor<TContext>.ExecuteTurnAsync(Incursa.OpenAI.Agents.AgentTurnRequest<TContext>! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentTurnResponse<TContext>!>
+Incursa.OpenAI.Agents.IInputGuardrail<TContext>
+Incursa.OpenAI.Agents.IInputGuardrail<TContext>.EvaluateAsync(Incursa.OpenAI.Agents.GuardrailContext<TContext>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.GuardrailResult!>
+Incursa.OpenAI.Agents.InMemoryAgentSessionStore
+Incursa.OpenAI.Agents.InMemoryAgentSessionStore.CleanupExpiredSessionsAsync() -> System.Threading.Tasks.ValueTask<int>
+Incursa.OpenAI.Agents.InMemoryAgentSessionStore.CleanupExpiredSessionsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<int>
+Incursa.OpenAI.Agents.InMemoryAgentSessionStore.InMemoryAgentSessionStore() -> void
+Incursa.OpenAI.Agents.InMemoryAgentSessionStore.InMemoryAgentSessionStore(Incursa.OpenAI.Agents.AgentSessionStoreOptions? options) -> void
+Incursa.OpenAI.Agents.InMemoryAgentSessionStore.LoadAsync(string! sessionKey, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentSession?>
+Incursa.OpenAI.Agents.InMemoryAgentSessionStore.LoadAsync(string! sessionKey) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentSession?>
+Incursa.OpenAI.Agents.InMemoryAgentSessionStore.SaveAsync(Incursa.OpenAI.Agents.AgentSession! session, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.InMemoryAgentSessionStore.SaveAsync(Incursa.OpenAI.Agents.AgentSession! session) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.IOpenAiResponsesClient
+Incursa.OpenAI.Agents.IOpenAiResponsesClient.CreateResponseAsync(Incursa.OpenAI.Agents.OpenAiResponsesRequest! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiResponsesResponse!>!
+Incursa.OpenAI.Agents.IOpenAiResponsesClient.StreamResponseAsync(Incursa.OpenAI.Agents.OpenAiResponsesRequest! request, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent!>!
+Incursa.OpenAI.Agents.IOutputGuardrail<TContext>
+Incursa.OpenAI.Agents.IOutputGuardrail<TContext>.EvaluateAsync(Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.GuardrailResult!>
+Incursa.OpenAI.Agents.IStreamingAgentTurnExecutor<TContext>
+Incursa.OpenAI.Agents.IStreamingAgentTurnExecutor<TContext>.ExecuteStreamingTurnAsync(Incursa.OpenAI.Agents.AgentTurnRequest<TContext>! request, System.Func<Incursa.OpenAI.Agents.AgentStreamEvent!, System.Threading.Tasks.ValueTask>! emitAsync, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentTurnResponse<TContext>!>
+Incursa.OpenAI.Agents.IToolInputGuardrail<TContext>
+Incursa.OpenAI.Agents.IToolInputGuardrail<TContext>.EvaluateAsync(Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.GuardrailResult!>
+Incursa.OpenAI.Agents.IToolOutputGuardrail<TContext>
+Incursa.OpenAI.Agents.IToolOutputGuardrail<TContext>.EvaluateAsync(Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.GuardrailResult!>
+Incursa.OpenAI.Agents.IVersionedAgentSessionStore
+Incursa.OpenAI.Agents.IVersionedAgentSessionStore.CleanupExpiredSessionsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<int>
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.<Clone>$() -> Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition!
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.ApprovalReason.get -> string?
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.ApprovalReason.init -> void
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.ApprovalRequired.get -> bool
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.ApprovalRequired.init -> void
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.Authorization.get -> string?
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.Authorization.init -> void
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.ConnectorId.get -> string?
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.ConnectorId.init -> void
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.Description.get -> string?
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.Description.init -> void
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.Equals(Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition? other) -> bool
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.Headers.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>?
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.Headers.init -> void
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.HostedMcpToolDefinition(string! serverLabel, System.Uri? serverUrl, string? connectorId, string? authorization, bool approvalRequired, System.Collections.Generic.IReadOnlyDictionary<string!, string!>? headers, string? approvalReason, string? description) -> void
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.HostedMcpToolDefinition(string! serverLabel) -> void
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.ServerLabel.get -> string!
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.ServerLabel.init -> void
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.ServerUrl.get -> System.Uri?
+Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.ServerUrl.init -> void
+Incursa.OpenAI.Agents.Mcp.IMcpClientObserver
+Incursa.OpenAI.Agents.Mcp.IMcpClientObserver.ObserveAsync(Incursa.OpenAI.Agents.Mcp.McpClientObservation! observation, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.Mcp.IMcpToolMetadataResolver
+Incursa.OpenAI.Agents.Mcp.IMcpToolMetadataResolver.ResolveAsync(Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<System.Text.Json.Nodes.JsonObject?>
+Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient
+Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient.CallToolAsync(string! toolName, System.Text.Json.Nodes.JsonNode? arguments, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.Mcp.McpToolCallResult!>!
+Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient.ListToolsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.Mcp.McpToolDescriptor!>!>!
+Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient.ServerLabel.get -> string!
+Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient.ServerUrl.get -> System.Uri!
+Incursa.OpenAI.Agents.Mcp.IUserScopedMcpAuthResolver
+Incursa.OpenAI.Agents.Mcp.IUserScopedMcpAuthResolver.ResolveAsync(Incursa.OpenAI.Agents.Mcp.McpAuthContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.Mcp.McpAuthResult!>
+Incursa.OpenAI.Agents.Mcp.McpAuthContext
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.<Clone>$() -> Incursa.OpenAI.Agents.Mcp.McpAuthContext!
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.AgentName.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.AgentName.init -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.ConnectionId.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.ConnectionId.init -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.ContextItems.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>?
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.ContextItems.init -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.Equals(Incursa.OpenAI.Agents.Mcp.McpAuthContext? other) -> bool
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.MailboxId.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.MailboxId.init -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.McpAuthContext() -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.McpAuthContext(string? userId, string? tenantId, string? workspaceId, string? mailboxId, string? connectionId, string? sessionKey, string? agentName, System.Collections.Generic.IReadOnlyDictionary<string!, object?>? contextItems) -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.SessionKey.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.SessionKey.init -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.TenantId.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.TenantId.init -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.UserId.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.UserId.init -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.WorkspaceId.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpAuthContext.WorkspaceId.init -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthenticationException
+Incursa.OpenAI.Agents.Mcp.McpAuthenticationException.McpAuthenticationException(string! serverLabel, string! method, string? toolName, string! message, System.Net.HttpStatusCode? statusCode, System.Exception? innerException) -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthenticationException.McpAuthenticationException(string! serverLabel, string! method, string? toolName, string! message, System.Net.HttpStatusCode? statusCode) -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthenticationException.McpAuthenticationException(string! serverLabel, string! method, string? toolName, string! message) -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthenticationException.StatusCode.get -> System.Net.HttpStatusCode?
+Incursa.OpenAI.Agents.Mcp.McpAuthResult
+Incursa.OpenAI.Agents.Mcp.McpAuthResult.<Clone>$() -> Incursa.OpenAI.Agents.Mcp.McpAuthResult!
+Incursa.OpenAI.Agents.Mcp.McpAuthResult.BearerToken.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpAuthResult.BearerToken.init -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthResult.Equals(Incursa.OpenAI.Agents.Mcp.McpAuthResult? other) -> bool
+Incursa.OpenAI.Agents.Mcp.McpAuthResult.Headers.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>?
+Incursa.OpenAI.Agents.Mcp.McpAuthResult.Headers.init -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthResult.McpAuthResult() -> void
+Incursa.OpenAI.Agents.Mcp.McpAuthResult.McpAuthResult(string? bearerToken, System.Collections.Generic.IReadOnlyDictionary<string!, string!>? headers) -> void
+Incursa.OpenAI.Agents.Mcp.McpCallOutcome
+Incursa.OpenAI.Agents.Mcp.McpCallOutcome.AuthenticationFailure = 3 -> Incursa.OpenAI.Agents.Mcp.McpCallOutcome
+Incursa.OpenAI.Agents.Mcp.McpCallOutcome.RetryScheduled = 1 -> Incursa.OpenAI.Agents.Mcp.McpCallOutcome
+Incursa.OpenAI.Agents.Mcp.McpCallOutcome.ServerFailure = 4 -> Incursa.OpenAI.Agents.Mcp.McpCallOutcome
+Incursa.OpenAI.Agents.Mcp.McpCallOutcome.Success = 0 -> Incursa.OpenAI.Agents.Mcp.McpCallOutcome
+Incursa.OpenAI.Agents.Mcp.McpCallOutcome.TransportFailure = 2 -> Incursa.OpenAI.Agents.Mcp.McpCallOutcome
+Incursa.OpenAI.Agents.Mcp.McpClientObservation
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.<Clone>$() -> Incursa.OpenAI.Agents.Mcp.McpClientObservation!
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.Attempt.get -> int
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.Attempt.init -> void
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.Detail.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.Detail.init -> void
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.Duration.get -> System.TimeSpan
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.Duration.init -> void
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.Equals(Incursa.OpenAI.Agents.Mcp.McpClientObservation? other) -> bool
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.McpClientObservation(string! serverLabel, string! method, string? toolName, int attempt, System.TimeSpan duration, Incursa.OpenAI.Agents.Mcp.McpCallOutcome outcome, System.Net.HttpStatusCode? statusCode, string? detail) -> void
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.Method.get -> string!
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.Method.init -> void
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.Outcome.get -> Incursa.OpenAI.Agents.Mcp.McpCallOutcome
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.Outcome.init -> void
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.ServerLabel.get -> string!
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.ServerLabel.init -> void
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.StatusCode.get -> System.Net.HttpStatusCode?
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.StatusCode.init -> void
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.ToolName.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpClientObservation.ToolName.init -> void
+Incursa.OpenAI.Agents.Mcp.McpClientObserverExtensions
+Incursa.OpenAI.Agents.Mcp.McpClientOptions
+Incursa.OpenAI.Agents.Mcp.McpClientOptions.McpClientOptions() -> void
+Incursa.OpenAI.Agents.Mcp.McpClientOptions.Observer.get -> Incursa.OpenAI.Agents.Mcp.IMcpClientObserver?
+Incursa.OpenAI.Agents.Mcp.McpClientOptions.Observer.init -> void
+Incursa.OpenAI.Agents.Mcp.McpClientOptions.RetryCount.get -> int
+Incursa.OpenAI.Agents.Mcp.McpClientOptions.RetryCount.init -> void
+Incursa.OpenAI.Agents.Mcp.McpClientOptions.RetryDelay.get -> System.TimeSpan
+Incursa.OpenAI.Agents.Mcp.McpClientOptions.RetryDelay.init -> void
+Incursa.OpenAI.Agents.Mcp.McpException
+Incursa.OpenAI.Agents.Mcp.McpException.McpException(string! serverLabel, string! method, string? toolName, string! message, System.Exception? innerException) -> void
+Incursa.OpenAI.Agents.Mcp.McpException.McpException(string! serverLabel, string! method, string? toolName, string! message) -> void
+Incursa.OpenAI.Agents.Mcp.McpException.Method.get -> string!
+Incursa.OpenAI.Agents.Mcp.McpException.ServerLabel.get -> string!
+Incursa.OpenAI.Agents.Mcp.McpException.ToolName.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpServerException
+Incursa.OpenAI.Agents.Mcp.McpServerException.JsonRpcCode.get -> int?
+Incursa.OpenAI.Agents.Mcp.McpServerException.McpServerException(string! serverLabel, string! method, string? toolName, string! message, System.Net.HttpStatusCode? statusCode, int? jsonRpcCode, System.Exception? innerException) -> void
+Incursa.OpenAI.Agents.Mcp.McpServerException.McpServerException(string! serverLabel, string! method, string? toolName, string! message, System.Net.HttpStatusCode? statusCode, int? jsonRpcCode) -> void
+Incursa.OpenAI.Agents.Mcp.McpServerException.McpServerException(string! serverLabel, string! method, string? toolName, string! message, System.Net.HttpStatusCode? statusCode) -> void
+Incursa.OpenAI.Agents.Mcp.McpServerException.McpServerException(string! serverLabel, string! method, string? toolName, string! message) -> void
+Incursa.OpenAI.Agents.Mcp.McpServerException.StatusCode.get -> System.Net.HttpStatusCode?
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.<Clone>$() -> Incursa.OpenAI.Agents.Mcp.McpToolCallResult!
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Equals(Incursa.OpenAI.Agents.Mcp.McpToolCallResult? other) -> bool
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.McpToolCallResult() -> void
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.McpToolCallResult(string? text, System.Text.Json.Nodes.JsonNode? raw) -> void
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.McpToolCallResult(string? text) -> void
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Raw.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Raw.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Text.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Text.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.<Clone>$() -> Incursa.OpenAI.Agents.Mcp.McpToolDescriptor!
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.Description.get -> string?
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.Description.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.Equals(Incursa.OpenAI.Agents.Mcp.McpToolDescriptor? other) -> bool
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.InputSchema.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.InputSchema.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.McpToolDescriptor(string! name, string? description, System.Text.Json.Nodes.JsonNode? inputSchema, bool requiresApproval) -> void
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.McpToolDescriptor(string! name) -> void
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.Name.get -> string!
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.Name.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.RequiresApproval.get -> bool
+Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.RequiresApproval.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolFilter
+Incursa.OpenAI.Agents.Mcp.McpToolFilter.<Clone>$() -> Incursa.OpenAI.Agents.Mcp.McpToolFilter!
+Incursa.OpenAI.Agents.Mcp.McpToolFilter.AllowsAsync(string! serverLabel, Incursa.OpenAI.Agents.Mcp.McpAuthContext! authContext, Incursa.OpenAI.Agents.Mcp.McpToolDescriptor! descriptor, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<bool>
+Incursa.OpenAI.Agents.Mcp.McpToolFilter.Equals(Incursa.OpenAI.Agents.Mcp.McpToolFilter? other) -> bool
+Incursa.OpenAI.Agents.Mcp.McpToolFilter.ExcludeNames.get -> System.Collections.Generic.IReadOnlyCollection<string!>?
+Incursa.OpenAI.Agents.Mcp.McpToolFilter.ExcludeNames.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolFilter.FilterAsync.get -> System.Func<Incursa.OpenAI.Agents.Mcp.McpToolFilterContext!, Incursa.OpenAI.Agents.Mcp.McpToolDescriptor!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<bool>>?
+Incursa.OpenAI.Agents.Mcp.McpToolFilter.FilterAsync.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolFilter.IncludeNames.get -> System.Collections.Generic.IReadOnlyCollection<string!>?
+Incursa.OpenAI.Agents.Mcp.McpToolFilter.IncludeNames.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolFilter.McpToolFilter() -> void
+Incursa.OpenAI.Agents.Mcp.McpToolFilter.McpToolFilter(System.Collections.Generic.IReadOnlyCollection<string!>? includeNames, System.Collections.Generic.IReadOnlyCollection<string!>? excludeNames, System.Func<Incursa.OpenAI.Agents.Mcp.McpToolFilterContext!, Incursa.OpenAI.Agents.Mcp.McpToolDescriptor!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<bool>>? filterAsync) -> void
+Incursa.OpenAI.Agents.Mcp.McpToolFilterContext
+Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.<Clone>$() -> Incursa.OpenAI.Agents.Mcp.McpToolFilterContext!
+Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.AuthContext.get -> Incursa.OpenAI.Agents.Mcp.McpAuthContext!
+Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.AuthContext.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.Equals(Incursa.OpenAI.Agents.Mcp.McpToolFilterContext? other) -> bool
+Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.McpToolFilterContext(string! serverLabel, Incursa.OpenAI.Agents.Mcp.McpAuthContext! authContext) -> void
+Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.ServerLabel.get -> string!
+Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.ServerLabel.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.<Clone>$() -> Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext!
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.Arguments.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.AuthContext.get -> Incursa.OpenAI.Agents.Mcp.McpAuthContext!
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.AuthContext.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.Equals(Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext? other) -> bool
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.McpToolMetadataContext(string! serverLabel, string! toolName, Incursa.OpenAI.Agents.Mcp.McpAuthContext! authContext, System.Text.Json.Nodes.JsonNode? arguments) -> void
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.ServerLabel.get -> string!
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.ServerLabel.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.ToolName.get -> string!
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.ToolName.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolMetadataResolverExtensions
+Incursa.OpenAI.Agents.Mcp.McpTransportException
+Incursa.OpenAI.Agents.Mcp.McpTransportException.McpTransportException(string! serverLabel, string! method, string? toolName, string! message, System.Exception? innerException) -> void
+Incursa.OpenAI.Agents.Mcp.McpTransportException.McpTransportException(string! serverLabel, string! method, string? toolName, string! message) -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.CallToolAsync(string! toolName, System.Text.Json.Nodes.JsonNode? arguments, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.Mcp.McpToolCallResult!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.CallToolAsync(string! toolName, System.Text.Json.Nodes.JsonNode? arguments) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.Mcp.McpToolCallResult!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.CallToolAsync(string! toolName) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.Mcp.McpToolCallResult!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ListToolsAsync() -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.Mcp.McpToolDescriptor!>!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ListToolsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.Mcp.McpToolDescriptor!>!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ServerLabel.get -> string!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ServerUrl.get -> System.Uri!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.StreamableHttpMcpClient(System.Net.Http.HttpClient! httpClient, string! serverLabel, System.Uri! serverUrl, System.Collections.Generic.IReadOnlyDictionary<string!, string!>? staticHeaders, Incursa.OpenAI.Agents.Mcp.IUserScopedMcpAuthResolver? authResolver, Incursa.OpenAI.Agents.Mcp.McpAuthContext? authContext, Incursa.OpenAI.Agents.Mcp.IMcpToolMetadataResolver? metadataResolver, Incursa.OpenAI.Agents.Mcp.McpToolFilter? toolFilter, bool cacheToolsList, Incursa.OpenAI.Agents.Mcp.McpClientOptions? options) -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.StreamableHttpMcpClient(System.Net.Http.HttpClient! httpClient, string! serverLabel, System.Uri! serverUrl) -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.<Clone>$() -> Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.Equals(Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest? other) -> bool
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.Id.get -> string?
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.Id.init -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.Method.get -> string!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.Method.init -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.Params.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.Params.init -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.StreamableHttpMcpRequest(string! method, System.Text.Json.Nodes.JsonNode? params, string? id) -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.StreamableHttpMcpRequest(string! method, System.Text.Json.Nodes.JsonNode? params) -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.StreamableHttpMcpRequest(string! method) -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.<Clone>$() -> Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.ApprovalRequired.get -> bool
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.ApprovalRequired.init -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.CacheToolsList.get -> bool
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.CacheToolsList.init -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.ConnectorId.get -> string?
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.ConnectorId.init -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.Description.get -> string?
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.Description.init -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.Equals(Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition? other) -> bool
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.Headers.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>?
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.Headers.init -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.ServerLabel.get -> string!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.ServerLabel.init -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.ServerUrl.get -> System.Uri!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.ServerUrl.init -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.StreamableHttpMcpServerDefinition(string! serverLabel, System.Uri! serverUrl, string? connectorId, bool approvalRequired, System.Collections.Generic.IReadOnlyDictionary<string!, string!>? headers, string? description, Incursa.OpenAI.Agents.Mcp.McpToolFilter? toolFilter, bool cacheToolsList) -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.StreamableHttpMcpServerDefinition(string! serverLabel, System.Uri! serverUrl) -> void
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.ToolFilter.get -> Incursa.OpenAI.Agents.Mcp.McpToolFilter?
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.ToolFilter.init -> void
+Incursa.OpenAI.Agents.Mcp.StreamableMcpClientExtensions
+Incursa.OpenAI.Agents.Mcp.UserScopedMcpAuthResolverExtensions
+Incursa.OpenAI.Agents.NullAgentRuntimeObserver
+Incursa.OpenAI.Agents.NullAgentRuntimeObserver.NullAgentRuntimeObserver() -> void
+Incursa.OpenAI.Agents.NullAgentRuntimeObserver.ObserveAsync(Incursa.OpenAI.Agents.AgentRuntimeObservation! observation, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.NullAgentRuntimeObserver.ObserveAsync(Incursa.OpenAI.Agents.AgentRuntimeObservation! observation) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.OpenAiResponsesClient
+Incursa.OpenAI.Agents.OpenAiResponsesClient.CreateResponseAsync(Incursa.OpenAI.Agents.OpenAiResponsesRequest! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiResponsesResponse!>!
+Incursa.OpenAI.Agents.OpenAiResponsesClient.CreateResponseAsync(Incursa.OpenAI.Agents.OpenAiResponsesRequest! request) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiResponsesResponse!>!
+Incursa.OpenAI.Agents.OpenAiResponsesClient.OpenAiResponsesClient(System.Net.Http.HttpClient! httpClient, string! responsesPath) -> void
+Incursa.OpenAI.Agents.OpenAiResponsesClient.OpenAiResponsesClient(System.Net.Http.HttpClient! httpClient) -> void
+Incursa.OpenAI.Agents.OpenAiResponsesClient.StreamResponseAsync(Incursa.OpenAI.Agents.OpenAiResponsesRequest! request, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent!>!
+Incursa.OpenAI.Agents.OpenAiResponsesClient.StreamResponseAsync(Incursa.OpenAI.Agents.OpenAiResponsesRequest! request) -> System.Collections.Generic.IAsyncEnumerable<Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent!>!
+Incursa.OpenAI.Agents.OpenAiResponsesClientExtensions
+Incursa.OpenAI.Agents.OpenAiResponsesRequest
+Incursa.OpenAI.Agents.OpenAiResponsesRequest.<Clone>$() -> Incursa.OpenAI.Agents.OpenAiResponsesRequest!
+Incursa.OpenAI.Agents.OpenAiResponsesRequest.Body.get -> System.Text.Json.Nodes.JsonObject!
+Incursa.OpenAI.Agents.OpenAiResponsesRequest.Body.init -> void
+Incursa.OpenAI.Agents.OpenAiResponsesRequest.Equals(Incursa.OpenAI.Agents.OpenAiResponsesRequest? other) -> bool
+Incursa.OpenAI.Agents.OpenAiResponsesRequest.OpenAiResponsesRequest(System.Text.Json.Nodes.JsonObject! body, bool stream) -> void
+Incursa.OpenAI.Agents.OpenAiResponsesRequest.OpenAiResponsesRequest(System.Text.Json.Nodes.JsonObject! body) -> void
+Incursa.OpenAI.Agents.OpenAiResponsesRequest.Stream.get -> bool
+Incursa.OpenAI.Agents.OpenAiResponsesRequest.Stream.init -> void
+Incursa.OpenAI.Agents.OpenAiResponsesResponse
+Incursa.OpenAI.Agents.OpenAiResponsesResponse.<Clone>$() -> Incursa.OpenAI.Agents.OpenAiResponsesResponse!
+Incursa.OpenAI.Agents.OpenAiResponsesResponse.Equals(Incursa.OpenAI.Agents.OpenAiResponsesResponse? other) -> bool
+Incursa.OpenAI.Agents.OpenAiResponsesResponse.Id.get -> string!
+Incursa.OpenAI.Agents.OpenAiResponsesResponse.Id.init -> void
+Incursa.OpenAI.Agents.OpenAiResponsesResponse.OpenAiResponsesResponse(string! id, System.Text.Json.Nodes.JsonObject! raw) -> void
+Incursa.OpenAI.Agents.OpenAiResponsesResponse.Raw.get -> System.Text.Json.Nodes.JsonObject!
+Incursa.OpenAI.Agents.OpenAiResponsesResponse.Raw.init -> void
+Incursa.OpenAI.Agents.OpenAiResponsesRunner
+Incursa.OpenAI.Agents.OpenAiResponsesRunner.OpenAiResponsesRunner(Incursa.OpenAI.Agents.IOpenAiResponsesClient! client, Incursa.OpenAI.Agents.IAgentSessionStore? sessionStore, Incursa.OpenAI.Agents.IAgentApprovalService? approvalService, Incursa.OpenAI.Agents.Mcp.IUserScopedMcpAuthResolver? authResolver, System.Net.Http.HttpClient? mcpHttpClient, Incursa.OpenAI.Agents.Mcp.IMcpToolMetadataResolver? mcpToolMetadataResolver, Incursa.OpenAI.Agents.Mcp.McpClientOptions? mcpClientOptions, Incursa.OpenAI.Agents.IAgentRuntimeObserver? observer) -> void
+Incursa.OpenAI.Agents.OpenAiResponsesRunner.OpenAiResponsesRunner(Incursa.OpenAI.Agents.IOpenAiResponsesClient! client) -> void
+Incursa.OpenAI.Agents.OpenAiResponsesRunner.RunAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request, System.Func<Incursa.OpenAI.Agents.AgentTurnRequest<TContext>!, Incursa.OpenAI.Agents.Mcp.McpAuthContext?>? authContextFactory, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.AgentRunResult<TContext>!>!
+Incursa.OpenAI.Agents.OpenAiResponsesRunner.RunAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request, System.Func<Incursa.OpenAI.Agents.AgentTurnRequest<TContext>!, Incursa.OpenAI.Agents.Mcp.McpAuthContext?>? authContextFactory) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.AgentRunResult<TContext>!>!
+Incursa.OpenAI.Agents.OpenAiResponsesRunner.RunAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.AgentRunResult<TContext>!>!
+Incursa.OpenAI.Agents.OpenAiResponsesRunner.RunAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.AgentRunResult<TContext>!>!
+Incursa.OpenAI.Agents.OpenAiResponsesRunner.RunStreamingAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request, System.Func<Incursa.OpenAI.Agents.AgentTurnRequest<TContext>!, Incursa.OpenAI.Agents.Mcp.McpAuthContext?>? authContextFactory, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<Incursa.OpenAI.Agents.AgentStreamEvent!>!
+Incursa.OpenAI.Agents.OpenAiResponsesRunner.RunStreamingAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request, System.Func<Incursa.OpenAI.Agents.AgentTurnRequest<TContext>!, Incursa.OpenAI.Agents.Mcp.McpAuthContext?>? authContextFactory) -> System.Collections.Generic.IAsyncEnumerable<Incursa.OpenAI.Agents.AgentStreamEvent!>!
+Incursa.OpenAI.Agents.OpenAiResponsesRunner.RunStreamingAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<Incursa.OpenAI.Agents.AgentStreamEvent!>!
+Incursa.OpenAI.Agents.OpenAiResponsesRunner.RunStreamingAsync<TContext>(Incursa.OpenAI.Agents.AgentRunRequest<TContext>! request) -> System.Collections.Generic.IAsyncEnumerable<Incursa.OpenAI.Agents.AgentStreamEvent!>!
+Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent
+Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.<Clone>$() -> Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent!
+Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.Data.get -> System.Text.Json.Nodes.JsonObject!
+Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.Data.init -> void
+Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.Equals(Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent? other) -> bool
+Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.OpenAiResponsesStreamEvent(string! type, System.Text.Json.Nodes.JsonObject! data) -> void
+Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.Type.get -> string!
+Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.Type.init -> void
+Incursa.OpenAI.Agents.OpenAiResponsesStreaming
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>!
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.Equals(Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>? other) -> bool
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.Output.get -> Incursa.OpenAI.Agents.AgentFinalOutput!
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.Output.init -> void
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.OutputGuardrailContext(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, Incursa.OpenAI.Agents.AgentFinalOutput! output, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.ReasoningItemIdPolicy
+Incursa.OpenAI.Agents.ReasoningItemIdPolicy.Omit = 1 -> Incursa.OpenAI.Agents.ReasoningItemIdPolicy
+Incursa.OpenAI.Agents.ReasoningItemIdPolicy.Preserve = 0 -> Incursa.OpenAI.Agents.ReasoningItemIdPolicy
+Incursa.OpenAI.Agents.Sessions
+Incursa.OpenAI.Agents.Sessions.KeepLatestWindow = 1 -> Incursa.OpenAI.Agents.Sessions
+Incursa.OpenAI.Agents.Sessions.None = 0 -> Incursa.OpenAI.Agents.Sessions
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>!
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.Arguments.init -> void
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.Equals(Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>? other) -> bool
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.ToolCallId.get -> string!
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.ToolCallId.init -> void
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.ToolInputGuardrailContext(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, string! toolName, string! toolCallId, System.Text.Json.Nodes.JsonNode? arguments, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.ToolName.get -> string!
+Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.ToolName.init -> void
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>!
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Agent.init -> void
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Arguments.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Arguments.init -> void
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Context.get -> TContext
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Context.init -> void
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Conversation.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>!
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Conversation.init -> void
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Equals(Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>? other) -> bool
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Result.get -> Incursa.OpenAI.Agents.AgentToolResult!
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Result.init -> void
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.SessionKey.get -> string!
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.SessionKey.init -> void
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.ToolCallId.get -> string!
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.ToolCallId.init -> void
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.ToolName.get -> string!
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.ToolName.init -> void
+Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.ToolOutputGuardrailContext(Incursa.OpenAI.Agents.Agent<TContext>! agent, TContext context, string! sessionKey, string! toolName, string! toolCallId, System.Text.Json.Nodes.JsonNode? arguments, Incursa.OpenAI.Agents.AgentToolResult! result, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentConversationItem!>! conversation) -> void
+override Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentApprovalRequest.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentApprovalRequest.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentApprovalRequest.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentApprovalResponse.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentApprovalResponse.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentApprovalResponse.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentConversationItem.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentConversationItem.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentConversationItem.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentFinalOutput.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentFinalOutput.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentFinalOutput.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentOutputContract.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentOutputContract.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentOutputContract.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentRunItem.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentRunItem.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentRunItem.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentRunOptions<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentRunOptions<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentRunOptions<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentRunRequest<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentRunRequest<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentRunResult<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentRunResult<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentRunResult<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentRunState<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentRunState<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentRunState<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentRuntimeObservation.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentRuntimeObservation.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentRuntimeObservation.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentSessionPendingApproval.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentSessionPendingApproval.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentSessionPendingApproval.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentStreamEvent.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentStreamEvent.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentStreamEvent.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentToolCall<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentToolCall<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentToolCall<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentToolErrorContext.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentToolErrorContext.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentToolErrorContext.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentToolResult.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentToolResult.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentToolResult.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.ApprovalDecision.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.ApprovalDecision.GetHashCode() -> int
+override Incursa.OpenAI.Agents.ApprovalDecision.ToString() -> string!
+override Incursa.OpenAI.Agents.GuardrailContext<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.GuardrailContext<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.GuardrailContext<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.GuardrailResult.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.GuardrailResult.GetHashCode() -> int
+override Incursa.OpenAI.Agents.GuardrailResult.ToString() -> string!
+override Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.GetHashCode() -> int
+override Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.ToString() -> string!
+override Incursa.OpenAI.Agents.Mcp.McpAuthContext.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.Mcp.McpAuthContext.GetHashCode() -> int
+override Incursa.OpenAI.Agents.Mcp.McpAuthContext.ToString() -> string!
+override Incursa.OpenAI.Agents.Mcp.McpAuthResult.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.Mcp.McpAuthResult.GetHashCode() -> int
+override Incursa.OpenAI.Agents.Mcp.McpAuthResult.ToString() -> string!
+override Incursa.OpenAI.Agents.Mcp.McpClientObservation.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.Mcp.McpClientObservation.GetHashCode() -> int
+override Incursa.OpenAI.Agents.Mcp.McpClientObservation.ToString() -> string!
+override Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.Mcp.McpToolCallResult.GetHashCode() -> int
+override Incursa.OpenAI.Agents.Mcp.McpToolCallResult.ToString() -> string!
+override Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.GetHashCode() -> int
+override Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.ToString() -> string!
+override Incursa.OpenAI.Agents.Mcp.McpToolFilter.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.Mcp.McpToolFilter.GetHashCode() -> int
+override Incursa.OpenAI.Agents.Mcp.McpToolFilter.ToString() -> string!
+override Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.GetHashCode() -> int
+override Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.ToString() -> string!
+override Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.GetHashCode() -> int
+override Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.ToString() -> string!
+override Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.GetHashCode() -> int
+override Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.ToString() -> string!
+override Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.GetHashCode() -> int
+override Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.ToString() -> string!
+override Incursa.OpenAI.Agents.OpenAiResponsesRequest.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.OpenAiResponsesRequest.GetHashCode() -> int
+override Incursa.OpenAI.Agents.OpenAiResponsesRequest.ToString() -> string!
+override Incursa.OpenAI.Agents.OpenAiResponsesResponse.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.OpenAiResponsesResponse.GetHashCode() -> int
+override Incursa.OpenAI.Agents.OpenAiResponsesResponse.ToString() -> string!
+override Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.GetHashCode() -> int
+override Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.ToString() -> string!
+override Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.ToString() -> string!
+override Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.GetHashCode() -> int
+override Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.ToString() -> string!
+static Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.operator !=(Incursa.OpenAI.Agents.AgentApprovalContext<TContext>? left, Incursa.OpenAI.Agents.AgentApprovalContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentApprovalContext<TContext>.operator ==(Incursa.OpenAI.Agents.AgentApprovalContext<TContext>? left, Incursa.OpenAI.Agents.AgentApprovalContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentApprovalRequest.operator !=(Incursa.OpenAI.Agents.AgentApprovalRequest? left, Incursa.OpenAI.Agents.AgentApprovalRequest? right) -> bool
+static Incursa.OpenAI.Agents.AgentApprovalRequest.operator ==(Incursa.OpenAI.Agents.AgentApprovalRequest? left, Incursa.OpenAI.Agents.AgentApprovalRequest? right) -> bool
+static Incursa.OpenAI.Agents.AgentApprovalResponse.operator !=(Incursa.OpenAI.Agents.AgentApprovalResponse? left, Incursa.OpenAI.Agents.AgentApprovalResponse? right) -> bool
+static Incursa.OpenAI.Agents.AgentApprovalResponse.operator ==(Incursa.OpenAI.Agents.AgentApprovalResponse? left, Incursa.OpenAI.Agents.AgentApprovalResponse? right) -> bool
+static Incursa.OpenAI.Agents.AgentBuilder.Create<TContext>(string! name) -> Incursa.OpenAI.Agents.AgentBuilder<TContext>!
+static Incursa.OpenAI.Agents.AgentConversationItem.operator !=(Incursa.OpenAI.Agents.AgentConversationItem? left, Incursa.OpenAI.Agents.AgentConversationItem? right) -> bool
+static Incursa.OpenAI.Agents.AgentConversationItem.operator ==(Incursa.OpenAI.Agents.AgentConversationItem? left, Incursa.OpenAI.Agents.AgentConversationItem? right) -> bool
+static Incursa.OpenAI.Agents.AgentFinalOutput.operator !=(Incursa.OpenAI.Agents.AgentFinalOutput? left, Incursa.OpenAI.Agents.AgentFinalOutput? right) -> bool
+static Incursa.OpenAI.Agents.AgentFinalOutput.operator ==(Incursa.OpenAI.Agents.AgentFinalOutput? left, Incursa.OpenAI.Agents.AgentFinalOutput? right) -> bool
+static Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.operator !=(Incursa.OpenAI.Agents.AgentHandoffContext<TContext>? left, Incursa.OpenAI.Agents.AgentHandoffContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentHandoffContext<TContext>.operator ==(Incursa.OpenAI.Agents.AgentHandoffContext<TContext>? left, Incursa.OpenAI.Agents.AgentHandoffContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.operator !=(Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>? left, Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>.operator ==(Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>? left, Incursa.OpenAI.Agents.AgentHandoffHistoryContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.operator !=(Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>? left, Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>.operator ==(Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>? left, Incursa.OpenAI.Agents.AgentHandoffHistoryTransformContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.operator !=(Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>? left, Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>.operator ==(Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>? left, Incursa.OpenAI.Agents.AgentHandoffInvocation<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.operator !=(Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>? left, Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>.operator ==(Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>? left, Incursa.OpenAI.Agents.AgentHandoffRequest<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.operator !=(Incursa.OpenAI.Agents.AgentInstructionContext<TContext>? left, Incursa.OpenAI.Agents.AgentInstructionContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentInstructionContext<TContext>.operator ==(Incursa.OpenAI.Agents.AgentInstructionContext<TContext>? left, Incursa.OpenAI.Agents.AgentInstructionContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentInstructions<TContext>.FromDelegate(System.Func<Incursa.OpenAI.Agents.AgentInstructionContext<TContext>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<string!>>! factory) -> Incursa.OpenAI.Agents.AgentInstructions<TContext>!
+static Incursa.OpenAI.Agents.AgentInstructions<TContext>.FromText(string! text) -> Incursa.OpenAI.Agents.AgentInstructions<TContext>!
+static Incursa.OpenAI.Agents.AgentInstructions<TContext>.implicit operator Incursa.OpenAI.Agents.AgentInstructions<TContext>!(string! text) -> Incursa.OpenAI.Agents.AgentInstructions<TContext>!
+static Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.operator !=(Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>? left, Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.operator ==(Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>? left, Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentOutputContract.For<T>() -> Incursa.OpenAI.Agents.AgentOutputContract!
+static Incursa.OpenAI.Agents.AgentOutputContract.For<T>(string? name) -> Incursa.OpenAI.Agents.AgentOutputContract!
+static Incursa.OpenAI.Agents.AgentOutputContract.operator !=(Incursa.OpenAI.Agents.AgentOutputContract? left, Incursa.OpenAI.Agents.AgentOutputContract? right) -> bool
+static Incursa.OpenAI.Agents.AgentOutputContract.operator ==(Incursa.OpenAI.Agents.AgentOutputContract? left, Incursa.OpenAI.Agents.AgentOutputContract? right) -> bool
+static Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.operator !=(Incursa.OpenAI.Agents.AgentPendingApproval<TContext>? left, Incursa.OpenAI.Agents.AgentPendingApproval<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.operator ==(Incursa.OpenAI.Agents.AgentPendingApproval<TContext>? left, Incursa.OpenAI.Agents.AgentPendingApproval<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentRunItem.operator !=(Incursa.OpenAI.Agents.AgentRunItem? left, Incursa.OpenAI.Agents.AgentRunItem? right) -> bool
+static Incursa.OpenAI.Agents.AgentRunItem.operator ==(Incursa.OpenAI.Agents.AgentRunItem? left, Incursa.OpenAI.Agents.AgentRunItem? right) -> bool
+static Incursa.OpenAI.Agents.AgentRunOptions<TContext>.operator !=(Incursa.OpenAI.Agents.AgentRunOptions<TContext>? left, Incursa.OpenAI.Agents.AgentRunOptions<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentRunOptions<TContext>.operator ==(Incursa.OpenAI.Agents.AgentRunOptions<TContext>? left, Incursa.OpenAI.Agents.AgentRunOptions<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.FromState(Incursa.OpenAI.Agents.AgentRunState<TContext>! state, TContext context, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentApprovalResponse!>? approvalResponses, int? maxTurns, Incursa.OpenAI.Agents.AgentRunOptions<TContext>? options) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.FromState(Incursa.OpenAI.Agents.AgentRunState<TContext>! state, TContext context, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentApprovalResponse!>? approvalResponses, int? maxTurns) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.FromState(Incursa.OpenAI.Agents.AgentRunState<TContext>! state, TContext context, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentApprovalResponse!>? approvalResponses) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.FromState(Incursa.OpenAI.Agents.AgentRunState<TContext>! state, TContext context) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.FromUserInput(Incursa.OpenAI.Agents.Agent<TContext>! agent, string! userInput, TContext context, string? sessionKey, int maxTurns, Incursa.OpenAI.Agents.AgentRunOptions<TContext>? options) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.FromUserInput(Incursa.OpenAI.Agents.Agent<TContext>! agent, string! userInput, TContext context, string? sessionKey, int maxTurns) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.FromUserInput(Incursa.OpenAI.Agents.Agent<TContext>! agent, string! userInput, TContext context, string? sessionKey) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.FromUserInput(Incursa.OpenAI.Agents.Agent<TContext>! agent, string! userInput, TContext context) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.operator !=(Incursa.OpenAI.Agents.AgentRunRequest<TContext>? left, Incursa.OpenAI.Agents.AgentRunRequest<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.operator ==(Incursa.OpenAI.Agents.AgentRunRequest<TContext>? left, Incursa.OpenAI.Agents.AgentRunRequest<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ResumeApproved(Incursa.OpenAI.Agents.AgentRunState<TContext>! state, TContext context, string! toolCallId, int? maxTurns, Incursa.OpenAI.Agents.AgentRunOptions<TContext>? options) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ResumeApproved(Incursa.OpenAI.Agents.AgentRunState<TContext>! state, TContext context, string! toolCallId, int? maxTurns) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ResumeApproved(Incursa.OpenAI.Agents.AgentRunState<TContext>! state, TContext context, string! toolCallId) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ResumeRejected(Incursa.OpenAI.Agents.AgentRunState<TContext>! state, TContext context, string! toolCallId, string? reason, int? maxTurns, Incursa.OpenAI.Agents.AgentRunOptions<TContext>? options) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ResumeRejected(Incursa.OpenAI.Agents.AgentRunState<TContext>! state, TContext context, string! toolCallId, string? reason, int? maxTurns) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ResumeRejected(Incursa.OpenAI.Agents.AgentRunState<TContext>! state, TContext context, string! toolCallId, string? reason) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunRequest<TContext>.ResumeRejected(Incursa.OpenAI.Agents.AgentRunState<TContext>! state, TContext context, string! toolCallId) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentRunResult<TContext>.operator !=(Incursa.OpenAI.Agents.AgentRunResult<TContext>? left, Incursa.OpenAI.Agents.AgentRunResult<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentRunResult<TContext>.operator ==(Incursa.OpenAI.Agents.AgentRunResult<TContext>? left, Incursa.OpenAI.Agents.AgentRunResult<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentRunState<TContext>.operator !=(Incursa.OpenAI.Agents.AgentRunState<TContext>? left, Incursa.OpenAI.Agents.AgentRunState<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentRunState<TContext>.operator ==(Incursa.OpenAI.Agents.AgentRunState<TContext>? left, Incursa.OpenAI.Agents.AgentRunState<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentRuntimeObservation.operator !=(Incursa.OpenAI.Agents.AgentRuntimeObservation? left, Incursa.OpenAI.Agents.AgentRuntimeObservation? right) -> bool
+static Incursa.OpenAI.Agents.AgentRuntimeObservation.operator ==(Incursa.OpenAI.Agents.AgentRuntimeObservation? left, Incursa.OpenAI.Agents.AgentRuntimeObservation? right) -> bool
+static Incursa.OpenAI.Agents.AgentRuntimeObserverExtensions.ObserveAsync(this Incursa.OpenAI.Agents.IAgentRuntimeObserver! observer, Incursa.OpenAI.Agents.AgentRuntimeObservation! observation) -> System.Threading.Tasks.ValueTask
+static Incursa.OpenAI.Agents.AgentSessionPendingApproval.operator !=(Incursa.OpenAI.Agents.AgentSessionPendingApproval? left, Incursa.OpenAI.Agents.AgentSessionPendingApproval? right) -> bool
+static Incursa.OpenAI.Agents.AgentSessionPendingApproval.operator ==(Incursa.OpenAI.Agents.AgentSessionPendingApproval? left, Incursa.OpenAI.Agents.AgentSessionPendingApproval? right) -> bool
+static Incursa.OpenAI.Agents.AgentSessionRecovery.RequiresApproval(this Incursa.OpenAI.Agents.AgentSession! session) -> bool
+static Incursa.OpenAI.Agents.AgentSessionRecovery.ResumeApproved<TContext>(this Incursa.OpenAI.Agents.AgentSession! session, Incursa.OpenAI.Agents.Agent<TContext>! currentAgent, TContext context, string! toolCallId, int? maxTurns, Incursa.OpenAI.Agents.AgentRunOptions<TContext>? options) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentSessionRecovery.ResumeApproved<TContext>(this Incursa.OpenAI.Agents.AgentSession! session, Incursa.OpenAI.Agents.Agent<TContext>! currentAgent, TContext context, string! toolCallId, int? maxTurns) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentSessionRecovery.ResumeApproved<TContext>(this Incursa.OpenAI.Agents.AgentSession! session, Incursa.OpenAI.Agents.Agent<TContext>! currentAgent, TContext context, string! toolCallId) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentSessionRecovery.ResumeRejected<TContext>(this Incursa.OpenAI.Agents.AgentSession! session, Incursa.OpenAI.Agents.Agent<TContext>! currentAgent, TContext context, string! toolCallId, string? reason, int? maxTurns, Incursa.OpenAI.Agents.AgentRunOptions<TContext>? options) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentSessionRecovery.ResumeRejected<TContext>(this Incursa.OpenAI.Agents.AgentSession! session, Incursa.OpenAI.Agents.Agent<TContext>! currentAgent, TContext context, string! toolCallId, string? reason, int? maxTurns) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentSessionRecovery.ResumeRejected<TContext>(this Incursa.OpenAI.Agents.AgentSession! session, Incursa.OpenAI.Agents.Agent<TContext>! currentAgent, TContext context, string! toolCallId, string? reason) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentSessionRecovery.ResumeRejected<TContext>(this Incursa.OpenAI.Agents.AgentSession! session, Incursa.OpenAI.Agents.Agent<TContext>! currentAgent, TContext context, string! toolCallId) -> Incursa.OpenAI.Agents.AgentRunRequest<TContext>!
+static Incursa.OpenAI.Agents.AgentSessionRecovery.ToRunState<TContext>(this Incursa.OpenAI.Agents.AgentSession! session, Incursa.OpenAI.Agents.Agent<TContext>! currentAgent) -> Incursa.OpenAI.Agents.AgentRunState<TContext>!
+static Incursa.OpenAI.Agents.AgentSessionStoreExtensions.CleanupExpiredSessionsAsync(this Incursa.OpenAI.Agents.IVersionedAgentSessionStore! store) -> System.Threading.Tasks.ValueTask<int>
+static Incursa.OpenAI.Agents.AgentSessionStoreExtensions.LoadAsync(this Incursa.OpenAI.Agents.IAgentSessionStore! store, string! sessionKey) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentSession?>
+static Incursa.OpenAI.Agents.AgentSessionStoreExtensions.SaveAsync(this Incursa.OpenAI.Agents.IAgentSessionStore! store, Incursa.OpenAI.Agents.AgentSession! session) -> System.Threading.Tasks.ValueTask
+static Incursa.OpenAI.Agents.AgentStreamEvent.operator !=(Incursa.OpenAI.Agents.AgentStreamEvent? left, Incursa.OpenAI.Agents.AgentStreamEvent? right) -> bool
+static Incursa.OpenAI.Agents.AgentStreamEvent.operator ==(Incursa.OpenAI.Agents.AgentStreamEvent? left, Incursa.OpenAI.Agents.AgentStreamEvent? right) -> bool
+static Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.operator !=(Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>? left, Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>.operator ==(Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>? left, Incursa.OpenAI.Agents.AgentToolAvailabilityContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentToolCall<TContext>.operator !=(Incursa.OpenAI.Agents.AgentToolCall<TContext>? left, Incursa.OpenAI.Agents.AgentToolCall<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentToolCall<TContext>.operator ==(Incursa.OpenAI.Agents.AgentToolCall<TContext>? left, Incursa.OpenAI.Agents.AgentToolCall<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentToolErrorContext.operator !=(Incursa.OpenAI.Agents.AgentToolErrorContext? left, Incursa.OpenAI.Agents.AgentToolErrorContext? right) -> bool
+static Incursa.OpenAI.Agents.AgentToolErrorContext.operator ==(Incursa.OpenAI.Agents.AgentToolErrorContext? left, Incursa.OpenAI.Agents.AgentToolErrorContext? right) -> bool
+static Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.operator !=(Incursa.OpenAI.Agents.AgentToolInvocation<TContext>? left, Incursa.OpenAI.Agents.AgentToolInvocation<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentToolInvocation<TContext>.operator ==(Incursa.OpenAI.Agents.AgentToolInvocation<TContext>? left, Incursa.OpenAI.Agents.AgentToolInvocation<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentToolResult.FromStructured(System.Text.Json.Nodes.JsonNode! value, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentRunItem!>? items) -> Incursa.OpenAI.Agents.AgentToolResult!
+static Incursa.OpenAI.Agents.AgentToolResult.FromStructured(System.Text.Json.Nodes.JsonNode! value) -> Incursa.OpenAI.Agents.AgentToolResult!
+static Incursa.OpenAI.Agents.AgentToolResult.FromText(string! text, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.AgentRunItem!>? items) -> Incursa.OpenAI.Agents.AgentToolResult!
+static Incursa.OpenAI.Agents.AgentToolResult.FromText(string! text) -> Incursa.OpenAI.Agents.AgentToolResult!
+static Incursa.OpenAI.Agents.AgentToolResult.operator !=(Incursa.OpenAI.Agents.AgentToolResult? left, Incursa.OpenAI.Agents.AgentToolResult? right) -> bool
+static Incursa.OpenAI.Agents.AgentToolResult.operator ==(Incursa.OpenAI.Agents.AgentToolResult? left, Incursa.OpenAI.Agents.AgentToolResult? right) -> bool
+static Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.operator !=(Incursa.OpenAI.Agents.AgentTurnRequest<TContext>? left, Incursa.OpenAI.Agents.AgentTurnRequest<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentTurnRequest<TContext>.operator ==(Incursa.OpenAI.Agents.AgentTurnRequest<TContext>? left, Incursa.OpenAI.Agents.AgentTurnRequest<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.Empty.get -> Incursa.OpenAI.Agents.AgentTurnResponse<TContext>!
+static Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.operator !=(Incursa.OpenAI.Agents.AgentTurnResponse<TContext>? left, Incursa.OpenAI.Agents.AgentTurnResponse<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.AgentTurnResponse<TContext>.operator ==(Incursa.OpenAI.Agents.AgentTurnResponse<TContext>? left, Incursa.OpenAI.Agents.AgentTurnResponse<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.ApprovalDecision.Allow() -> Incursa.OpenAI.Agents.ApprovalDecision!
+static Incursa.OpenAI.Agents.ApprovalDecision.operator !=(Incursa.OpenAI.Agents.ApprovalDecision? left, Incursa.OpenAI.Agents.ApprovalDecision? right) -> bool
+static Incursa.OpenAI.Agents.ApprovalDecision.operator ==(Incursa.OpenAI.Agents.ApprovalDecision? left, Incursa.OpenAI.Agents.ApprovalDecision? right) -> bool
+static Incursa.OpenAI.Agents.ApprovalDecision.Require(string? reason) -> Incursa.OpenAI.Agents.ApprovalDecision!
+static Incursa.OpenAI.Agents.GuardrailContext<TContext>.operator !=(Incursa.OpenAI.Agents.GuardrailContext<TContext>? left, Incursa.OpenAI.Agents.GuardrailContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.GuardrailContext<TContext>.operator ==(Incursa.OpenAI.Agents.GuardrailContext<TContext>? left, Incursa.OpenAI.Agents.GuardrailContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.GuardrailResult.Allow() -> Incursa.OpenAI.Agents.GuardrailResult!
+static Incursa.OpenAI.Agents.GuardrailResult.operator !=(Incursa.OpenAI.Agents.GuardrailResult? left, Incursa.OpenAI.Agents.GuardrailResult? right) -> bool
+static Incursa.OpenAI.Agents.GuardrailResult.operator ==(Incursa.OpenAI.Agents.GuardrailResult? left, Incursa.OpenAI.Agents.GuardrailResult? right) -> bool
+static Incursa.OpenAI.Agents.GuardrailResult.Tripwire(string! reason, System.Collections.Generic.IReadOnlyDictionary<string!, object?>? metadata) -> Incursa.OpenAI.Agents.GuardrailResult!
+static Incursa.OpenAI.Agents.GuardrailResult.Tripwire(string! reason) -> Incursa.OpenAI.Agents.GuardrailResult!
+static Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.operator !=(Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition? left, Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition.operator ==(Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition? left, Incursa.OpenAI.Agents.Mcp.HostedMcpToolDefinition? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpAuthContext.operator !=(Incursa.OpenAI.Agents.Mcp.McpAuthContext? left, Incursa.OpenAI.Agents.Mcp.McpAuthContext? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpAuthContext.operator ==(Incursa.OpenAI.Agents.Mcp.McpAuthContext? left, Incursa.OpenAI.Agents.Mcp.McpAuthContext? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpAuthResult.Empty.get -> Incursa.OpenAI.Agents.Mcp.McpAuthResult!
+static Incursa.OpenAI.Agents.Mcp.McpAuthResult.operator !=(Incursa.OpenAI.Agents.Mcp.McpAuthResult? left, Incursa.OpenAI.Agents.Mcp.McpAuthResult? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpAuthResult.operator ==(Incursa.OpenAI.Agents.Mcp.McpAuthResult? left, Incursa.OpenAI.Agents.Mcp.McpAuthResult? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpClientObservation.operator !=(Incursa.OpenAI.Agents.Mcp.McpClientObservation? left, Incursa.OpenAI.Agents.Mcp.McpClientObservation? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpClientObservation.operator ==(Incursa.OpenAI.Agents.Mcp.McpClientObservation? left, Incursa.OpenAI.Agents.Mcp.McpClientObservation? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpClientObserverExtensions.ObserveAsync(this Incursa.OpenAI.Agents.Mcp.IMcpClientObserver! observer, Incursa.OpenAI.Agents.Mcp.McpClientObservation! observation) -> System.Threading.Tasks.ValueTask
+static Incursa.OpenAI.Agents.Mcp.McpToolCallResult.operator !=(Incursa.OpenAI.Agents.Mcp.McpToolCallResult? left, Incursa.OpenAI.Agents.Mcp.McpToolCallResult? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpToolCallResult.operator ==(Incursa.OpenAI.Agents.Mcp.McpToolCallResult? left, Incursa.OpenAI.Agents.Mcp.McpToolCallResult? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.operator !=(Incursa.OpenAI.Agents.Mcp.McpToolDescriptor? left, Incursa.OpenAI.Agents.Mcp.McpToolDescriptor? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpToolDescriptor.operator ==(Incursa.OpenAI.Agents.Mcp.McpToolDescriptor? left, Incursa.OpenAI.Agents.Mcp.McpToolDescriptor? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpToolFilter.operator !=(Incursa.OpenAI.Agents.Mcp.McpToolFilter? left, Incursa.OpenAI.Agents.Mcp.McpToolFilter? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpToolFilter.operator ==(Incursa.OpenAI.Agents.Mcp.McpToolFilter? left, Incursa.OpenAI.Agents.Mcp.McpToolFilter? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.operator !=(Incursa.OpenAI.Agents.Mcp.McpToolFilterContext? left, Incursa.OpenAI.Agents.Mcp.McpToolFilterContext? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpToolFilterContext.operator ==(Incursa.OpenAI.Agents.Mcp.McpToolFilterContext? left, Incursa.OpenAI.Agents.Mcp.McpToolFilterContext? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.operator !=(Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext? left, Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext.operator ==(Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext? left, Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.McpToolMetadataResolverExtensions.ResolveAsync(this Incursa.OpenAI.Agents.Mcp.IMcpToolMetadataResolver! resolver, Incursa.OpenAI.Agents.Mcp.McpToolMetadataContext! context) -> System.Threading.Tasks.ValueTask<System.Text.Json.Nodes.JsonObject?>
+static Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.operator !=(Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest? left, Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest.operator ==(Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest? left, Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpRequest? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.operator !=(Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition? left, Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition.operator ==(Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition? left, Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpServerDefinition? right) -> bool
+static Incursa.OpenAI.Agents.Mcp.StreamableMcpClientExtensions.CallToolAsync(this Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient! client, string! toolName, System.Text.Json.Nodes.JsonNode? arguments) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.Mcp.McpToolCallResult!>!
+static Incursa.OpenAI.Agents.Mcp.StreamableMcpClientExtensions.CallToolAsync(this Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient! client, string! toolName) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.Mcp.McpToolCallResult!>!
+static Incursa.OpenAI.Agents.Mcp.StreamableMcpClientExtensions.ListToolsAsync(this Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient! client) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.Mcp.McpToolDescriptor!>!>!
+static Incursa.OpenAI.Agents.Mcp.UserScopedMcpAuthResolverExtensions.ResolveAsync(this Incursa.OpenAI.Agents.Mcp.IUserScopedMcpAuthResolver! resolver, Incursa.OpenAI.Agents.Mcp.McpAuthContext! context) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.Mcp.McpAuthResult!>
+static Incursa.OpenAI.Agents.OpenAiResponsesClientExtensions.CreateResponseAsync(this Incursa.OpenAI.Agents.IOpenAiResponsesClient! client, Incursa.OpenAI.Agents.OpenAiResponsesRequest! request) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiResponsesResponse!>!
+static Incursa.OpenAI.Agents.OpenAiResponsesClientExtensions.StreamResponseAsync(this Incursa.OpenAI.Agents.IOpenAiResponsesClient! client, Incursa.OpenAI.Agents.OpenAiResponsesRequest! request) -> System.Collections.Generic.IAsyncEnumerable<Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent!>!
+static Incursa.OpenAI.Agents.OpenAiResponsesRequest.operator !=(Incursa.OpenAI.Agents.OpenAiResponsesRequest? left, Incursa.OpenAI.Agents.OpenAiResponsesRequest? right) -> bool
+static Incursa.OpenAI.Agents.OpenAiResponsesRequest.operator ==(Incursa.OpenAI.Agents.OpenAiResponsesRequest? left, Incursa.OpenAI.Agents.OpenAiResponsesRequest? right) -> bool
+static Incursa.OpenAI.Agents.OpenAiResponsesResponse.operator !=(Incursa.OpenAI.Agents.OpenAiResponsesResponse? left, Incursa.OpenAI.Agents.OpenAiResponsesResponse? right) -> bool
+static Incursa.OpenAI.Agents.OpenAiResponsesResponse.operator ==(Incursa.OpenAI.Agents.OpenAiResponsesResponse? left, Incursa.OpenAI.Agents.OpenAiResponsesResponse? right) -> bool
+static Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.operator !=(Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent? left, Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent? right) -> bool
+static Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent.operator ==(Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent? left, Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent? right) -> bool
+static Incursa.OpenAI.Agents.OpenAiResponsesStreaming.IsRawModelEvent(Incursa.OpenAI.Agents.AgentStreamEvent! streamEvent) -> bool
+static Incursa.OpenAI.Agents.OpenAiResponsesStreaming.TryGetOutputItem(Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent! streamEvent, out System.Text.Json.Nodes.JsonObject? item) -> bool
+static Incursa.OpenAI.Agents.OpenAiResponsesStreaming.TryGetRawEventType(Incursa.OpenAI.Agents.AgentStreamEvent! streamEvent, out string? eventType) -> bool
+static Incursa.OpenAI.Agents.OpenAiResponsesStreaming.TryGetResponseId(Incursa.OpenAI.Agents.OpenAiResponsesStreamEvent! streamEvent, out string? responseId) -> bool
+static Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.operator !=(Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>? left, Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>.operator ==(Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>? left, Incursa.OpenAI.Agents.OutputGuardrailContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.operator !=(Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>? left, Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>.operator ==(Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>? left, Incursa.OpenAI.Agents.ToolInputGuardrailContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.operator !=(Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>? left, Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>? right) -> bool
+static Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>.operator ==(Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>? left, Incursa.OpenAI.Agents.ToolOutputGuardrailContext<TContext>? right) -> bool

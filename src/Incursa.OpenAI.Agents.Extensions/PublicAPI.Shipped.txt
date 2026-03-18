@@ -1,0 +1,54 @@
+#nullable enable
+Incursa.OpenAI.Agents.Extensions.AgentRuntimeObservationSinkExtensions
+Incursa.OpenAI.Agents.Extensions.AgentRuntimeOptions
+Incursa.OpenAI.Agents.Extensions.AgentRuntimeOptions.AgentRuntimeOptions() -> void
+Incursa.OpenAI.Agents.Extensions.AgentRuntimeOptions.EnableLoggingObserver.get -> bool
+Incursa.OpenAI.Agents.Extensions.AgentRuntimeOptions.EnableLoggingObserver.set -> void
+Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.AbsoluteLifetime.get -> System.TimeSpan?
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.AbsoluteLifetime.set -> void
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.AgentSessionRetentionOptions() -> void
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.CleanupExpiredOnLoad.get -> bool
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.CleanupExpiredOnLoad.set -> void
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.CleanupExpiredOnSave.get -> bool
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.CleanupExpiredOnSave.set -> void
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.CompactionMode.get -> Incursa.OpenAI.Agents.Sessions
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.CompactionMode.set -> void
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.MaxConversationItems.get -> int?
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.MaxConversationItems.set -> void
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.MaxTurns.get -> int?
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.MaxTurns.set -> void
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.SlidingExpiration.get -> System.TimeSpan?
+Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions.SlidingExpiration.set -> void
+Incursa.OpenAI.Agents.Extensions.IAgentRuntimeObservationSink
+Incursa.OpenAI.Agents.Extensions.IAgentRuntimeObservationSink.ObserveAsync(Incursa.OpenAI.Agents.AgentRuntimeObservation! observation, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.Extensions.IMcpObservationSink
+Incursa.OpenAI.Agents.Extensions.IMcpObservationSink.ObserveAsync(Incursa.OpenAI.Agents.Mcp.McpClientObservation! observation, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.Extensions.McpObservationSinkExtensions
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.ApiKey.get -> string?
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.ApiKey.set -> void
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.BaseAddress.get -> System.Uri?
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.BaseAddress.set -> void
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.EnableMcpLoggingObserver.get -> bool
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.EnableMcpLoggingObserver.set -> void
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.HttpClientName.get -> string!
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.HttpClientName.set -> void
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.McpHttpClientName.get -> string!
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.McpHttpClientName.set -> void
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.McpRetryCount.get -> int
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.McpRetryCount.set -> void
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.McpRetryDelay.get -> System.TimeSpan
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.McpRetryDelay.set -> void
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.OpenAiResponsesOptions() -> void
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.ResponsesPath.get -> string!
+Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.ResponsesPath.set -> void
+static Incursa.OpenAI.Agents.Extensions.AgentRuntimeObservationSinkExtensions.ObserveAsync(this Incursa.OpenAI.Agents.Extensions.IAgentRuntimeObservationSink! sink, Incursa.OpenAI.Agents.AgentRuntimeObservation! observation) -> System.Threading.Tasks.ValueTask
+static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddFileAgentSessions(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, string! directoryPath, System.Action<Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions!>? configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddFileAgentSessions(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, string! directoryPath) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddIncursaAgents(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Incursa.OpenAI.Agents.Extensions.AgentRuntimeOptions!>? configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddIncursaAgents(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddOpenAiResponses(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions!>? configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddOpenAiResponses(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Incursa.OpenAI.Agents.Extensions.McpObservationSinkExtensions.ObserveAsync(this Incursa.OpenAI.Agents.Extensions.IMcpObservationSink! sink, Incursa.OpenAI.Agents.Mcp.McpClientObservation! observation) -> System.Threading.Tasks.ValueTask

@@ -1,0 +1,573 @@
+{
+  "generatedAtUtc": "2026-03-18T05:32:47.4041305Z",
+  "repo": {
+    "defaultBranch": "main"
+  },
+  "summary": {
+    "total": 34,
+    "compliant": 34,
+    "missingRequired": 0,
+    "invalidFormat": 0
+  },
+  "byCategory": [
+    {
+      "category": "Incursa.OpenAI.Agents",
+      "total": 34,
+      "compliant": 34
+    }
+  ],
+  "byTag": [],
+  "byProject": [
+    {
+      "project": "Incursa.OpenAI.Agents.Tests",
+      "total": 34,
+      "compliant": 34
+    }
+  ],
+  "tests": [
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.AgentBuilderTests.AgentBuilder_CreatesConfiguredAgent",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "AgentBuilder preserves the configured composition surface when building an agent.",
+      "intent": "Protect the low-ceremony composition API used by consumer code.",
+      "scenario": "LIB-COMP-BUILDER-001",
+      "behavior": "Builder output keeps model, instructions, tools, handoffs, MCP definitions, metadata, model settings, and output contracts.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/AgentBuilderTests.cs",
+        "line": 15,
+        "member": "Incursa.OpenAI.Agents.Tests.AgentBuilderTests.AgentBuilder_CreatesConfiguredAgent"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.AgentBuilderTests.AgentRunRequest_HelpersCreateResumeAndPreviousResponseRequests",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "AgentRunRequest helper methods preserve resume and continuation metadata.",
+      "intent": "Keep request helper ergonomics aligned with the underlying runtime contracts.",
+      "scenario": "LIB-COMP-REQUEST-001",
+      "behavior": "Helper APIs carry session, previous-response, and approval-resume data into the resulting request.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/AgentBuilderTests.cs",
+        "line": 52,
+        "member": "Incursa.OpenAI.Agents.Tests.AgentBuilderTests.AgentRunRequest_HelpersCreateResumeAndPreviousResponseRequests"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_CompletesWithFinalOutputAndPersistsConversation",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Completed runs persist the final output back into the session conversation.",
+      "intent": "Protect the persisted run transcript contract for resumable execution.",
+      "scenario": "LIB-EXEC-RUNNER-001",
+      "behavior": "Completed runs return a final output and save the final-output item into the stored conversation.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
+        "line": 14,
+        "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_CompletesWithFinalOutputAndPersistsConversation"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_EnforcesMaxTurns",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Configured max turns stop the run before unbounded looping.",
+      "intent": "Protect callers from runaway tool-call or model loops.",
+      "scenario": "LIB-EXEC-MAXTURNS-001",
+      "behavior": "Runs return MaxTurnsExceeded once the configured turn budget is exhausted.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
+        "line": 138,
+        "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_EnforcesMaxTurns"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_ExecutesHandoffAndSwitchesAgent",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Handoffs switch execution to the delegated agent.",
+      "intent": "Protect runtime routing between cooperating agents.",
+      "scenario": "LIB-EXEC-HANDOFF-001",
+      "behavior": "When a handoff is requested the runner invokes the handoff and reports the delegated agent as the final agent.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
+        "line": 83,
+        "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_ExecutesHandoffAndSwitchesAgent"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_ExecutesToolCallAndContinues",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Tool calls execute and feed their outputs into the continuing run.",
+      "intent": "Protect the basic tool-execution loop in the runner.",
+      "scenario": "LIB-EXEC-TOOLS-001",
+      "behavior": "Tool calls invoke the configured tool and append tool output items before the next turn completes.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
+        "line": 44,
+        "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunAsync_ExecutesToolCallAndContinues"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunStreamingAsync_EmitsItemsAsTheyAreGenerated",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Streaming runs emit run items as they are generated.",
+      "intent": "Protect the streaming contract used by interactive callers.",
+      "scenario": "LIB-EXEC-STREAM-001",
+      "behavior": "Streaming execution emits the initial user input, generated message items, and the final output item in-order.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs",
+        "line": 163,
+        "member": "Incursa.OpenAI.Agents.Tests.AgentRunnerTests.RunStreamingAsync_EmitsItemsAsTheyAreGenerated"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_CanResumeApprovalFromPersistedSession",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Persisted approval state can be resumed from a stored session snapshot.",
+      "intent": "Protect durable approval workflows that span process boundaries.",
+      "scenario": "LIB-EXEC-APPROVAL-001-PERSISTED",
+      "behavior": "Stored sessions expose pending approval state that can be resumed and completed later.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
+        "line": 177,
+        "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_CanResumeApprovalFromPersistedSession"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_ReturnsApprovalRequiredAndCanResume",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Approval-required tool calls pause execution until the caller resumes the run.",
+      "intent": "Protect the approval workflow for sensitive tool invocations.",
+      "scenario": "LIB-EXEC-APPROVAL-001",
+      "behavior": "Approval-required tool calls return ApprovalRequired first and only execute after an approval response is supplied.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
+        "line": 13,
+        "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_ReturnsApprovalRequiredAndCanResume"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_StopsOnToolGuardrailTripwire",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Tool guardrail tripwires stop execution before the tool runs.",
+      "intent": "Protect enforcement of per-tool input guardrails.",
+      "scenario": "LIB-EXEC-GUARDRAIL-001",
+      "behavior": "Tripwired tool input guardrails return GuardrailTriggered and surface the guardrail message on the result.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
+        "line": 110,
+        "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_StopsOnToolGuardrailTripwire"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_UsesRunLevelInputGuardrailsOnFirstTurn",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Run-level input guardrails execute before the first turn.",
+      "intent": "Protect run-wide preflight validation semantics.",
+      "scenario": "LIB-EXEC-GUARDRAIL-001-RUN",
+      "behavior": "Run-level input guardrails can stop execution before any turn executor output is accepted.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
+        "line": 143,
+        "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_UsesRunLevelInputGuardrailsOnFirstTurn"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_UsesToolErrorFormatterForRejectedApprovals",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Rejected approvals use the configured tool error formatter.",
+      "intent": "Protect the caller-facing rejection message contract.",
+      "scenario": "LIB-EXEC-APPROVAL-002",
+      "behavior": "Rejected approval items use the supplied tool error formatter instead of invoking the tool.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs",
+        "line": 62,
+        "member": "Incursa.OpenAI.Agents.Tests.ApprovalAndGuardrailTests.RunAsync_UsesToolErrorFormatterForRejectedApprovals"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddIncursaAgents_AndOpenAiResponses_ResolveRunnableServices",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Verifies the extensions package wires the runnable default stack for DI consumers.",
+      "intent": "Protect the public DI registration surface in Incursa.OpenAI.Agents.Extensions.",
+      "scenario": "LIB-EXT-DI-001",
+      "behavior": "The container resolves runnable services and persists sessions through the file-backed store.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
+        "line": 17,
+        "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddIncursaAgents_AndOpenAiResponses_ResolveRunnableServices"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.CompositeAgentRuntimeObserver_FansOutObservationsToAllSinks",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Verifies composite extension observers fan out each runtime observation to all registered sinks.",
+      "intent": "Protect the extensions observability surface from dropping observations when multiple sinks are registered.",
+      "scenario": "LIB-EXT-OBS-001",
+      "behavior": "Each sink receives the same observation exactly once.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
+        "line": 67,
+        "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.CompositeAgentRuntimeObserver_FansOutObservationsToAllSinks"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_AppliesDynamicToolFilterAndSkipsFilterErrors",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Dynamic MCP tool filters can block tools and tolerate filter exceptions.",
+      "intent": "Protect runtime tool visibility filtering.",
+      "scenario": "LIB-MCP-FILTER-001",
+      "behavior": "Allowed tools remain visible while blocked or filter-error tools do not appear in the final list.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
+        "line": 69,
+        "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_AppliesDynamicToolFilterAndSkipsFilterErrors"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_CachesToolListWhenEnabled",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Tool discovery is cached when MCP tool-list caching is enabled.",
+      "intent": "Protect the caching contract for streamable MCP clients.",
+      "scenario": "LIB-MCP-CACHE-001",
+      "behavior": "Repeated tool discovery calls reuse the cached result instead of issuing a second HTTP request.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
+        "line": 103,
+        "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_CachesToolListWhenEnabled"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_DoesNotRetryAuthenticationFailures",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Authentication failures do not retry even when retries are configured.",
+      "intent": "Protect correct classification of non-retryable MCP auth failures.",
+      "scenario": "LIB-MCP-AUTHFAIL-001",
+      "behavior": "Unauthorized responses throw McpAuthenticationException without performing additional attempts.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
+        "line": 198,
+        "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_DoesNotRetryAuthenticationFailures"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_InsertsDynamicHeadersAndMetadataPerRequest",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Streamable MCP requests apply dynamic auth headers and metadata on each request.",
+      "intent": "Protect per-user MCP request shaping for hosted application scenarios.",
+      "scenario": "LIB-MCP-AUTH-001",
+      "behavior": "Requests carry resolver-provided bearer tokens, dynamic headers, and metadata payload content.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
+        "line": 16,
+        "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_InsertsDynamicHeadersAndMetadataPerRequest"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_RetriesTransientHttpFailuresAndObservesAttempts",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Transient MCP failures retry and emit observations when retry settings allow it.",
+      "intent": "Protect resiliency and observation behavior for MCP tool calls.",
+      "scenario": "LIB-MCP-RETRY-001",
+      "behavior": "Retryable failures schedule a retry, eventually succeed, and emit retry and success observations.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
+        "line": 153,
+        "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_RetriesTransientHttpFailuresAndObservesAttempts"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_ThrowsHelpfulErrorForJsonRpcErrors",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "JSON-RPC server errors surface as helpful MCP server exceptions.",
+      "intent": "Protect caller-facing diagnostics for MCP server-side failures.",
+      "scenario": "LIB-MCP-ERROR-001",
+      "behavior": "JSON-RPC error responses throw McpServerException with the server message included.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
+        "line": 132,
+        "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_ThrowsHelpfulErrorForJsonRpcErrors"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_MapsToolsHandoffsAndStructuredOutput",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Request mapping includes tools, handoffs, hosted MCP tools, and structured output definitions.",
+      "intent": "Protect the main request-mapping contract for the OpenAI Responses adapter.",
+      "scenario": "LIB-OAI-MAP-001",
+      "behavior": "Mapped requests preserve model selection, previous-response IDs, tool payloads, MCP payloads, and response-format metadata.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
+        "line": 18,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_MapsToolsHandoffsAndStructuredOutput"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_NormalizesHandoffModelInputAfterHandoff",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Handoff normalization can strip pre-handoff tool-call items from mapped model input.",
+      "intent": "Protect run-level handoff history shaping in the adapter.",
+      "scenario": "LIB-OAI-HANDOFF-001",
+      "behavior": "Normalized model input omits pre-handoff function-call and function-call-output items when that mode is enabled.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
+        "line": 165,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_NormalizesHandoffModelInputAfterHandoff"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_OmitsReasoningIdsWhenConfigured",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Reasoning item IDs can be omitted from mapped input when configured.",
+      "intent": "Protect request-shaping options for reasoning items.",
+      "scenario": "LIB-OAI-REASONING-001",
+      "behavior": "Mapped reasoning items omit their IDs when the configured reasoning-item policy is Omit.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
+        "line": 235,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_OmitsReasoningIdsWhenConfigured"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_UsesRunLevelModelInputFilter",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Run-level model input filters are applied during request mapping.",
+      "intent": "Protect consumer control over the model-visible conversation input.",
+      "scenario": "LIB-OAI-FILTER-001",
+      "behavior": "Mapped input reflects the filtered conversation instead of the full stored conversation.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
+        "line": 201,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_UsesRunLevelModelInputFilter"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Streaming execution reconstructs completed function arguments for emitted tool-call items and final tool-call results.",
+      "intent": "Protect streamed function-call fidelity when argument fragments complete later in the stream.",
+      "scenario": "LIB-OAI-STREAM-001",
+      "behavior": "Completed function arguments appear on emitted tool-call run items and on the final response tool-call data.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
+        "line": 265,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestBody",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Turn execution resolves local MCP servers into OpenAI tool definitions before sending the request.",
+      "intent": "Protect local MCP server translation in the OpenAI adapter.",
+      "scenario": "LIB-OAI-MCP-001",
+      "behavior": "Resolved streamable MCP tools are added to the request body before the turn completes.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
+        "line": 93,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestBody"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.RuntimeObservabilityTests.CompositeMcpClientObserver_FansOutObservationsToAllSinks",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Verifies the composite MCP observer fans out each observation to all registered sinks.",
+      "intent": "Protect the extensions MCP observability surface from partial sink delivery.",
+      "scenario": "LIB-EXT-OBS-001",
+      "behavior": "Each sink receives the same observation exactly once.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/RuntimeObservabilityTests.cs",
+        "line": 43,
+        "member": "Incursa.OpenAI.Agents.Tests.RuntimeObservabilityTests.CompositeMcpClientObserver_FansOutObservationsToAllSinks"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.RuntimeObservabilityTests.RunAsync_EmitsLifecycleObservations",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Verifies the runtime observer receives the lifecycle events emitted by a successful run.",
+      "intent": "Protect the runtime observability contract that downstream sinks rely on.",
+      "scenario": "LIB-EXEC-OBS-001",
+      "behavior": "The observer receives the run and turn lifecycle events in the emitted observation stream.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/RuntimeObservabilityTests.cs",
+        "line": 14,
+        "member": "Incursa.OpenAI.Agents.Tests.RuntimeObservabilityTests.RunAsync_EmitsLifecycleObservations"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_CleansUpExpiredSessions",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The file session store can clean up expired sessions.",
+      "intent": "Protect cleanup behavior for time-limited durable session storage.",
+      "scenario": "LIB-EXEC-SESSION-002-CLEANUP",
+      "behavior": "Expired file-backed sessions are removed and no longer load after cleanup.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
+        "line": 184,
+        "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_CleansUpExpiredSessions"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_PersistsSessionsAcrossLoads",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The file session store preserves agent, response, and conversation state across loads.",
+      "intent": "Protect durable local session persistence.",
+      "scenario": "LIB-EXEC-SESSION-001-FILE",
+      "behavior": "Saving and loading a file-backed session preserves core run-state fields and conversation items.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
+        "line": 38,
+        "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_PersistsSessionsAcrossLoads"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_TrimsToLatestWindowWhenConfigured",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The file session store trims the conversation according to the configured retention window.",
+      "intent": "Protect bounded session growth for file-backed persistence.",
+      "scenario": "LIB-EXEC-SESSION-002-TRIM",
+      "behavior": "Configured limits trim older conversation items and record the trimmed item count.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
+        "line": 75,
+        "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_TrimsToLatestWindowWhenConfigured"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_UsesAtomicReplaceWithoutLeavingTempFiles",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The file session store replaces persisted content atomically.",
+      "intent": "Protect durability without leaving partially written temp files behind.",
+      "scenario": "LIB-EXEC-SESSION-002-ATOMIC",
+      "behavior": "Repeated saves leave only the final session file and no lingering temp files.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
+        "line": 120,
+        "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.FileStore_UsesAtomicReplaceWithoutLeavingTempFiles"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.SessionStoreTests.InMemoryStore_PersistsConversationAcrossLoads",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The in-memory session store returns the saved conversation on later loads.",
+      "intent": "Protect the default session persistence contract.",
+      "scenario": "LIB-EXEC-SESSION-001-INMEMORY",
+      "behavior": "Saving a session to the in-memory store preserves its conversation for later retrieval.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
+        "line": 12,
+        "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.InMemoryStore_PersistsConversationAcrossLoads"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.SessionStoreTests.InMemoryStore_RejectsStaleVersionWrites",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The in-memory versioned session store rejects stale writes.",
+      "intent": "Protect optimistic concurrency for resumable sessions.",
+      "scenario": "LIB-EXEC-SESSION-001-VERSION",
+      "behavior": "Saving an older session version throws a version mismatch exception after a newer write succeeds.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs",
+        "line": 153,
+        "member": "Incursa.OpenAI.Agents.Tests.SessionStoreTests.InMemoryStore_RejectsStaleVersionWrites"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    }
+  ]
+}

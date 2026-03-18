@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-net/master/src/Stryker.CLI/Stryker.CLI/schema/stryker-config-schema.json",
+  "solution": "Incursa.OpenAI.Agents.slnx",
+  "test-projects": [
+    "tests/Incursa.OpenAI.Agents.Tests/Incursa.OpenAI.Agents.Tests.csproj"
+  ],
+  "project": "src/Incursa.OpenAI.Agents/Incursa.OpenAI.Agents.csproj",
+  "mutate": [
+    "**/Core/Agent.cs",
+    "**/Core/AgentBuilder.cs",
+    "**/Core/AgentRunner.cs",
+    "**/Core/Approvals.cs",
+    "**/Core/Guardrails.cs",
+    "**/Core/Sessions.cs",
+    "**/Mcp/Mcp.cs"
+  ],
+  "test-case-filter": "Category!=Integration&Category!=KnownIssue",
+  "reporters": [
+    "json",
+    "html",
+    "progress"
+  ],
+  "thresholds": {
+    "high": 75,
+    "low": 60,
+    "break": 65
+  }
+}

@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Incursa.OpenAI.Agents.Extensions/Incursa.OpenAI.Agents.Extensions.csproj" />
+    <Project Path="src/Incursa.OpenAI.Agents/Incursa.OpenAI.Agents.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/Incursa.OpenAI.Agents.ConsoleSample/Incursa.OpenAI.Agents.ConsoleSample.csproj" />
+    <Project Path="samples/Incursa.OpenAI.Agents.HostSample/Incursa.OpenAI.Agents.HostSample.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Incursa.OpenAI.Agents.Tests/Incursa.OpenAI.Agents.Tests.csproj" />
+  </Folder>
+</Solution>

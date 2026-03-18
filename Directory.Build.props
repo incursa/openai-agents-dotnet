@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Version>1.0.12</Version>
+    <Authors>Samuel McAravey</Authors>
+    <Company>Incursa</Company>
+    <PackageProjectUrl>https://github.com/incursa/openai-agents-dotnet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/incursa/openai-agents-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+</Project>

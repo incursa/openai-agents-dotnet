@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+set -eu
+python -m pre_commit run --hook-stage pre-commit --all-files

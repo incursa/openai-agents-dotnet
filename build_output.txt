@@ -1,0 +1,9 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Incursa.OpenAI.Agents -> C:\src\incursa\openai-agents-dotnet\src\Incursa.OpenAI.Agents\bin\Debug\net10.0\Incursa.OpenAI.Agents.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.66
