@@ -1,5 +1,6 @@
 # Incursa.OpenAI.Agents
 
+[![CI](https://github.com/incursa/openai-agents-dotnet/actions/workflows/ci.yml/badge.svg)](https://github.com/incursa/openai-agents-dotnet/actions/workflows/ci.yml)
 [![Quality](https://github.com/incursa/openai-agents-dotnet/actions/workflows/library-fast-quality.yml/badge.svg)](https://github.com/incursa/openai-agents-dotnet/actions/workflows/library-fast-quality.yml)
 [![Docs](https://github.com/incursa/openai-agents-dotnet/actions/workflows/testdocs.yml/badge.svg)](https://github.com/incursa/openai-agents-dotnet/actions/workflows/testdocs.yml)
 [![Nightly issue sync](https://github.com/incursa/openai-agents-dotnet/actions/workflows/workbench-nightly-sync.yml/badge.svg)](https://github.com/incursa/openai-agents-dotnet/actions/workflows/workbench-nightly-sync.yml)
@@ -119,6 +120,7 @@ dotnet test
 - Publishing uses the GitHub workflow `.github/workflows/publish-nuget-packages.yml`.
   - Tag with `vX.Y.Z` (for example `v1.0.12`) and push, or run workflow dispatch with `version` set to `X.Y.Z`.
   - The workflow validates policy using `scripts/release/validate-public-api-versioning.ps1` before packing and pushing both packages to nuget.org.
+- Standard CI uses `.github/workflows/ci.yml` for push and pull request validation without publishing.
 
 ### 2) Run samples
 
