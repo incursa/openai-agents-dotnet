@@ -130,19 +130,18 @@ internal sealed class OpenAiResponsesRequestMapper
             body["tools"] = tools;
         }
 
-        // Convert an explicit output contract into an OpenAI json_schema response_format.
+        // Convert an explicit output contract into the current Responses API json_schema shape.
         if (request.Agent.OutputContract is not null)
         {
-            body["response_format"] = new JsonObject
+            JsonObject text = body["text"] as JsonObject ?? new JsonObject();
+            text["format"] = new JsonObject
             {
                 ["type"] = "json_schema",
-                ["json_schema"] = new JsonObject
-                {
-                    ["name"] = request.Agent.OutputContract.Name ?? request.Agent.OutputContract.ClrType.Name,
-                    ["schema"] = OpenAiJsonSchemaGenerator.CreateSchema(request.Agent.OutputContract.ClrType),
-                    ["strict"] = true,
-                },
+                ["name"] = request.Agent.OutputContract.Name ?? request.Agent.OutputContract.ClrType.Name,
+                ["schema"] = OpenAiJsonSchemaGenerator.CreateSchema(request.Agent.OutputContract.ClrType),
+                ["strict"] = true,
             };
+            body["text"] = text;
         }
 
         return new OpenAiResponsesTurnPlan<TContext>(body, request.Agent, handoffMap);

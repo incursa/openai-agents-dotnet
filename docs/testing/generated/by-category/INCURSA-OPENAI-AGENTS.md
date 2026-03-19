@@ -161,27 +161,27 @@ Total tests: 44
   - Summary: Handoff normalization can strip pre-handoff tool-call items from mapped model input.
   - Intent: Protect run-level handoff history shaping in the adapter.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L168](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L168)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L176](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L176)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_OmitsReasoningIdsWhenConfigured**
   - Summary: Reasoning item IDs can be omitted from mapped input when configured.
   - Intent: Protect request-shaping options for reasoning items.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L238](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L238)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L246](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L246)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_UsesRunLevelModelInputFilter**
   - Summary: Run-level model input filters are applied during request mapping.
   - Intent: Protect consumer control over the model-visible conversation input.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L204](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L204)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L212](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L212)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse**
   - Summary: Streaming execution reconstructs completed function arguments for emitted tool-call items and final tool-call results.
   - Intent: Protect streamed function-call fidelity when argument fragments complete later in the stream.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L270](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L270)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L278](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L278)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestBody**
   - Summary: Turn execution resolves local MCP servers into OpenAI tool definitions before sending the request.
   - Intent: Protect local MCP server translation in the OpenAI adapter.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L94](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L94)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L102](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L102)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.RuntimeObservabilityTests.CompositeMcpClientObserver_FansOutObservationsToAllSinks**
   - Summary: Verifies the composite MCP observer fans out each observation to all registered sinks.
   - Intent: Protect the extensions MCP observability surface from partial sink delivery.

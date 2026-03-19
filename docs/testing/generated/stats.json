@@ -522,7 +522,7 @@
       "summary": "Request mapping includes tools, handoffs, hosted MCP tools, and structured output definitions.",
       "intent": "Protect the main request-mapping contract for the OpenAI Responses adapter.",
       "scenario": "LIB-OAI-MAP-001",
-      "behavior": "Mapped requests preserve model selection, previous-response IDs, tool payloads, MCP payloads, and response-format metadata.",
+      "behavior": "Mapped requests preserve model selection, previous-response IDs, tool payloads, MCP payloads, and structured-output metadata.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
         "line": 18,
@@ -541,7 +541,7 @@
       "behavior": "Normalized model input omits pre-handoff function-call and function-call-output items when that mode is enabled.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 168,
+        "line": 176,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_NormalizesHandoffModelInputAfterHandoff"
       },
       "status": "compliant",
@@ -557,7 +557,7 @@
       "behavior": "Mapped reasoning items omit their IDs when the configured reasoning-item policy is Omit.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 238,
+        "line": 246,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_OmitsReasoningIdsWhenConfigured"
       },
       "status": "compliant",
@@ -573,7 +573,7 @@
       "behavior": "Mapped input reflects the filtered conversation instead of the full stored conversation.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 204,
+        "line": 212,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_UsesRunLevelModelInputFilter"
       },
       "status": "compliant",
@@ -589,7 +589,7 @@
       "behavior": "Completed function arguments appear on emitted tool-call run items and on the final response tool-call data.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 270,
+        "line": 278,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse"
       },
       "status": "compliant",
@@ -605,7 +605,7 @@
       "behavior": "Resolved streamable MCP tools are added to the request body before the turn completes.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 94,
+        "line": 102,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestBody"
       },
       "status": "compliant",

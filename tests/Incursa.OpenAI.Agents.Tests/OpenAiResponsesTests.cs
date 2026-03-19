@@ -12,7 +12,7 @@ public sealed class OpenAiResponsesTests
     /// <summary>Request mapping includes tools, handoffs, hosted MCP tools, and structured output definitions.</summary>
     /// <intent>Protect the main request-mapping contract for the OpenAI Responses adapter.</intent>
     /// <scenario>LIB-OAI-MAP-001</scenario>
-    /// <behavior>Mapped requests preserve model selection, previous-response IDs, tool payloads, MCP payloads, and response-format metadata.</behavior>
+    /// <behavior>Mapped requests preserve model selection, previous-response IDs, tool payloads, MCP payloads, and structured-output metadata.</behavior>
     [Trait("Category", "Smoke")]
     [Fact]
     public async Task RequestMapper_MapsToolsHandoffsAndStructuredOutput()
@@ -58,6 +58,13 @@ public sealed class OpenAiResponsesTests
                 },
             ],
             OutputContract = AgentOutputContract.For<ExampleOutput>(),
+            ModelSettings = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["text"] = new
+                {
+                    verbosity = "medium",
+                },
+            },
             HostedMcpTools =
             [
                 new HostedMcpToolDefinition("mail", new Uri("https://mail.example.test/mcp"), "connector-1", null, true, null, null, "Hosted mail connector"),
@@ -80,8 +87,9 @@ public sealed class OpenAiResponsesTests
         Assert.Equal("gpt-5.4", plan.Body["model"]?.GetValue<string>());
         Assert.Equal("resp-previous", plan.Body["previous_response_id"]?.GetValue<string>());
         Assert.NotNull(plan.Body["tools"]);
-        Assert.NotNull(plan.Body["response_format"]);
-        Assert.Equal("json_schema", plan.Body["response_format"]?["type"]?.GetValue<string>());
+        Assert.Equal("medium", plan.Body["text"]?["verbosity"]?.GetValue<string>());
+        Assert.NotNull(plan.Body["text"]?["format"]);
+        Assert.Equal("json_schema", plan.Body["text"]?["format"]?["type"]?.GetValue<string>());
         Assert.Single(plan.HandoffMap);
         Assert.Contains(plan.Body["tools"]!.AsArray(), item => item!["type"]?.GetValue<string>() == "mcp");
     }
