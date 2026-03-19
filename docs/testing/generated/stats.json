@@ -4,16 +4,16 @@
     "defaultBranch": "main"
   },
   "summary": {
-    "total": 44,
-    "compliant": 44,
+    "total": 50,
+    "compliant": 50,
     "missingRequired": 0,
     "invalidFormat": 0
   },
   "byCategory": [
     {
       "category": "Incursa.OpenAI.Agents",
-      "total": 44,
-      "compliant": 44
+      "total": 50,
+      "compliant": 50
     }
   ],
   "byTag": [],
@@ -30,8 +30,8 @@
     },
     {
       "project": "Incursa.OpenAI.Agents.Tests",
-      "total": 38,
-      "compliant": 38
+      "total": 44,
+      "compliant": 44
     }
   ],
   "tests": [
@@ -516,6 +516,22 @@
       "project": "Incursa.OpenAI.Agents.Tests"
     },
     {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.OpenAiResponsesRequest_DoesNotSerializeTypedOptionsSnapshot",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Wrapping typed options does not force snapshot serialization for SDK-only tool types.",
+      "intent": "Prevent request construction from crashing on hosted MCP tools due to SDK serializer limitations.",
+      "scenario": "LIB-OAI-CLIENT-002",
+      "behavior": "Creating an internal request from typed options succeeds and leaves the compatibility JSON body empty until explicitly provided.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
+        "line": 277,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.OpenAiResponsesRequest_DoesNotSerializeTypedOptionsSnapshot"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
       "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_MapsToolsHandoffsAndStructuredOutput",
       "category": "Incursa.OpenAI.Agents",
       "tags": [],
@@ -525,7 +541,7 @@
       "behavior": "Mapped requests preserve model selection, previous-response IDs, tool payloads, MCP payloads, and structured-output metadata.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 18,
+        "line": 22,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_MapsToolsHandoffsAndStructuredOutput"
       },
       "status": "compliant",
@@ -541,7 +557,7 @@
       "behavior": "Normalized model input omits pre-handoff function-call and function-call-output items when that mode is enabled.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 176,
+        "line": 181,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_NormalizesHandoffModelInputAfterHandoff"
       },
       "status": "compliant",
@@ -557,7 +573,7 @@
       "behavior": "Mapped reasoning items omit their IDs when the configured reasoning-item policy is Omit.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 246,
+        "line": 313,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_OmitsReasoningIdsWhenConfigured"
       },
       "status": "compliant",
@@ -573,8 +589,40 @@
       "behavior": "Mapped input reflects the filtered conversation instead of the full stored conversation.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 212,
+        "line": 216,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_UsesRunLevelModelInputFilter"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponseMapper_MapsMcpApprovalRequestsToApprovalRequiredToolCalls",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Hosted MCP approval requests are surfaced as approval-required tool calls.",
+      "intent": "Protect MCP approval handling after switching to the official Responses SDK item models.",
+      "scenario": "LIB-OAI-MCP-APPROVAL-001",
+      "behavior": "MCP approval request output items map to approval-required MCP tool calls with parsed arguments.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
+        "line": 344,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponseMapper_MapsMcpApprovalRequestsToApprovalRequiredToolCalls"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponsesClient_PrefersTypedOptionsOverJsonSnapshot",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Runtime execution uses typed SDK options instead of rebuilding them from the JSON snapshot.",
+      "intent": "Prevent the compatibility request snapshot from becoming the live transport source of truth.",
+      "scenario": "LIB-OAI-CLIENT-001",
+      "behavior": "When typed options and a snapshot disagree, the client uses the typed options for the SDK call.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
+        "line": 249,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponsesClient_PrefersTypedOptionsOverJsonSnapshot"
       },
       "status": "compliant",
       "project": "Incursa.OpenAI.Agents.Tests"
@@ -589,14 +637,14 @@
       "behavior": "Completed function arguments appear on emitted tool-call run items and on the final response tool-call data.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 278,
+        "line": 396,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse"
       },
       "status": "compliant",
       "project": "Incursa.OpenAI.Agents.Tests"
     },
     {
-      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestBody",
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestOptions",
       "category": "Incursa.OpenAI.Agents",
       "tags": [],
       "summary": "Turn execution resolves local MCP servers into OpenAI tool definitions before sending the request.",
@@ -605,8 +653,56 @@
       "behavior": "Resolved streamable MCP tools are added to the request body before the turn completes.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 102,
-        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestBody"
+        "line": 107,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestOptions"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ReleaseVersioningScriptTests.InvokeReleaseVersioning_AllowsDirtyTreeOnTaggedHead_WhenTagCreationIsSkipped",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The release versioning script can advance from a tagged commit when the working tree is dirty.",
+      "intent": "Protect release versioning for local release preparation on top of an already-tagged HEAD commit.",
+      "scenario": "REPO-RELEASE-001",
+      "behavior": "When HEAD already has a release tag and tracked changes exist, the script continues instead of failing on the existing HEAD tag guard.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/ReleaseVersioningScriptTests.cs",
+        "line": 13,
+        "member": "Incursa.OpenAI.Agents.Tests.ReleaseVersioningScriptTests.InvokeReleaseVersioning_AllowsDirtyTreeOnTaggedHead_WhenTagCreationIsSkipped"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ReleaseVersioningScriptTests.InvokeReleaseVersioning_CalculateOnlyReportsTargetVersion_WithoutMutatingFiles",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The release versioning script can preview the computed version without changing the repository.",
+      "intent": "Support a safe check for what the next release would be before committing to any release action.",
+      "scenario": "REPO-RELEASE-003",
+      "behavior": "When calculate-only mode is used, the script reports the computed bump and exits before validation or repo mutation.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/ReleaseVersioningScriptTests.cs",
+        "line": 69,
+        "member": "Incursa.OpenAI.Agents.Tests.ReleaseVersioningScriptTests.InvokeReleaseVersioning_CalculateOnlyReportsTargetVersion_WithoutMutatingFiles"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ReleaseVersioningScriptTests.InvokeReleaseVersioning_HonorsExplicitMinorBump_WhenApiDiffLooksBreaking",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "The release versioning script can honor a manual minor bump override when the public API diff looks breaking.",
+      "intent": "Protect the explicit bump override path for semver exceptions that are intentionally non-breaking.",
+      "scenario": "REPO-RELEASE-002",
+      "behavior": "When the shipped API diff would normally require a major bump, the script respects -Bump Minor and the validator accepts it.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/ReleaseVersioningScriptTests.cs",
+        "line": 35,
+        "member": "Incursa.OpenAI.Agents.Tests.ReleaseVersioningScriptTests.InvokeReleaseVersioning_HonorsExplicitMinorBump_WhenApiDiffLooksBreaking"
       },
       "status": "compliant",
       "project": "Incursa.OpenAI.Agents.Tests"

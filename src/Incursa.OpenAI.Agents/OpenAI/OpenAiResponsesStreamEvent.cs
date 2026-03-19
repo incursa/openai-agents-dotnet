@@ -1,3 +1,6 @@
+#pragma warning disable OPENAI001
+
+using OpenAI.Responses;
 using System.Text.Json.Nodes;
 
 namespace Incursa.OpenAI.Agents;
@@ -15,9 +18,18 @@ public sealed record OpenAiResponsesStreamEvent
         Data = data;
     }
 
+    internal OpenAiResponsesStreamEvent(StreamingResponseUpdate update)
+    {
+        Update = update;
+        Data = OpenAiSdkSerialization.ToJsonObject(update);
+        Type = Data["type"]?.GetValue<string>() ?? "unknown";
+    }
+
     /// <summary>Gets or sets the event type value.</summary>
     public string Type { get; init; }
 
     /// <summary>Gets or sets the streamed event payload.</summary>
     public JsonObject Data { get; init; }
+
+    internal StreamingResponseUpdate? Update { get; init; }
 }

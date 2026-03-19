@@ -1,3 +1,6 @@
+#pragma warning disable OPENAI001
+
+using OpenAI.Responses;
 using System.Text.Json.Nodes;
 
 namespace Incursa.OpenAI.Agents;
@@ -15,9 +18,18 @@ public sealed record OpenAiResponsesResponse
         Raw = raw;
     }
 
+    internal OpenAiResponsesResponse(ResponseResult result)
+    {
+        Result = result;
+        Id = result.Id ?? string.Empty;
+        Raw = OpenAiSdkSerialization.ToJsonObject(result);
+    }
+
     /// <summary>Gets or sets the response identifier.</summary>
     public string Id { get; init; }
 
     /// <summary>Gets or sets the raw JSON payload returned by OpenAI.</summary>
     public JsonObject Raw { get; init; }
+
+    internal ResponseResult? Result { get; init; }
 }

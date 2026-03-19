@@ -1,6 +1,10 @@
 [CmdletBinding()]
 param(
     [string]$Version,
+    [ValidateSet("Major", "Minor", "Patch")]
+    [string]$Bump,
+    [Alias("DryRun")]
+    [switch]$CalculateOnly,
     [string]$ProjectsRoot = "src",
     [string]$PropsPath = "Directory.Build.props",
     [string]$FirstReleaseVersion = "1.0.12",
@@ -213,7 +217,8 @@ function Get-NextVersion {
     $candidate = switch ($RequiredBump) {
         "Major" { [version]::new($BaseVersion.Major + 1, 0, 0) }
         "Minor" { [version]::new($BaseVersion.Major, $BaseVersion.Minor + 1, 0) }
-        default { [version]::new($BaseVersion.Major, $BaseVersion.Minor, $BaseVersion.Build + 1) }
+        "Patch" { [version]::new($BaseVersion.Major, $BaseVersion.Minor, $BaseVersion.Build + 1) }
+        default { throw "Unexpected version bump '$RequiredBump'." }
     }
 
     if ($candidate -lt $MinimumVersion) {
@@ -246,6 +251,17 @@ if ($Version) {
     $targetVersion = [version]$Version
     $requiredBump = "Explicit"
 }
+elseif ($Bump) {
+    if ($priorTagVersion) {
+        $baseVersion = if ($currentVersion -gt $priorTagVersion) { $currentVersion } else { $priorTagVersion }
+    }
+    else {
+        $baseVersion = $currentVersion
+    }
+
+    $requiredBump = $Bump
+    $targetVersion = Get-NextVersion -BaseVersion $baseVersion -RequiredBump $requiredBump -MinimumVersion $minimumVersion
+}
 else {
     if ($priorTagVersion) {
         $baseVersion = if ($currentVersion -gt $priorTagVersion) { $currentVersion } else { $priorTagVersion }
@@ -273,13 +289,24 @@ $hadWorkingTreeChanges = -not [string]::IsNullOrWhiteSpace(($initialStatus | Out
 $headReleaseTags = @(Get-HeadReleaseTags)
 
 if ($headReleaseTags.Count -gt 0) {
-    throw "Current HEAD already has release tag(s): $($headReleaseTags -join ', ')"
+    if ($hadWorkingTreeChanges) {
+        Write-Host "Current HEAD already has release tag(s): $($headReleaseTags -join ', ')."
+        Write-Host "Dirty working tree detected; release versioning will continue from a new release commit."
+    }
+    else {
+        throw "Current HEAD already has release tag(s): $($headReleaseTags -join ', ')"
+    }
 }
 
 Write-Host "Current props version: $currentVersion"
 Write-Host "Prior release tag: $(if ($priorTagName) { $priorTagName } else { 'none' })"
 Write-Host "Required bump: $requiredBump"
 Write-Host "Target release version: $targetVersion"
+
+if ($CalculateOnly) {
+    Write-Host "Calculation only; no files will be modified or release actions performed."
+    return
+}
 
 if ($hadWorkingTreeChanges -and $currentVersion -ne $targetVersion) {
     Set-VersionInProps -Path $propsFullPath -TargetVersion $targetVersion
@@ -292,7 +319,17 @@ else {
     Write-Host "$PropsPath already matches $targetVersion"
 }
 
-& pwsh -NoProfile -File (Join-Path $PSScriptRoot "validate-public-api-versioning.ps1") -Tag $targetTag
+$validateArguments = @(
+    "-NoProfile"
+    "-File"
+    (Join-Path $PSScriptRoot "validate-public-api-versioning.ps1")
+    "-Tag"
+    $targetTag
+)
+if ($Bump) {
+    $validateArguments += @("-Bump", $Bump)
+}
+& pwsh @validateArguments
 if ($LASTEXITCODE -ne 0) {
     throw "validate-public-api-versioning.ps1 failed for $targetTag"
 }

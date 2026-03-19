@@ -1,3 +1,7 @@
+#pragma warning disable OPENAI001
+#pragma warning disable SCME0001
+
+using OpenAI.Responses;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -9,23 +13,21 @@ internal sealed class OpenAiResponsesResponseMapper
 
     internal AgentTurnResponse<TContext> Map<TContext>(OpenAiResponsesResponse response, OpenAiResponsesTurnPlan<TContext> plan)
     {
-        JsonArray output = response.Raw["output"] as JsonArray ?? [];
-        List<AgentToolCall<TContext>> toolCalls = new();
-        List<AgentHandoffRequest<TContext>> handoffs = new();
-        List<AgentRunItem> items = new();
+        ResponseResult result = response.Result ?? OpenAiSdkSerialization.ReadModel<ResponseResult>(response.Raw);
+        List<AgentToolCall<TContext>> toolCalls = [];
+        List<AgentHandoffRequest<TContext>> handoffs = [];
+        List<AgentRunItem> items = [];
         string? finalText = null;
         JsonNode? structured = null;
 
-        // Convert provider output items into the normalized internal run-item model.
-        foreach (JsonObject item in output.OfType<JsonObject>())
+        foreach (ResponseItem outputItem in result.OutputItems)
         {
-            var type = item["type"]?.GetValue<string>();
-            switch (type)
+            switch (outputItem)
             {
-                case "message":
-                    // Capture final text/structured payload from the first message item; keep both.
-                    finalText ??= ExtractText(item["content"]);
-                    structured ??= ExtractStructured(item["content"]);
+                case MessageResponseItem message:
+                    JsonObject rawMessage = OpenAiSdkSerialization.ToJsonObject(message);
+                    finalText ??= ExtractText(rawMessage["content"]);
+                    structured ??= ExtractStructured(rawMessage["content"]);
                     items.Add(new AgentRunItem(AgentItemTypes.MessageOutput, "assistant", plan.EffectiveAgent.Name)
                     {
                         Text = finalText,
@@ -33,39 +35,39 @@ internal sealed class OpenAiResponsesResponseMapper
                         TimestampUtc = DateTimeOffset.UtcNow,
                     });
                     break;
-                case "reasoning":
-                    items.Add(MapReasoningItem(plan.EffectiveAgent.Name, item));
-                    break;
-                case "function_call":
-                case "tool_call":
-                    {
-                        var toolName = item["name"]?.GetValue<string>() ?? string.Empty;
-                        // Resolve handoff calls separately from generic tool calls to route execution.
-                        JsonNode? arguments = ParseJsonNode(item["arguments"]);
-                        if (plan.HandoffMap.TryGetValue(toolName, out AgentHandoff<TContext>? handoff))
-                        {
-                            handoffs.Add(new AgentHandoffRequest<TContext>(handoff.Name, handoff.TargetAgent, arguments, item["status"]?.GetValue<string>()));
-                        }
-                        else
-                        {
-                            toolCalls.Add(new AgentToolCall<TContext>(
-                                item["call_id"]?.GetValue<string>() ?? item["id"]?.GetValue<string>() ?? Guid.NewGuid().ToString("n"),
-                                toolName,
-                                arguments,
-                                item["approval_required"]?.GetValue<bool>() ?? false,
-                                item["approval_reason"]?.GetValue<string>(),
-                                item["tool_type"]?.GetValue<string>() ?? "function"));
-                        }
 
-                        break;
-                    }
-                case "mcp_list_tools":
-                    // Expose raw MCP tool-list events in the run item stream for observability/debugging.
+                case ReasoningResponseItem reasoning:
+                    items.Add(MapReasoningItem(plan.EffectiveAgent.Name, reasoning));
+                    break;
+
+                case FunctionCallResponseItem functionCall:
+                    MapToolCall(plan, toolCalls, handoffs, functionCall.CallId, functionCall.FunctionName, functionCall.FunctionArguments?.ToString(), OpenAiSdkSerialization.ToJsonObject(functionCall)["status"]?.GetValue<string>(), false, null, "function");
+                    break;
+
+                case McpToolCallApprovalRequestItem approvalRequest:
+                    toolCalls.Add(new AgentToolCall<TContext>(
+                        approvalRequest.Id ?? Guid.NewGuid().ToString("n"),
+                        approvalRequest.ToolName,
+                        ParseJsonNode(approvalRequest.ToolArguments is null ? null : JsonValue.Create(approvalRequest.ToolArguments.ToString())),
+                        true,
+                        OpenAiSdkSerialization.ToJsonObject(approvalRequest)["approval_reason"]?.GetValue<string>(),
+                        "mcp"));
+                    break;
+
+                case McpToolCallItem mcpCall:
+                    MapToolCall(plan, toolCalls, handoffs, mcpCall.Id ?? Guid.NewGuid().ToString("n"), mcpCall.ToolName, mcpCall.ToolArguments?.ToString(), OpenAiSdkSerialization.ToJsonObject(mcpCall)["status"]?.GetValue<string>(), false, null, "mcp");
+                    break;
+
+                case McpToolDefinitionListItem mcpList:
                     items.Add(new AgentRunItem(AgentItemTypes.McpListTools, "system", plan.EffectiveAgent.Name)
                     {
-                        Data = item.DeepClone(),
+                        Data = OpenAiSdkSerialization.ToJsonObject(mcpList),
                         TimestampUtc = DateTimeOffset.UtcNow,
                     });
+                    break;
+
+                default:
+                    TryMapUnknownItem(plan, outputItem, toolCalls, handoffs, items, ref finalText, ref structured);
                     break;
             }
         }
@@ -86,8 +88,120 @@ internal sealed class OpenAiResponsesResponseMapper
 
     internal static AgentRunItem? TryMapStreamingOutputItem(string agentName, JsonObject item)
     {
-        var type = item["type"]?.GetValue<string>();
-        // Keep streaming output mapping aligned with non-streaming mapping types to avoid behavioral drift.
+        ResponseItem typedItem = OpenAiSdkSerialization.ReadModel<ResponseItem>(item);
+
+        return typedItem switch
+        {
+            MessageResponseItem => new AgentRunItem(AgentItemTypes.MessageOutput, "assistant", agentName)
+            {
+                Text = ExtractText(item["content"]),
+                Data = ExtractStructured(item["content"]),
+                TimestampUtc = DateTimeOffset.UtcNow,
+            },
+            ReasoningResponseItem reasoning => MapReasoningItem(agentName, reasoning),
+            FunctionCallResponseItem functionCall => new AgentRunItem(AgentItemTypes.ToolCall, "assistant", agentName)
+            {
+                Name = functionCall.FunctionName,
+                ToolCallId = functionCall.CallId ?? functionCall.Id,
+                Data = ParseJsonNode(JsonValue.Create(functionCall.FunctionArguments?.ToString())),
+                Status = item["status"]?.GetValue<string>(),
+                TimestampUtc = DateTimeOffset.UtcNow,
+            },
+            McpToolCallItem mcpCall => new AgentRunItem(AgentItemTypes.ToolCall, "assistant", agentName)
+            {
+                Name = mcpCall.ToolName,
+                ToolCallId = mcpCall.Id,
+                Data = ParseJsonNode(JsonValue.Create(mcpCall.ToolArguments?.ToString())),
+                Status = item["status"]?.GetValue<string>(),
+                TimestampUtc = DateTimeOffset.UtcNow,
+            },
+            McpToolDefinitionListItem => new AgentRunItem(AgentItemTypes.McpListTools, "system", agentName)
+            {
+                Data = item.DeepClone(),
+                TimestampUtc = DateTimeOffset.UtcNow,
+            },
+            _ => TryMapUnknownStreamingOutputItem(agentName, item),
+        };
+    }
+
+    private static void MapToolCall<TContext>(
+        OpenAiResponsesTurnPlan<TContext> plan,
+        List<AgentToolCall<TContext>> toolCalls,
+        List<AgentHandoffRequest<TContext>> handoffs,
+        string? callId,
+        string toolName,
+        string? argumentsJson,
+        string? status,
+        bool requiresApproval,
+        string? approvalReason,
+        string toolType)
+    {
+        JsonNode? arguments = ParseJsonNode(argumentsJson is null ? null : JsonValue.Create(argumentsJson));
+        if (plan.HandoffMap.TryGetValue(toolName, out AgentHandoff<TContext>? handoff))
+        {
+            handoffs.Add(new AgentHandoffRequest<TContext>(handoff.Name, handoff.TargetAgent, arguments, status));
+            return;
+        }
+
+        toolCalls.Add(new AgentToolCall<TContext>(
+            callId ?? Guid.NewGuid().ToString("n"),
+            toolName,
+            arguments,
+            requiresApproval,
+            approvalReason,
+            toolType));
+    }
+
+    private static void TryMapUnknownItem<TContext>(
+        OpenAiResponsesTurnPlan<TContext> plan,
+        ResponseItem outputItem,
+        List<AgentToolCall<TContext>> toolCalls,
+        List<AgentHandoffRequest<TContext>> handoffs,
+        List<AgentRunItem> items,
+        ref string? finalText,
+        ref JsonNode? structured)
+    {
+        JsonObject rawItem = OpenAiSdkSerialization.ToJsonObject(outputItem);
+        string? type = rawItem["type"]?.GetValue<string>();
+
+        switch (type)
+        {
+            case "message":
+                finalText ??= ExtractText(rawItem["content"]);
+                structured ??= ExtractStructured(rawItem["content"]);
+                items.Add(new AgentRunItem(AgentItemTypes.MessageOutput, "assistant", plan.EffectiveAgent.Name)
+                {
+                    Text = finalText,
+                    Data = structured,
+                    TimestampUtc = DateTimeOffset.UtcNow,
+                });
+                break;
+
+            case "reasoning":
+                items.Add(new AgentRunItem(AgentItemTypes.Reasoning, "assistant", plan.EffectiveAgent.Name)
+                {
+                    Data = rawItem,
+                    TimestampUtc = DateTimeOffset.UtcNow,
+                });
+                break;
+
+            case "function_call" or "tool_call":
+                MapToolCall(plan, toolCalls, handoffs, rawItem["call_id"]?.GetValue<string>() ?? rawItem["id"]?.GetValue<string>(), rawItem["name"]?.GetValue<string>() ?? string.Empty, rawItem["arguments"]?.GetValue<string>(), rawItem["status"]?.GetValue<string>(), rawItem["approval_required"]?.GetValue<bool>() ?? false, rawItem["approval_reason"]?.GetValue<string>(), rawItem["tool_type"]?.GetValue<string>() ?? "function");
+                break;
+
+            case "mcp_list_tools":
+                items.Add(new AgentRunItem(AgentItemTypes.McpListTools, "system", plan.EffectiveAgent.Name)
+                {
+                    Data = rawItem,
+                    TimestampUtc = DateTimeOffset.UtcNow,
+                });
+                break;
+        }
+    }
+
+    private static AgentRunItem? TryMapUnknownStreamingOutputItem(string agentName, JsonObject item)
+    {
+        string? type = item["type"]?.GetValue<string>();
         return type switch
         {
             "message" => new AgentRunItem(AgentItemTypes.MessageOutput, "assistant", agentName)
@@ -96,7 +210,11 @@ internal sealed class OpenAiResponsesResponseMapper
                 Data = ExtractStructured(item["content"]),
                 TimestampUtc = DateTimeOffset.UtcNow,
             },
-            "reasoning" => MapReasoningItem(agentName, item),
+            "reasoning" => new AgentRunItem(AgentItemTypes.Reasoning, "assistant", agentName)
+            {
+                Data = item.DeepClone(),
+                TimestampUtc = DateTimeOffset.UtcNow,
+            },
             "function_call" or "tool_call" => new AgentRunItem(AgentItemTypes.ToolCall, "assistant", agentName)
             {
                 Name = item["name"]?.GetValue<string>(),
@@ -114,23 +232,22 @@ internal sealed class OpenAiResponsesResponseMapper
         };
     }
 
-    private static AgentRunItem MapReasoningItem(string agentName, JsonObject item)
+    private static AgentRunItem MapReasoningItem(string agentName, ReasoningResponseItem item)
         => new(AgentItemTypes.Reasoning, "assistant", agentName)
         {
-            Data = item.DeepClone(),
+            Data = OpenAiSdkSerialization.ToJsonObject(item),
             TimestampUtc = DateTimeOffset.UtcNow,
         };
 
     private static string? ExtractText(JsonNode? content)
     {
-        // For message nodes, concatenate text fragments in stable order to reconstruct final assistant output.
         if (content is JsonArray array)
         {
-            var parts = array
+            string[] parts = array
                 .OfType<JsonObject>()
                 .Select(node => node["text"]?.GetValue<string>())
                 .Where(text => !string.IsNullOrWhiteSpace(text))
-                .ToArray();
+                .ToArray()!;
             return parts.Length > 0 ? string.Join(Environment.NewLine, parts) : null;
         }
 
@@ -139,7 +256,6 @@ internal sealed class OpenAiResponsesResponseMapper
 
     private static JsonNode? ExtractStructured(JsonNode? content)
     {
-        // Structured payload is represented as the first non-output-text component (if present).
         if (content is JsonArray array)
         {
             return array.OfType<JsonObject>().FirstOrDefault(node => node["type"]?.GetValue<string>() is not "output_text");
@@ -155,9 +271,7 @@ internal sealed class OpenAiResponsesResponseMapper
             return null;
         }
 
-        // Some APIs return JSON text in a string field; parse it when possible and
-        // keep a wrapped fallback node when parsing fails.
-        if (node is JsonValue value && value.TryGetValue<string>(out var text) && !string.IsNullOrWhiteSpace(text))
+        if (node is JsonValue value && value.TryGetValue<string>(out string? text) && !string.IsNullOrWhiteSpace(text))
         {
             try
             {

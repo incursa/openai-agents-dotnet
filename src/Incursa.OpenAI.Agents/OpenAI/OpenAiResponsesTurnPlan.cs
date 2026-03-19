@@ -1,20 +1,22 @@
-using System.Text.Json.Nodes;
+#pragma warning disable OPENAI001
+
+using OpenAI.Responses;
 
 namespace Incursa.OpenAI.Agents;
 
 internal sealed record OpenAiResponsesTurnPlan<TContext>
 {
     internal OpenAiResponsesTurnPlan(
-        JsonObject body,
+        CreateResponseOptions options,
         Agent<TContext> effectiveAgent,
         IReadOnlyDictionary<string, AgentHandoff<TContext>> handoffMap)
     {
-        Body = body;
+        Options = options;
         EffectiveAgent = effectiveAgent;
         HandoffMap = handoffMap;
     }
 
-    internal JsonObject Body { get; init; }
+    internal CreateResponseOptions Options { get; init; }
 
     internal Agent<TContext> EffectiveAgent { get; init; }
 

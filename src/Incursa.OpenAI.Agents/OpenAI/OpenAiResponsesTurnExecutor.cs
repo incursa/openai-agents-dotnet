@@ -1,5 +1,9 @@
+#pragma warning disable OPENAI001
+#pragma warning disable SCME0001
+
 using System.Text.Json.Nodes;
 using Incursa.OpenAI.Agents.Mcp;
+using OpenAI.Responses;
 
 namespace Incursa.OpenAI.Agents;
 
@@ -48,7 +52,7 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
 
         // 3) Translate the turn request into the OpenAI responses wire format and execute once.
         OpenAiResponsesTurnPlan<TContext> plan = await mapper.CreateAsync(effectiveRequest, cancellationToken).ConfigureAwait(false);
-        OpenAiResponsesResponse response = await client.CreateResponseAsync(new OpenAiResponsesRequest(plan.Body), cancellationToken).ConfigureAwait(false);
+        OpenAiResponsesResponse response = await client.CreateResponseAsync(new OpenAiResponsesRequest(plan.Options), cancellationToken).ConfigureAwait(false);
         return new OpenAiResponsesResponseMapper().Map(response, plan);
     }
 
@@ -70,7 +74,7 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
         StreamingResponseAccumulator accumulator = new();
 
         // Stream in-order model deltas, emit raw events, and emit normalized run items when complete frames arrive.
-        await foreach (OpenAiResponsesStreamEvent? streamEvent in client.StreamResponseAsync(new OpenAiResponsesRequest(plan.Body, true), cancellationToken).ConfigureAwait(false))
+        await foreach (OpenAiResponsesStreamEvent? streamEvent in client.StreamResponseAsync(new OpenAiResponsesRequest(plan.Options, true), cancellationToken).ConfigureAwait(false))
         {
             cancellationToken.ThrowIfCancellationRequested();
             accumulator.Accept(streamEvent);
@@ -145,12 +149,11 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
         return $"mcp_{Normalize(serverLabel)}__{Normalize(toolName)}";
     }
 
-    private sealed class StreamingResponseAccumulator
-    {
-        // Collects streaming output frames and reconstructs final output items (including function-arg deltas).
+        private sealed class StreamingResponseAccumulator
+        {
         private readonly JsonArray output = [];
-        // Tracks in-progress function call output fragments by output_index until completion.
         private readonly Dictionary<int, JsonObject> pendingByOutputIndex = [];
+        private ResponseResult? completedResponse;
         private string? responseId;
 
         /// <summary>
@@ -159,48 +162,54 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
 
         public void Accept(OpenAiResponsesStreamEvent streamEvent)
         {
-            if (streamEvent.Data["response"]?["id"] is JsonValue responseId && responseId.TryGetValue<string>(out var value))
+            StreamingResponseUpdate update = streamEvent.Update ?? OpenAiSdkSerialization.ReadModel<StreamingResponseUpdate>(streamEvent.Data);
+
+            switch (update)
             {
-                this.responseId = value;
-            }
-
-            // Delegate each event type to the assembler rule for that transition.
-            switch (streamEvent.Type)
-            {
-                case "response.output_item.added":
-                    // Seed a pending item shell so later delta packets can append arguments.
-                    if (streamEvent.Data["item"] is JsonObject addedItem)
-                    {
-                        pendingByOutputIndex[GetOutputIndex(streamEvent.Data)] = addedItem.DeepClone() as JsonObject ?? new JsonObject();
-                    }
-
+                case StreamingResponseCreatedUpdate created when !string.IsNullOrWhiteSpace(created.Response?.Id):
+                    responseId = created.Response.Id;
                     break;
-                case "response.function_call_arguments.delta":
-                    AppendArgumentsDelta(streamEvent.Data);
-                    break;
-                case "response.function_call_arguments.done":
-                    CompleteArguments(streamEvent.Data);
-                    break;
-                case "response.output_item.done":
-                    // Merge pending incremental arguments and persist final output item.
-                    if (streamEvent.Data["item"] is JsonObject doneItem)
-                    {
-                        JsonObject merged = MergePendingArguments(doneItem, GetOutputIndex(streamEvent.Data));
-                        this.output.Add(merged.DeepClone());
-                    }
 
+                case StreamingResponseInProgressUpdate inProgress when !string.IsNullOrWhiteSpace(inProgress.Response?.Id):
+                    responseId = inProgress.Response.Id;
                     break;
-                case "response.completed":
-                    // Server may emit a full final output array; treat that as the source of truth when present.
-                    if (streamEvent.Data["response"] is JsonObject response && response["output"] is JsonArray output)
-                    {
-                        this.output.Clear();
-                        foreach (JsonNode? item in output)
-                        {
-                            this.output.Add(item?.DeepClone());
-                        }
-                    }
 
+                case StreamingResponseOutputItemAddedUpdate added:
+                    pendingByOutputIndex[added.OutputIndex] = OpenAiSdkSerialization.ToJsonObject(added.Item);
+                    break;
+
+                case StreamingResponseFunctionCallArgumentsDeltaUpdate delta:
+                    AppendArgumentsDelta(delta.OutputIndex, delta.Delta?.ToString());
+                    break;
+
+                case StreamingResponseFunctionCallArgumentsDoneUpdate done:
+                    CompleteArguments(done.OutputIndex, done.FunctionArguments?.ToString());
+                    break;
+
+                case StreamingResponseMcpCallArgumentsDeltaUpdate delta:
+                    AppendArgumentsDelta(delta.OutputIndex, delta.Delta?.ToString());
+                    break;
+
+                case StreamingResponseMcpCallArgumentsDoneUpdate done:
+                    CompleteArguments(done.OutputIndex, done.ToolArguments?.ToString());
+                    break;
+
+                case StreamingResponseOutputItemDoneUpdate done:
+                    JsonObject merged = MergePendingArguments(OpenAiSdkSerialization.ToJsonObject(done.Item), done.OutputIndex);
+                    output.Add(merged.DeepClone());
+                    break;
+
+                case StreamingResponseCompletedUpdate completed:
+                    completedResponse = completed.Response;
+                    responseId = completed.Response?.Id ?? responseId;
+                    break;
+
+                case StreamingResponseFailedUpdate failed:
+                    responseId = failed.Response?.Id ?? responseId;
+                    break;
+
+                case StreamingResponseIncompleteUpdate incomplete:
+                    responseId = incomplete.Response?.Id ?? responseId;
                     break;
             }
         }
@@ -212,18 +221,13 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
         public bool TryCreateRunItem(OpenAiResponsesStreamEvent streamEvent, string agentName, out AgentRunItem? runItem)
         {
             runItem = null;
-            if (!string.Equals(streamEvent.Type, "response.output_item.done", StringComparison.Ordinal))
+            StreamingResponseUpdate update = streamEvent.Update ?? OpenAiSdkSerialization.ReadModel<StreamingResponseUpdate>(streamEvent.Data);
+            if (update is not StreamingResponseOutputItemDoneUpdate doneUpdate)
             {
                 return false;
             }
 
-            if (streamEvent.Data["item"] is not JsonObject doneItem)
-            {
-                return false;
-            }
-
-            // Emit a normalized streaming run item only when the final item frame can be mapped.
-            JsonObject merged = MergePendingArguments(doneItem, GetOutputIndex(streamEvent.Data));
+            JsonObject merged = MergePendingArguments(OpenAiSdkSerialization.ToJsonObject(doneUpdate.Item), doneUpdate.OutputIndex);
             runItem = OpenAiResponsesResponseMapper.TryMapStreamingOutputItem(agentName, merged);
             return runItem is not null;
         }
@@ -233,38 +237,35 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
         /// </summary>
 
         public OpenAiResponsesResponse CreateResponse()
-            => new(responseId ?? string.Empty, new JsonObject
-            {
-                ["id"] = responseId ?? string.Empty,
-                ["output"] = output.DeepClone(),
-            });
+            => completedResponse is not null
+                ? new OpenAiResponsesResponse(completedResponse)
+                : new OpenAiResponsesResponse(responseId ?? string.Empty, new JsonObject
+                {
+                    ["id"] = responseId ?? string.Empty,
+                    ["output"] = output.DeepClone(),
+                });
 
-        private void AppendArgumentsDelta(JsonNode data)
+        private void AppendArgumentsDelta(int outputIndex, string? delta)
         {
-            var outputIndex = GetOutputIndex(data);
             if (!pendingByOutputIndex.TryGetValue(outputIndex, out JsonObject? item))
             {
                 return;
             }
 
-            // Incrementally concatenate argument chunks on the pending item.
             var current = item["arguments"]?.GetValue<string>() ?? string.Empty;
-            var delta = data["delta"]?.GetValue<string>() ?? string.Empty;
-            item["arguments"] = current + delta;
+            item["arguments"] = current + (delta ?? string.Empty);
         }
 
-        private void CompleteArguments(JsonNode data)
+        private void CompleteArguments(int outputIndex, string? arguments)
         {
-            var outputIndex = GetOutputIndex(data);
             if (!pendingByOutputIndex.TryGetValue(outputIndex, out JsonObject? item))
             {
                 return;
             }
 
-            // Replace partial accumulation with final argument payload when delta stream indicates completion.
-            if (data["arguments"] is JsonValue arguments && arguments.TryGetValue<string>(out var value))
+            if (!string.IsNullOrWhiteSpace(arguments))
             {
-                item["arguments"] = value;
+                item["arguments"] = arguments;
             }
         }
 
@@ -275,7 +276,6 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
                 return doneItem.DeepClone() as JsonObject ?? new JsonObject();
             }
 
-            // Start from the pending shell and overlay the completed item fields, preferring explicit done values.
             JsonObject merged = pending.DeepClone() as JsonObject ?? new JsonObject();
             foreach (KeyValuePair<string, JsonNode?> pair in doneItem)
             {
@@ -290,8 +290,5 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
 
             return merged;
         }
-
-        private static int GetOutputIndex(JsonNode data)
-            => data["output_index"]?.GetValue<int>() ?? 0;
     }
 }

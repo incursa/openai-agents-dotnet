@@ -1,8 +1,12 @@
+#pragma warning disable OPENAI001
+
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Text.Json.Nodes;
 using Incursa.OpenAI.Agents;
 using Incursa.OpenAI.Agents.Mcp;
+using OpenAI.Responses;
 
 namespace Incursa.OpenAI.Agents.Tests;
 
@@ -84,14 +88,15 @@ public sealed class OpenAiResponsesTests
             "resp-previous",
             null));
 
-        Assert.Equal("gpt-5.4", plan.Body["model"]?.GetValue<string>());
-        Assert.Equal("resp-previous", plan.Body["previous_response_id"]?.GetValue<string>());
-        Assert.NotNull(plan.Body["tools"]);
-        Assert.Equal("medium", plan.Body["text"]?["verbosity"]?.GetValue<string>());
-        Assert.NotNull(plan.Body["text"]?["format"]);
-        Assert.Equal("json_schema", plan.Body["text"]?["format"]?["type"]?.GetValue<string>());
+        Assert.Equal("gpt-5.4", plan.Options.Model);
+        Assert.Equal("resp-previous", plan.Options.PreviousResponseId);
+        Assert.Equal(3, plan.Options.Tools.Count);
+        Assert.NotNull(plan.Options.TextOptions?.TextFormat);
+        Assert.Equal(ResponseTextFormatKind.JsonSchema, plan.Options.TextOptions!.TextFormat.Kind);
         Assert.Single(plan.HandoffMap);
-        Assert.Contains(plan.Body["tools"]!.AsArray(), item => item!["type"]?.GetValue<string>() == "mcp");
+        Assert.Contains(plan.Options.Tools, item => item is FunctionTool function && function.FunctionName == "lookup_customer");
+        Assert.Contains(plan.Options.Tools, item => item is FunctionTool function && function.FunctionName == "transfer_to_mail_specialist");
+        Assert.Contains(plan.Options.Tools, item => item is McpTool);
     }
 
     /// <summary>Turn execution resolves local MCP servers into OpenAI tool definitions before sending the request.</summary>
@@ -99,9 +104,9 @@ public sealed class OpenAiResponsesTests
     /// <scenario>LIB-OAI-MCP-001</scenario>
     /// <behavior>Resolved streamable MCP tools are added to the request body before the turn completes.</behavior>
     [Fact]
-    public async Task TurnExecutor_AddsLocalMcpToolsToRequestBody()
+    public async Task TurnExecutor_AddsLocalMcpToolsToRequestOptions()
     {
-        List<JsonObject> requests = new();
+        List<CreateResponseOptions> requests = new();
         Queue<OpenAiResponsesResponse> responses = new([
             new OpenAiResponsesResponse("resp-1", new JsonObject
             {
@@ -165,7 +170,7 @@ public sealed class OpenAiResponsesTests
 
         Assert.Equal("done", response.FinalOutput?.Text);
         Assert.Single(requests);
-        Assert.Contains(requests[0]["tools"]!.AsArray(), item => item!["name"]?.GetValue<string>() == "mcp_mail__list_messages");
+        Assert.Contains(requests[0].Tools, item => item is FunctionTool function && function.FunctionName == "mcp_mail__list_messages");
     }
 
     /// <summary>Handoff normalization can strip pre-handoff tool-call items from mapped model input.</summary>
@@ -199,9 +204,8 @@ public sealed class OpenAiResponsesTests
             "resp-1",
             new AgentRunOptions<TestContext> { HandoffHistoryMode = AgentHandoffHistoryMode.NormalizeModelInputAfterHandoff }));
 
-        JsonArray input = plan.Body["input"]!.AsArray();
-        Assert.DoesNotContain(input, item => item?["type"]?.GetValue<string>() == "function_call");
-        Assert.DoesNotContain(input, item => item?["type"]?.GetValue<string>() == "function_call_output");
+        Assert.DoesNotContain(plan.Options.InputItems, item => item is FunctionCallResponseItem);
+        Assert.DoesNotContain(plan.Options.InputItems, item => item is FunctionCallOutputResponseItem);
     }
 
     /// <summary>Run-level model input filters are applied during request mapping.</summary>
@@ -233,9 +237,72 @@ public sealed class OpenAiResponsesTests
             "resp-2",
             new AgentRunOptions<TestContext> { ModelInputFilterAsync = (ctx, _) => ValueTask.FromResult<IReadOnlyList<AgentConversationItem>>(ctx.Conversation.Where(item => item.Role != "tool").ToArray()) }));
 
-        JsonArray input = plan.Body["input"]!.AsArray();
-        Assert.Equal(2, input.Count);
-        Assert.DoesNotContain(input, item => item?["type"]?.GetValue<string>() == "function_call_output");
+        Assert.Equal(2, plan.Options.InputItems.Count);
+        Assert.DoesNotContain(plan.Options.InputItems, item => item is FunctionCallOutputResponseItem);
+    }
+
+    /// <summary>Runtime execution uses typed SDK options instead of rebuilding them from the JSON snapshot.</summary>
+    /// <intent>Prevent the compatibility request snapshot from becoming the live transport source of truth.</intent>
+    /// <scenario>LIB-OAI-CLIENT-001</scenario>
+    /// <behavior>When typed options and a snapshot disagree, the client uses the typed options for the SDK call.</behavior>
+    [Fact]
+    public void ResponsesClient_PrefersTypedOptionsOverJsonSnapshot()
+    {
+        CreateResponseOptions options = new()
+        {
+            Model = "gpt-5.4",
+        };
+
+        OpenAiResponsesRequest request = new(
+            options,
+            new JsonObject
+            {
+                ["model"] = "wrong-model",
+            });
+
+        MethodInfo method = typeof(OpenAiResponsesClient).GetMethod("GetRequestOptions", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new InvalidOperationException("OpenAiResponsesClient.GetRequestOptions was not found.");
+
+        CreateResponseOptions actual = Assert.IsType<CreateResponseOptions>(method.Invoke(null, [request, true]));
+
+        Assert.Equal("gpt-5.4", actual.Model);
+        Assert.True(actual.StreamingEnabled);
+    }
+
+    /// <summary>Wrapping typed options does not force snapshot serialization for SDK-only tool types.</summary>
+    /// <intent>Prevent request construction from crashing on hosted MCP tools due to SDK serializer limitations.</intent>
+    /// <scenario>LIB-OAI-CLIENT-002</scenario>
+    /// <behavior>Creating an internal request from typed options succeeds and leaves the compatibility JSON body empty until explicitly provided.</behavior>
+    [Fact]
+    public async Task OpenAiResponsesRequest_DoesNotSerializeTypedOptionsSnapshot()
+    {
+        Agent<TestContext> agent = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle mail",
+            HostedMcpTools =
+            [
+                new HostedMcpToolDefinition("mail", new Uri("https://mail.example.test/mcp"), "connector-1", null, true, null, null, "Hosted mail connector"),
+            ],
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            agent,
+            new TestContext("user-1", "tenant-1"),
+            "session-1",
+            1,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "Need mail help" },
+            ],
+            null,
+            null,
+            null));
+
+        OpenAiResponsesRequest request = new(plan.Options);
+
+        Assert.Same(plan.Options, request.Options);
+        Assert.Empty(request.Body);
     }
 
     /// <summary>Reasoning item IDs can be omitted from mapped input when configured.</summary>
@@ -265,9 +332,60 @@ public sealed class OpenAiResponsesTests
             null,
             new AgentRunOptions<TestContext> { ReasoningItemIdPolicy = ReasoningItemIdPolicy.Omit }));
 
-        JsonArray input = plan.Body["input"]!.AsArray();
-        JsonNode? reasoning = Assert.Single(input, item => item?["type"]?.GetValue<string>() == "reasoning");
-        Assert.Null(reasoning?["id"]);
+        ReasoningResponseItem reasoning = Assert.IsType<ReasoningResponseItem>(Assert.Single(plan.Options.InputItems));
+        Assert.Null(reasoning.Id);
+    }
+
+    /// <summary>Hosted MCP approval requests are surfaced as approval-required tool calls.</summary>
+    /// <intent>Protect MCP approval handling after switching to the official Responses SDK item models.</intent>
+    /// <scenario>LIB-OAI-MCP-APPROVAL-001</scenario>
+    /// <behavior>MCP approval request output items map to approval-required MCP tool calls with parsed arguments.</behavior>
+    [Fact]
+    public async Task ResponseMapper_MapsMcpApprovalRequestsToApprovalRequiredToolCalls()
+    {
+        Agent<TestContext> agent = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle mail approvals.",
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            agent,
+            new TestContext("user-1", "tenant-1"),
+            "session-approval",
+            1,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "Delete the spam message" },
+            ],
+            null,
+            null,
+            null));
+
+        OpenAiResponsesResponse response = new("resp-approval-1", new JsonObject
+        {
+            ["id"] = "resp-approval-1",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "mcp_approval_request",
+                    ["id"] = "apr_1",
+                    ["server_label"] = "mail",
+                    ["name"] = "delete_message",
+                    ["arguments"] = """{"message_id":"msg_42"}""",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.True(toolCall.RequiresApproval);
+        Assert.Equal("mcp", toolCall.ToolType);
+        Assert.Equal("delete_message", toolCall.ToolName);
+        Assert.Equal("msg_42", toolCall.Arguments?["message_id"]?.GetValue<string>());
+        Assert.Null(turn.FinalOutput);
     }
 
     /// <summary>Streaming execution reconstructs completed function arguments for emitted tool-call items and final tool-call results.</summary>
@@ -396,10 +514,10 @@ public sealed class OpenAiResponsesTests
 
     private sealed class RecordingResponsesClient : IOpenAiResponsesClient
     {
-        private readonly List<JsonObject> requests;
+        private readonly List<CreateResponseOptions> requests;
         private readonly Queue<OpenAiResponsesResponse> responses;
 
-        public RecordingResponsesClient(List<JsonObject> requests, Queue<OpenAiResponsesResponse> responses)
+        public RecordingResponsesClient(List<CreateResponseOptions> requests, Queue<OpenAiResponsesResponse> responses)
         {
             this.requests = requests;
             this.responses = responses;
@@ -407,7 +525,7 @@ public sealed class OpenAiResponsesTests
 
         public Task<OpenAiResponsesResponse> CreateResponseAsync(OpenAiResponsesRequest request, CancellationToken cancellationToken)
         {
-            requests.Add(request.Body.DeepClone() as JsonObject ?? new JsonObject());
+            requests.Add(request.Options ?? OpenAiSdkSerialization.ReadModel<CreateResponseOptions>(request.Body));
             return Task.FromResult(responses.Dequeue());
         }
 

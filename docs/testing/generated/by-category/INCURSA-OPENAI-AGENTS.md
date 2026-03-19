@@ -1,6 +1,6 @@
 # Incursa.OpenAI.Agents
 
-Total tests: 44
+Total tests: 50
 
 - **Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests:Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.CleanupExpiredSessionsAsync_RemovesExpiredSessions**
   - Summary: The Azure session store removes expired sessions during explicit cleanup.
@@ -152,36 +152,66 @@ Total tests: 44
   - Intent: Protect caller-facing diagnostics for MCP server-side failures.
   - Tags: (none)
   - Source: [tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L147](tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L147)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.OpenAiResponsesRequest_DoesNotSerializeTypedOptionsSnapshot**
+  - Summary: Wrapping typed options does not force snapshot serialization for SDK-only tool types.
+  - Intent: Prevent request construction from crashing on hosted MCP tools due to SDK serializer limitations.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L277](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L277)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_MapsToolsHandoffsAndStructuredOutput**
   - Summary: Request mapping includes tools, handoffs, hosted MCP tools, and structured output definitions.
   - Intent: Protect the main request-mapping contract for the OpenAI Responses adapter.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L18](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L18)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L22](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L22)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_NormalizesHandoffModelInputAfterHandoff**
   - Summary: Handoff normalization can strip pre-handoff tool-call items from mapped model input.
   - Intent: Protect run-level handoff history shaping in the adapter.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L176](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L176)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L181](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L181)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_OmitsReasoningIdsWhenConfigured**
   - Summary: Reasoning item IDs can be omitted from mapped input when configured.
   - Intent: Protect request-shaping options for reasoning items.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L246](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L246)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L313](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L313)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_UsesRunLevelModelInputFilter**
   - Summary: Run-level model input filters are applied during request mapping.
   - Intent: Protect consumer control over the model-visible conversation input.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L212](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L212)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L216](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L216)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponseMapper_MapsMcpApprovalRequestsToApprovalRequiredToolCalls**
+  - Summary: Hosted MCP approval requests are surfaced as approval-required tool calls.
+  - Intent: Protect MCP approval handling after switching to the official Responses SDK item models.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L344](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L344)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponsesClient_PrefersTypedOptionsOverJsonSnapshot**
+  - Summary: Runtime execution uses typed SDK options instead of rebuilding them from the JSON snapshot.
+  - Intent: Prevent the compatibility request snapshot from becoming the live transport source of truth.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L249](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L249)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse**
   - Summary: Streaming execution reconstructs completed function arguments for emitted tool-call items and final tool-call results.
   - Intent: Protect streamed function-call fidelity when argument fragments complete later in the stream.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L278](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L278)
-- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestBody**
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L396](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L396)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestOptions**
   - Summary: Turn execution resolves local MCP servers into OpenAI tool definitions before sending the request.
   - Intent: Protect local MCP server translation in the OpenAI adapter.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L102](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L102)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L107](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L107)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ReleaseVersioningScriptTests.InvokeReleaseVersioning_AllowsDirtyTreeOnTaggedHead_WhenTagCreationIsSkipped**
+  - Summary: The release versioning script can advance from a tagged commit when the working tree is dirty.
+  - Intent: Protect release versioning for local release preparation on top of an already-tagged HEAD commit.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/ReleaseVersioningScriptTests.cs#L13](tests/Incursa.OpenAI.Agents.Tests/ReleaseVersioningScriptTests.cs#L13)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ReleaseVersioningScriptTests.InvokeReleaseVersioning_CalculateOnlyReportsTargetVersion_WithoutMutatingFiles**
+  - Summary: The release versioning script can preview the computed version without changing the repository.
+  - Intent: Support a safe check for what the next release would be before committing to any release action.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/ReleaseVersioningScriptTests.cs#L69](tests/Incursa.OpenAI.Agents.Tests/ReleaseVersioningScriptTests.cs#L69)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ReleaseVersioningScriptTests.InvokeReleaseVersioning_HonorsExplicitMinorBump_WhenApiDiffLooksBreaking**
+  - Summary: The release versioning script can honor a manual minor bump override when the public API diff looks breaking.
+  - Intent: Protect the explicit bump override path for semver exceptions that are intentionally non-breaking.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/ReleaseVersioningScriptTests.cs#L35](tests/Incursa.OpenAI.Agents.Tests/ReleaseVersioningScriptTests.cs#L35)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.RuntimeObservabilityTests.CompositeMcpClientObserver_FansOutObservationsToAllSinks**
   - Summary: Verifies the composite MCP observer fans out each observation to all registered sinks.
   - Intent: Protect the extensions MCP observability surface from partial sink delivery.

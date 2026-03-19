@@ -1,11 +1,19 @@
+#pragma warning disable OPENAI001
+#pragma warning disable SCME0001
+
+using System.ClientModel.Primitives;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Incursa.OpenAI.Agents.Mcp;
+using OpenAI.Responses;
 
 namespace Incursa.OpenAI.Agents;
 
 internal sealed class OpenAiResponsesRequestMapper
 {
+    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
+
     private readonly HostedMcpToolFactory? hostedMcpToolFactory;
     private readonly Func<object?, McpAuthContext?>? authContextFactory;
 
@@ -21,61 +29,46 @@ internal sealed class OpenAiResponsesRequestMapper
         AgentTurnRequest<TContext> request,
         CancellationToken cancellationToken = default)
     {
-        // Validate required model input before constructing the provider payload.
         if (string.IsNullOrWhiteSpace(request.Agent.Model))
         {
             throw new InvalidOperationException($"Agent '{request.Agent.Name}' must specify a model for OpenAI Responses runs.");
         }
 
         AgentRunOptions<TContext> options = request.Options ?? new AgentRunOptions<TContext>();
-        // Resolve dynamic instructions from context/agent composition.
-        var instructions = request.Agent.Instructions is null
+        string? instructions = request.Agent.Instructions is null
             ? null
             : await request.Agent.Instructions.ResolveAsync(
                 new AgentInstructionContext<TContext>(request.Agent, request.Context, request.SessionKey, request.Conversation),
                 cancellationToken).ConfigureAwait(false);
 
-        JsonObject body = new()
+        CreateResponseOptions requestOptions = new()
         {
-            ["model"] = request.Agent.Model,
-            ["instructions"] = instructions,
-            ["previous_response_id"] = request.PreviousResponseId,
-            ["metadata"] = new JsonObject
-            {
-                ["session_key"] = request.SessionKey,
-                ["agent_name"] = request.Agent.Name,
-                ["turn_number"] = request.TurnNumber,
-            },
-            ["input"] = await BuildInputItemsAsync(request, options, cancellationToken).ConfigureAwait(false),
+            Model = request.Agent.Model,
+            Instructions = instructions,
+            PreviousResponseId = request.PreviousResponseId,
         };
 
-        // Carry forward any caller-supplied model configuration keys unless already explicit in the payload.
-        foreach (KeyValuePair<string, object?> pair in request.Agent.ModelSettings)
-        {
-            if (body.ContainsKey(pair.Key))
-            {
-                continue;
-            }
+        requestOptions.Metadata["session_key"] = request.SessionKey;
+        requestOptions.Metadata["agent_name"] = request.Agent.Name;
+        requestOptions.Metadata["turn_number"] = request.TurnNumber.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
-            body[pair.Key] = JsonSerializer.SerializeToNode(pair.Value, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        IReadOnlyList<ResponseItem> inputItems = await BuildInputItemsAsync(request, options, cancellationToken).ConfigureAwait(false);
+        foreach (ResponseItem inputItem in inputItems)
+        {
+            requestOptions.InputItems.Add(inputItem);
         }
 
-        JsonArray tools = new();
         Dictionary<string, AgentHandoff<TContext>> handoffMap = new(StringComparer.Ordinal);
 
-        // Register user-defined function tools.
         foreach (IAgentTool<TContext> tool in request.Agent.Tools)
         {
-            tools.Add(new JsonObject
-            {
-                ["type"] = "function",
-                ["name"] = tool.Name,
-                ["description"] = tool.Description,
-                ["parameters"] = tool.InputSchema?.DeepClone() ?? CreateDefaultToolSchema(),
-            });
+            requestOptions.Tools.Add(ResponseTool.CreateFunctionTool(
+                tool.Name,
+                BinaryData.FromString((tool.InputSchema?.DeepClone() ?? CreateDefaultToolSchema()).ToJsonString(SerializerOptions)),
+                strictModeEnabled: null,
+                functionDescription: tool.Description));
         }
 
-        // Register conditional handoff tools only when enabled for the current turn context.
         foreach (AgentHandoff<TContext> handoff in request.Agent.Handoffs)
         {
             if (!await IsEnabledAsync(handoff, request, cancellationToken).ConfigureAwait(false))
@@ -83,18 +76,16 @@ internal sealed class OpenAiResponsesRequestMapper
                 continue;
             }
 
-            var toolName = handoff.ToolNameOverride ?? ToHandoffToolName(handoff.TargetAgent.Name);
+            string toolName = handoff.ToolNameOverride ?? ToHandoffToolName(handoff.TargetAgent.Name);
             handoffMap[toolName] = handoff;
-            tools.Add(new JsonObject
-            {
-                ["type"] = "function",
-                ["name"] = toolName,
-                ["description"] = handoff.Description ?? handoff.TargetAgent.HandoffDescription ?? $"Transfer to {handoff.TargetAgent.Name}.",
-                ["parameters"] = handoff.InputSchema?.DeepClone() ?? CreateDefaultToolSchema(),
-            });
+
+            requestOptions.Tools.Add(ResponseTool.CreateFunctionTool(
+                toolName,
+                BinaryData.FromString((handoff.InputSchema?.DeepClone() ?? CreateDefaultToolSchema()).ToJsonString(SerializerOptions)),
+                strictModeEnabled: null,
+                functionDescription: handoff.Description ?? handoff.TargetAgent.HandoffDescription ?? $"Transfer to {handoff.TargetAgent.Name}."));
         }
 
-        // Register hosted MCP tools; apply auth/context factory at build time when configured.
         foreach (HostedMcpToolDefinition hostedMcp in request.Agent.HostedMcpTools)
         {
             HostedMcpToolDefinition resolved = hostedMcp;
@@ -104,57 +95,29 @@ internal sealed class OpenAiResponsesRequestMapper
                 resolved = await hostedMcpToolFactory.CreateAsync(hostedMcp, authContext, cancellationToken).ConfigureAwait(false);
             }
 
-            JsonObject hosted = new()
-            {
-                ["type"] = "mcp",
-                ["server_label"] = resolved.ServerLabel,
-                ["server_url"] = resolved.ServerUrl?.ToString(),
-                ["connector_id"] = resolved.ConnectorId,
-                ["authorization"] = resolved.Authorization,
-                ["require_approval"] = resolved.ApprovalRequired ? "always" : "never",
-                ["approval_reason"] = resolved.ApprovalReason,
-                ["description"] = resolved.Description,
-            };
-
-            if (resolved.Headers is not null)
-            {
-                hosted["headers"] = JsonSerializer.SerializeToNode(resolved.Headers, new JsonSerializerOptions(JsonSerializerDefaults.Web));
-            }
-
-            tools.Add(hosted);
+            requestOptions.Tools.Add(CreateHostedMcpTool(resolved));
         }
 
-        // Add the final tools collection only when non-empty so model input stays minimal.
-        if (tools.Count > 0)
-        {
-            body["tools"] = tools;
-        }
-
-        // Convert an explicit output contract into the current Responses API json_schema shape.
         if (request.Agent.OutputContract is not null)
         {
-            JsonObject text = body["text"] as JsonObject ?? new JsonObject();
-            text["format"] = new JsonObject
-            {
-                ["type"] = "json_schema",
-                ["name"] = request.Agent.OutputContract.Name ?? request.Agent.OutputContract.ClrType.Name,
-                ["schema"] = OpenAiJsonSchemaGenerator.CreateSchema(request.Agent.OutputContract.ClrType),
-                ["strict"] = true,
-            };
-            body["text"] = text;
+            requestOptions.TextOptions ??= new ResponseTextOptions();
+            requestOptions.TextOptions.TextFormat = ResponseTextFormat.CreateJsonSchemaFormat(
+                request.Agent.OutputContract.Name ?? request.Agent.OutputContract.ClrType.Name,
+                BinaryData.FromString(OpenAiJsonSchemaGenerator.CreateSchema(request.Agent.OutputContract.ClrType).ToJsonString(SerializerOptions)),
+                jsonSchemaIsStrict: true);
         }
 
-        return new OpenAiResponsesTurnPlan<TContext>(body, request.Agent, handoffMap);
+        ApplyModelSettings(requestOptions, request.Agent.ModelSettings);
+        return new OpenAiResponsesTurnPlan<TContext>(requestOptions, request.Agent, handoffMap);
     }
 
-    private static async ValueTask<JsonArray> BuildInputItemsAsync<TContext>(
+    private static async ValueTask<IReadOnlyList<ResponseItem>> BuildInputItemsAsync<TContext>(
         AgentTurnRequest<TContext> request,
         AgentRunOptions<TContext> options,
         CancellationToken cancellationToken)
     {
         IReadOnlyList<AgentConversationItem> conversation = request.Conversation;
 
-        // Optionally normalize handoff history to remove tool noise before the model sees it.
         if (ShouldNormalizeHandoffInput(request, options))
         {
             conversation = options.HandoffHistoryTransformerAsync is not null
@@ -170,7 +133,6 @@ internal sealed class OpenAiResponsesRequestMapper
                 : NormalizeConversationForHandoff(request.Conversation);
         }
 
-        // Apply an optional user-provided input filter as the final shape transform.
         if (options.ModelInputFilterAsync is not null)
         {
             conversation = await options.ModelInputFilterAsync(
@@ -184,57 +146,207 @@ internal sealed class OpenAiResponsesRequestMapper
                 cancellationToken).ConfigureAwait(false);
         }
 
-        JsonArray input = new();
+        List<ResponseItem> input = [];
         foreach (AgentConversationItem item in conversation)
         {
-            // Preserve one-to-one mapping between internal conversation items and provider item schema.
-            input.Add(item.ItemType switch
-            {
-                AgentItemTypes.UserInput or AgentItemTypes.MessageOutput or AgentItemTypes.FinalOutput or AgentItemTypes.GuardrailTripwire or AgentItemTypes.ApprovalRejected
-                    => new JsonObject
-                    {
-                        ["type"] = "message",
-                        ["role"] = item.Role,
-                        ["content"] = new JsonArray
-                        {
-                            new JsonObject
-                            {
-                                ["type"] = item.Role == "assistant" ? "output_text" : "input_text",
-                                ["text"] = item.Text,
-                            },
-                        },
-                    },
-                AgentItemTypes.ToolCall
-                    => new JsonObject
-                    {
-                        ["type"] = "function_call",
-                        ["call_id"] = item.ToolCallId,
-                        ["name"] = item.Name,
-                        ["arguments"] = item.Data?.ToJsonString(),
-                    },
-                AgentItemTypes.ToolOutput
-                    => new JsonObject
-                    {
-                        ["type"] = "function_call_output",
-                        ["call_id"] = item.ToolCallId,
-                        ["output"] = item.Text ?? item.Data?.ToJsonString(),
-                    },
-                AgentItemTypes.Reasoning
-                    => NormalizeReasoningNode(item.Data, options.ReasoningItemIdPolicy),
-                _ => new JsonObject
-                {
-                    ["type"] = item.ItemType,
-                    ["role"] = item.Role,
-                    ["name"] = item.Name,
-                    ["content"] = item.Text,
-                    ["tool_call_id"] = item.ToolCallId,
-                    ["data"] = item.Data?.DeepClone(),
-                },
-            });
+            input.Add(MapConversationItem(item, options.ReasoningItemIdPolicy));
         }
 
         return input;
     }
+
+    private static ResponseItem MapConversationItem(AgentConversationItem item, ReasoningItemIdPolicy reasoningItemIdPolicy)
+        => item.ItemType switch
+        {
+            AgentItemTypes.UserInput or AgentItemTypes.MessageOutput or AgentItemTypes.FinalOutput or AgentItemTypes.GuardrailTripwire or AgentItemTypes.ApprovalRejected
+                => CreateMessageItem(item),
+            AgentItemTypes.ToolCall
+                => CreateFunctionCallItem(item),
+            AgentItemTypes.ToolOutput
+                => CreateFunctionCallOutputItem(item),
+            AgentItemTypes.Reasoning
+                => CreateReasoningItem(item.Data, reasoningItemIdPolicy),
+            _ => OpenAiSdkSerialization.ReadModel<ResponseItem>(new JsonObject
+            {
+                ["type"] = item.ItemType,
+                ["role"] = item.Role,
+                ["name"] = item.Name,
+                ["content"] = item.Text,
+                ["tool_call_id"] = item.ToolCallId,
+                ["data"] = item.Data?.DeepClone(),
+            }),
+        };
+
+    private static MessageResponseItem CreateMessageItem(AgentConversationItem item)
+    {
+        ResponseContentPart contentPart = item.Role == "assistant"
+            ? ResponseContentPart.CreateOutputTextPart(item.Text ?? string.Empty, [])
+            : ResponseContentPart.CreateInputTextPart(item.Text ?? string.Empty);
+
+        MessageResponseItem message = item.Role switch
+        {
+            "assistant" => ResponseItem.CreateAssistantMessageItem([contentPart]),
+            "system" => ResponseItem.CreateSystemMessageItem([contentPart]),
+            "developer" => ResponseItem.CreateDeveloperMessageItem([contentPart]),
+            _ => ResponseItem.CreateUserMessageItem([contentPart]),
+        };
+
+        return message;
+    }
+
+    private static FunctionCallResponseItem CreateFunctionCallItem(AgentConversationItem item)
+    {
+        FunctionCallResponseItem toolCall = ResponseItem.CreateFunctionCallItem(
+            item.ToolCallId ?? Guid.NewGuid().ToString("n"),
+            item.Name ?? string.Empty,
+            BinaryData.FromString((item.Data?.DeepClone() ?? new JsonObject()).ToJsonString(SerializerOptions)));
+
+        if (TryParseFunctionCallStatus(item.Status, out FunctionCallStatus status))
+        {
+            toolCall.Status = status;
+        }
+
+        return toolCall;
+    }
+
+    private static FunctionCallOutputResponseItem CreateFunctionCallOutputItem(AgentConversationItem item)
+    {
+        FunctionCallOutputResponseItem toolOutput = ResponseItem.CreateFunctionCallOutputItem(
+            item.ToolCallId ?? Guid.NewGuid().ToString("n"),
+            item.Text ?? item.Data?.ToJsonString(SerializerOptions) ?? string.Empty);
+
+        if (TryParseFunctionCallOutputStatus(item.Status, out FunctionCallOutputStatus status))
+        {
+            toolOutput.Status = status;
+        }
+
+        return toolOutput;
+    }
+
+    private static ReasoningResponseItem CreateReasoningItem(JsonNode? node, ReasoningItemIdPolicy policy)
+    {
+        JsonObject normalized = NormalizeReasoningNode(node, policy);
+        string summaryText = ExtractReasoningSummaryText(normalized["summary"]);
+        ReasoningResponseItem reasoning = ResponseItem.CreateReasoningItem(summaryText);
+
+        if (normalized["id"] is JsonValue idValue && idValue.TryGetValue<string>(out string? id) && !string.IsNullOrWhiteSpace(id))
+        {
+            reasoning.Id = id;
+        }
+
+        if (normalized["status"] is JsonValue statusValue
+            && statusValue.TryGetValue<string>(out string? status)
+            && Enum.TryParse(status, ignoreCase: true, out ReasoningStatus reasoningStatus))
+        {
+            reasoning.Status = reasoningStatus;
+        }
+
+        if (normalized["encrypted_content"] is JsonValue encryptedValue
+            && encryptedValue.TryGetValue<string>(out string? encryptedContent)
+            && !string.IsNullOrWhiteSpace(encryptedContent))
+        {
+            reasoning.EncryptedContent = encryptedContent;
+        }
+
+        return reasoning;
+    }
+
+    private static McpTool CreateHostedMcpTool(HostedMcpToolDefinition resolved)
+    {
+        McpTool tool = resolved.ServerUrl is not null
+            ? new McpTool(resolved.ServerLabel, resolved.ServerUrl)
+            : new McpTool(resolved.ServerLabel, resolved.ConnectorId ?? string.Empty);
+
+        if (!string.IsNullOrWhiteSpace(resolved.ConnectorId))
+        {
+            tool.ConnectorId = resolved.ConnectorId;
+        }
+
+        tool.AuthorizationToken = resolved.Authorization;
+        tool.ServerDescription = resolved.Description;
+        tool.Headers = resolved.Headers is null ? null : new Dictionary<string, string>(resolved.Headers, StringComparer.Ordinal);
+        tool.ToolCallApprovalPolicy = resolved.ApprovalRequired
+            ? GlobalMcpToolCallApprovalPolicy.AlwaysRequireApproval
+            : GlobalMcpToolCallApprovalPolicy.NeverRequireApproval;
+
+        if (!string.IsNullOrWhiteSpace(resolved.ApprovalReason))
+        {
+            tool.Patch.Set("$.approval_reason"u8, resolved.ApprovalReason);
+        }
+
+        return tool;
+    }
+
+    private static void ApplyModelSettings(CreateResponseOptions options, IReadOnlyDictionary<string, object?> modelSettings)
+    {
+        foreach (KeyValuePair<string, object?> pair in modelSettings)
+        {
+            if (IsExplicitTopLevelField(pair.Key))
+            {
+                continue;
+            }
+
+            JsonNode? node = JsonSerializer.SerializeToNode(pair.Value, SerializerOptions);
+            ApplyJsonPatchValue(options.Patch, BuildJsonPath(pair.Key), node);
+        }
+    }
+
+    private static void ApplyJsonPatchValue(JsonPatch patch, string path, JsonNode? node)
+    {
+        if (node is JsonObject obj)
+        {
+            foreach (KeyValuePair<string, JsonNode?> property in obj)
+            {
+                ApplyJsonPatchValue(patch, $"{path}.{property.Key}", property.Value);
+            }
+
+            return;
+        }
+
+        byte[] jsonPath = Encoding.UTF8.GetBytes(path);
+        switch (node)
+        {
+            case null:
+                patch.SetNull(jsonPath);
+                return;
+            case JsonValue value when value.TryGetValue<string>(out string? text):
+                patch.Set(jsonPath, text);
+                return;
+            case JsonValue value when value.TryGetValue<bool>(out bool boolean):
+                patch.Set(jsonPath, boolean);
+                return;
+            case JsonValue value when value.TryGetValue<int>(out int int32):
+                patch.Set(jsonPath, int32);
+                return;
+            case JsonValue value when value.TryGetValue<long>(out long int64):
+                patch.Set(jsonPath, int64);
+                return;
+            case JsonValue value when value.TryGetValue<double>(out double number):
+                patch.Set(jsonPath, number);
+                return;
+            case JsonArray array:
+                for (int i = 0; i < array.Count; i++)
+                {
+                    ApplyJsonPatchValue(patch, $"{path}[{i}]", array[i]);
+                }
+                return;
+            default:
+                patch.Set(jsonPath, node.ToJsonString(SerializerOptions));
+                return;
+        }
+    }
+
+    private static string BuildJsonPath(string propertyName)
+        => $"$.{propertyName}";
+
+    private static bool IsExplicitTopLevelField(string propertyName)
+        => propertyName is "model" or "instructions" or "previous_response_id" or "metadata" or "input" or "tools" or "stream";
+
+    private static bool TryParseFunctionCallStatus(string? value, out FunctionCallStatus status)
+        => Enum.TryParse(value, ignoreCase: true, out status);
+
+    private static bool TryParseFunctionCallOutputStatus(string? value, out FunctionCallOutputStatus status)
+        => Enum.TryParse(value, ignoreCase: true, out status);
 
     private static bool ShouldNormalizeHandoffInput<TContext>(AgentTurnRequest<TContext> request, AgentRunOptions<TContext> options)
         => options.HandoffHistoryMode == AgentHandoffHistoryMode.NormalizeModelInputAfterHandoff
@@ -242,7 +354,6 @@ internal sealed class OpenAiResponsesRequestMapper
 
     private static IReadOnlyList<AgentConversationItem> NormalizeConversationForHandoff(IReadOnlyList<AgentConversationItem> conversation)
         => conversation
-            // Hide noisy handoff/tool plumbing and keep only the most relevant model context.
             .Where(item => item.ItemType is not AgentItemTypes.ToolCall
                 and not AgentItemTypes.ToolOutput
                 and not AgentItemTypes.Reasoning
@@ -256,9 +367,8 @@ internal sealed class OpenAiResponsesRequestMapper
     private static JsonNode? FindLastHandoffArguments(IReadOnlyList<AgentConversationItem> conversation, string targetAgentName)
         => conversation.LastOrDefault(item => item.ItemType == AgentItemTypes.HandoffOccurred && string.Equals(item.AgentName, targetAgentName, StringComparison.Ordinal))?.Data?.DeepClone();
 
-    private static JsonNode NormalizeReasoningNode(JsonNode? node, ReasoningItemIdPolicy policy)
+    private static JsonObject NormalizeReasoningNode(JsonNode? node, ReasoningItemIdPolicy policy)
     {
-        // Clone the reasoning payload and optionally remove generated IDs depending on policy.
         JsonObject clone = node?.DeepClone() as JsonObject ?? new JsonObject { ["type"] = "reasoning" };
         if (policy == ReasoningItemIdPolicy.Omit)
         {
@@ -268,6 +378,30 @@ internal sealed class OpenAiResponsesRequestMapper
         return clone;
     }
 
+    private static string ExtractReasoningSummaryText(JsonNode? node)
+    {
+        if (node is not JsonArray summary)
+        {
+            return string.Empty;
+        }
+
+        List<string> parts = [];
+        foreach (JsonNode? entry in summary)
+        {
+            switch (entry)
+            {
+                case JsonValue value when value.TryGetValue<string>(out string? text) && !string.IsNullOrWhiteSpace(text):
+                    parts.Add(text);
+                    break;
+                case JsonObject obj when obj["text"] is JsonValue textValue && textValue.TryGetValue<string>(out string? text) && !string.IsNullOrWhiteSpace(text):
+                    parts.Add(text);
+                    break;
+            }
+        }
+
+        return string.Join(Environment.NewLine, parts);
+    }
+
     private static async ValueTask<bool> IsEnabledAsync<TContext>(AgentHandoff<TContext> handoff, AgentTurnRequest<TContext> request, CancellationToken cancellationToken)
     {
         if (handoff.IsEnabledAsync is null)
@@ -275,7 +409,6 @@ internal sealed class OpenAiResponsesRequestMapper
             return true;
         }
 
-        // Ask the handoff-specific policy whether it is currently allowed.
         return await handoff.IsEnabledAsync(new AgentHandoffContext<TContext>(request.Agent, request.Context, request.SessionKey, request.Conversation), cancellationToken).ConfigureAwait(false);
     }
 
@@ -289,7 +422,7 @@ internal sealed class OpenAiResponsesRequestMapper
 
     private static string ToHandoffToolName(string agentName)
     {
-        var chars = agentName.ToLowerInvariant().Select(ch => char.IsLetterOrDigit(ch) ? ch : '_').ToArray();
+        char[] chars = agentName.ToLowerInvariant().Select(ch => char.IsLetterOrDigit(ch) ? ch : '_').ToArray();
         return $"transfer_to_{new string(chars).Trim('_')}";
     }
 }

@@ -1,20 +1,22 @@
-using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
+#pragma warning disable OPENAI001
+#pragma warning disable SCME0001
+
+using OpenAI;
+using OpenAI.Responses;
+using System.ClientModel;
+using System.ClientModel.Primitives;
+using System.Net.Http.Headers;
 using System.Text.Json.Nodes;
 
 namespace Incursa.OpenAI.Agents;
 
 /// <summary>
-/// Calls the OpenAI Responses API over HTTP.
+/// Calls the OpenAI Responses API via the official OpenAI .NET SDK.
 /// </summary>
 
 public sealed class OpenAiResponsesClient : IOpenAiResponsesClient
 {
-    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
-
-    private readonly HttpClient httpClient;
-    private readonly string responsesPath;
+    private readonly ResponsesClient responsesClient;
 
     /// <summary>Creates a client that uses the default responses path.</summary>
     public OpenAiResponsesClient(HttpClient httpClient)
@@ -24,9 +26,13 @@ public sealed class OpenAiResponsesClient : IOpenAiResponsesClient
 
     /// <summary>Creates a client for the specified responses endpoint path.</summary>
     public OpenAiResponsesClient(HttpClient httpClient, string responsesPath)
+        : this(CreateSdkClient(httpClient, responsesPath))
     {
-        this.httpClient = httpClient;
-        this.responsesPath = responsesPath;
+    }
+
+    internal OpenAiResponsesClient(ResponsesClient responsesClient)
+    {
+        this.responsesClient = responsesClient;
     }
 
     /// <summary>Creates a non-streamed response.</summary>
@@ -36,13 +42,17 @@ public sealed class OpenAiResponsesClient : IOpenAiResponsesClient
     /// <summary>Creates a non-streamed response using the supplied cancellation token.</summary>
     public async Task<OpenAiResponsesResponse> CreateResponseAsync(OpenAiResponsesRequest request, CancellationToken cancellationToken)
     {
-        using HttpResponseMessage response = await httpClient.PostAsJsonAsync(responsesPath, request.Body, SerializerOptions, cancellationToken).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+        CreateResponseOptions options = GetRequestOptions(request, stream: false);
 
-        JsonObject raw = await response.Content.ReadFromJsonAsync<JsonObject>(SerializerOptions, cancellationToken).ConfigureAwait(false)
-            ?? new JsonObject();
-        var id = raw["id"]?.GetValue<string>() ?? string.Empty;
-        return new OpenAiResponsesResponse(id, raw);
+        try
+        {
+            ClientResult<ResponseResult> result = await responsesClient.CreateResponseAsync(options, cancellationToken).ConfigureAwait(false);
+            return new OpenAiResponsesResponse(result.Value);
+        }
+        catch (ClientResultException ex)
+        {
+            throw CreateDetailedException("create response", ex);
+        }
     }
 
     /// <summary>Streams raw response events.</summary>
@@ -52,59 +62,98 @@ public sealed class OpenAiResponsesClient : IOpenAiResponsesClient
     /// <summary>Streams raw response events using the supplied cancellation token.</summary>
     public async IAsyncEnumerable<OpenAiResponsesStreamEvent> StreamResponseAsync(OpenAiResponsesRequest request, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        // Clone once per stream call so we can set the stream flag without mutating caller-owned request object.
-        JsonObject body = request.Body.DeepClone() as JsonObject ?? new JsonObject();
-        body["stream"] = true;
+        CreateResponseOptions options = GetRequestOptions(request, stream: true);
 
-        using HttpRequestMessage message = new(HttpMethod.Post, responsesPath)
+        AsyncCollectionResult<StreamingResponseUpdate> updates;
+        try
         {
-            Content = JsonContent.Create(body, options: SerializerOptions),
-        };
-        message.Headers.Accept.ParseAdd("text/event-stream");
-
-        using HttpResponseMessage response = await httpClient.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-
-        await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        using StreamReader reader = new(stream, Encoding.UTF8);
-
-        // Parse SSE stream incrementally and emit model events until DONE or EOF.
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            var line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
-            if (line is null)
-            {
-                yield break;
-            }
-
-            if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("data:", StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            var payload = line["data:".Length..].Trim();
-            if (string.Equals(payload, "[DONE]", StringComparison.Ordinal))
-            {
-                yield break;
-            }
-
-            JsonObject? data;
-            try
-            {
-                // Only emit lines that are valid JSON objects; ignore malformed fragments.
-                data = JsonNode.Parse(payload) as JsonObject;
-            }
-            catch
-            {
-                continue;
-            }
-
-            if (data is null)
-            {
-                continue;
-            }
-
-            yield return new OpenAiResponsesStreamEvent(data["type"]?.GetValue<string>() ?? "unknown", data);
+            updates = responsesClient.CreateResponseStreamingAsync(options, cancellationToken);
         }
+        catch (ClientResultException ex)
+        {
+            throw CreateDetailedException("start response stream", ex);
+        }
+
+        await foreach (StreamingResponseUpdate update in updates.ConfigureAwait(false))
+        {
+            yield return new OpenAiResponsesStreamEvent(update);
+        }
+    }
+
+    private static ResponsesClient CreateSdkClient(HttpClient httpClient, string responsesPath)
+    {
+        ArgumentNullException.ThrowIfNull(httpClient);
+
+        OpenAIClientOptions options = new()
+        {
+            Endpoint = ResolveEndpoint(httpClient.BaseAddress, responsesPath),
+            Transport = new HttpClientPipelineTransport(httpClient),
+        };
+
+        AuthenticationHeaderValue? authorization = httpClient.DefaultRequestHeaders.Authorization;
+        if (authorization is null || !string.Equals(authorization.Scheme, "Bearer", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(authorization.Parameter))
+        {
+            throw new InvalidOperationException("OpenAiResponsesClient requires an HttpClient with a bearer Authorization header when constructed from HttpClient.");
+        }
+
+        return new ResponsesClient(new ApiKeyCredential(authorization.Parameter), options);
+    }
+
+    private static Uri ResolveEndpoint(Uri? baseAddress, string responsesPath)
+    {
+        if (baseAddress is null)
+        {
+            return new Uri("https://api.openai.com/v1");
+        }
+
+        string normalizedPath = responsesPath.Trim().TrimStart('/');
+        if (string.IsNullOrWhiteSpace(normalizedPath))
+        {
+            return baseAddress;
+        }
+
+        if (normalizedPath.EndsWith("/responses", StringComparison.OrdinalIgnoreCase))
+        {
+            string prefix = normalizedPath[..^"/responses".Length];
+            return string.IsNullOrWhiteSpace(prefix)
+                ? baseAddress
+                : new Uri(baseAddress, prefix.Trim('/') + "/");
+        }
+
+        if (string.Equals(normalizedPath, "responses", StringComparison.OrdinalIgnoreCase))
+        {
+            return baseAddress;
+        }
+
+        throw new NotSupportedException($"Responses path '{responsesPath}' is not supported by the official OpenAI .NET client. Expected a path ending in '/responses'.");
+    }
+
+    private static CreateResponseOptions GetRequestOptions(OpenAiResponsesRequest request, bool stream)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        CreateResponseOptions options = request.Options
+            ?? OpenAiSdkSerialization.ReadModel<CreateResponseOptions>(request.Body);
+
+        options.StreamingEnabled = stream;
+        return options;
+    }
+
+    private static Exception CreateDetailedException(string operation, ClientResultException exception)
+    {
+        string? body = null;
+        try
+        {
+            body = exception.GetRawResponse()?.Content?.ToString();
+        }
+        catch
+        {
+        }
+
+        string message = body is null
+            ? $"OpenAI Responses API failed to {operation}: {exception.Message}"
+            : $"OpenAI Responses API failed to {operation}: {exception.Message}{Environment.NewLine}Response body: {body}";
+
+        return new InvalidOperationException(message, exception);
     }
 }
