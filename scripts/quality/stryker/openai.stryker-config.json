@@ -6,7 +6,6 @@
   ],
   "project": "src/Incursa.OpenAI.Agents/Incursa.OpenAI.Agents.csproj",
   "mutate": [
-    "**/OpenAiJsonSchemaGenerator.cs",
     "**/OpenAiResponsesClient.cs",
     "**/OpenAiResponsesMapping.cs",
     "**/OpenAiResponsesRunner.cs",

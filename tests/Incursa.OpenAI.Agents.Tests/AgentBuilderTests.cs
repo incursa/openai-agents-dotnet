@@ -7,6 +7,17 @@ namespace Incursa.OpenAI.Agents.Tests;
 /// <summary>Tests for agent composition helpers and request factory APIs.</summary>
 public sealed class AgentBuilderTests
 {
+    private static readonly JsonObject ExampleOutputSchema = new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["value"] = new JsonObject { ["type"] = "string" },
+        },
+        ["required"] = new JsonArray("value"),
+        ["additionalProperties"] = false,
+    };
+
     /// <summary>AgentBuilder preserves the configured composition surface when building an agent.</summary>
     /// <intent>Protect the low-ceremony composition API used by consumer code.</intent>
     /// <scenario>LIB-COMP-BUILDER-001</scenario>
@@ -34,7 +45,7 @@ public sealed class AgentBuilderTests
             .WithStreamableMcpServer(new StreamableHttpMcpServerDefinition("mail", new Uri("https://mail.example.test/mcp")))
             .WithMetadata("team", "support")
             .WithModelSetting("temperature", 0.2)
-            .WithOutputContract(AgentOutputContract.For<ExampleOutput>())
+            .WithOutputContract(new AgentOutputContract(ExampleOutputSchema, null, typeof(ExampleOutput)))
             .Build();
 
         Assert.Equal("triage", agent.Name);
@@ -45,6 +56,7 @@ public sealed class AgentBuilderTests
         Assert.Single(agent.StreamableMcpServers);
         Assert.Equal("support", agent.Metadata["team"]);
         Assert.Equal(0.2, agent.ModelSettings["temperature"]);
+        Assert.Equal(ExampleOutputSchema.ToJsonString(), agent.OutputContract?.Schema.ToJsonString());
         Assert.Equal(typeof(ExampleOutput), agent.OutputContract?.ClrType);
     }
 

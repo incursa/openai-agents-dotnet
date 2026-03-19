@@ -13,6 +13,17 @@ namespace Incursa.OpenAI.Agents.Tests;
 /// <summary>Tests for the OpenAI Responses adapter and request mapping.</summary>
 public sealed class OpenAiResponsesTests
 {
+    private static readonly JsonObject ExampleOutputSchema = new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["value"] = new JsonObject { ["type"] = "string" },
+        },
+        ["required"] = new JsonArray("value"),
+        ["additionalProperties"] = false,
+    };
+
     /// <summary>Request mapping includes tools, handoffs, hosted MCP tools, and structured output definitions.</summary>
     /// <intent>Protect the main request-mapping contract for the OpenAI Responses adapter.</intent>
     /// <scenario>LIB-OAI-MAP-001</scenario>
@@ -61,7 +72,7 @@ public sealed class OpenAiResponsesTests
                     Description = "Transfer to mail",
                 },
             ],
-            OutputContract = AgentOutputContract.For<ExampleOutput>(),
+            OutputContract = new AgentOutputContract(ExampleOutputSchema, null, typeof(ExampleOutput)),
             ModelSettings = new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["text"] = new
@@ -93,10 +104,24 @@ public sealed class OpenAiResponsesTests
         Assert.Equal(3, plan.Options.Tools.Count);
         Assert.NotNull(plan.Options.TextOptions?.TextFormat);
         Assert.Equal(ResponseTextFormatKind.JsonSchema, plan.Options.TextOptions!.TextFormat.Kind);
+        Assert.Equal(ExampleOutputSchema.ToJsonString(), OpenAiSdkSerialization.ToJsonObject(plan.Options.TextOptions.TextFormat)["schema"]?.ToJsonString());
+        Assert.Equal("ExampleOutput", OpenAiSdkSerialization.ToJsonObject(plan.Options.TextOptions.TextFormat)["name"]?.GetValue<string>());
         Assert.Single(plan.HandoffMap);
         Assert.Contains(plan.Options.Tools, item => item is FunctionTool function && function.FunctionName == "lookup_customer");
         Assert.Contains(plan.Options.Tools, item => item is FunctionTool function && function.FunctionName == "transfer_to_mail_specialist");
         Assert.Contains(plan.Options.Tools, item => item is McpTool);
+    }
+
+    /// <summary>Invalid output schemas are rejected before the request reaches the OpenAI SDK.</summary>
+    /// <intent>Prevent malformed output schemas from surfacing as remote 400 responses.</intent>
+    /// <scenario>LIB-OAI-MAP-OUTPUT-001</scenario>
+    /// <behavior>Constructing an output contract with a non-object schema fails locally.</behavior>
+    [Fact]
+    public void AgentOutputContract_RejectsNonObjectSchemas()
+    {
+        var error = Assert.Throws<ArgumentException>(() => new AgentOutputContract(new JsonArray()));
+
+        Assert.Equal("schema", error.ParamName);
     }
 
     /// <summary>Turn execution resolves local MCP servers into OpenAI tool definitions before sending the request.</summary>
@@ -386,6 +411,66 @@ public sealed class OpenAiResponsesTests
         Assert.Equal("delete_message", toolCall.ToolName);
         Assert.Equal("msg_42", toolCall.Arguments?["message_id"]?.GetValue<string>());
         Assert.Null(turn.FinalOutput);
+    }
+
+    /// <summary>Structured final outputs keep the caller-supplied CLR type metadata for downstream consumers.</summary>
+    /// <intent>Preserve typed output metadata after removing CLR-based schema generation.</intent>
+    /// <scenario>LIB-OAI-RESP-OUTPUT-001</scenario>
+    /// <behavior>Mapped final output carries the output contract CLR type when one is supplied.</behavior>
+    [Fact]
+    public async Task ResponseMapper_PreservesOutputTypeMetadataFromExplicitSchemaContract()
+    {
+        Agent<TestContext> agent = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Route work",
+            OutputContract = new AgentOutputContract(ExampleOutputSchema, null, typeof(ExampleOutput)),
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            agent,
+            new TestContext("user-1", "tenant-1"),
+            "session-output",
+            1,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "Say hello" },
+            ],
+            null,
+            null,
+            null));
+
+        OpenAiResponsesResponse response = new("resp-output-1", new JsonObject
+        {
+            ["id"] = "resp-output-1",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "message",
+                    ["content"] = new JsonArray
+                    {
+                        new JsonObject
+                        {
+                            ["type"] = "output_text",
+                            ["text"] = """{"value":"hello"}""",
+                        },
+                        new JsonObject
+                        {
+                            ["type"] = "output_json",
+                            ["value"] = new JsonObject
+                            {
+                                ["value"] = "hello",
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        Assert.Equal(typeof(ExampleOutput), turn.FinalOutput?.OutputType);
     }
 
     /// <summary>Streaming execution reconstructs completed function arguments for emitted tool-call items and final tool-call results.</summary>

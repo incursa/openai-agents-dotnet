@@ -290,13 +290,16 @@ Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.TurnNumber.get -> i
 Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.TurnNumber.init -> void
 Incursa.OpenAI.Agents.AgentOutputContract
 Incursa.OpenAI.Agents.AgentOutputContract.<Clone>$() -> Incursa.OpenAI.Agents.AgentOutputContract!
-Incursa.OpenAI.Agents.AgentOutputContract.AgentOutputContract(System.Type! clrType, string? name) -> void
-Incursa.OpenAI.Agents.AgentOutputContract.AgentOutputContract(System.Type! clrType) -> void
-Incursa.OpenAI.Agents.AgentOutputContract.ClrType.get -> System.Type!
+Incursa.OpenAI.Agents.AgentOutputContract.AgentOutputContract(System.Text.Json.Nodes.JsonNode! schema) -> void
+Incursa.OpenAI.Agents.AgentOutputContract.AgentOutputContract(System.Text.Json.Nodes.JsonNode! schema, string? name) -> void
+Incursa.OpenAI.Agents.AgentOutputContract.AgentOutputContract(System.Text.Json.Nodes.JsonNode! schema, string? name, System.Type? clrType) -> void
+Incursa.OpenAI.Agents.AgentOutputContract.ClrType.get -> System.Type?
 Incursa.OpenAI.Agents.AgentOutputContract.ClrType.init -> void
 Incursa.OpenAI.Agents.AgentOutputContract.Equals(Incursa.OpenAI.Agents.AgentOutputContract? other) -> bool
 Incursa.OpenAI.Agents.AgentOutputContract.Name.get -> string?
 Incursa.OpenAI.Agents.AgentOutputContract.Name.init -> void
+Incursa.OpenAI.Agents.AgentOutputContract.Schema.get -> System.Text.Json.Nodes.JsonNode!
+Incursa.OpenAI.Agents.AgentOutputContract.Schema.init -> void
 Incursa.OpenAI.Agents.AgentPendingApproval<TContext>
 Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.<Clone>$() -> Incursa.OpenAI.Agents.AgentPendingApproval<TContext>!
 Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.Agent.get -> Incursa.OpenAI.Agents.Agent<TContext>!
@@ -1298,8 +1301,6 @@ static Incursa.OpenAI.Agents.AgentInstructions<TContext>.FromText(string! text) 
 static Incursa.OpenAI.Agents.AgentInstructions<TContext>.implicit operator Incursa.OpenAI.Agents.AgentInstructions<TContext>!(string! text) -> Incursa.OpenAI.Agents.AgentInstructions<TContext>!
 static Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.operator !=(Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>? left, Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>? right) -> bool
 static Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>.operator ==(Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>? left, Incursa.OpenAI.Agents.AgentModelInputFilterContext<TContext>? right) -> bool
-static Incursa.OpenAI.Agents.AgentOutputContract.For<T>() -> Incursa.OpenAI.Agents.AgentOutputContract!
-static Incursa.OpenAI.Agents.AgentOutputContract.For<T>(string? name) -> Incursa.OpenAI.Agents.AgentOutputContract!
 static Incursa.OpenAI.Agents.AgentOutputContract.operator !=(Incursa.OpenAI.Agents.AgentOutputContract? left, Incursa.OpenAI.Agents.AgentOutputContract? right) -> bool
 static Incursa.OpenAI.Agents.AgentOutputContract.operator ==(Incursa.OpenAI.Agents.AgentOutputContract? left, Incursa.OpenAI.Agents.AgentOutputContract? right) -> bool
 static Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.operator !=(Incursa.OpenAI.Agents.AgentPendingApproval<TContext>? left, Incursa.OpenAI.Agents.AgentPendingApproval<TContext>? right) -> bool

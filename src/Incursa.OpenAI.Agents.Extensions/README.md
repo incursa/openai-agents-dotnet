@@ -8,6 +8,7 @@ Included in this package:
 - `AddFileAgentSessions()` for file-backed versioned session persistence and retention settings
 - provider-specific adapters like `Incursa.OpenAI.Agents.Storage.Azure` and `Incursa.OpenAI.Agents.Storage.S3` for production-backed sessions
 - `AddOpenAiResponses()` for `HttpClient` setup, `OpenAiResponsesRunner`, and MCP observation/retry configuration
+- `AgentOutputContractFactory.ForJsonSchema(...)` convenience helpers for generating explicit output schemas from CLR types via `Microsoft.Extensions.AI.Abstractions`
 - logging-backed observation sinks for `IAgentRuntimeObserver` and `IMcpClientObserver`
 
 This package is additive. The core runtime and OpenAI adapter still work without DI or `Microsoft.Extensions.*`.

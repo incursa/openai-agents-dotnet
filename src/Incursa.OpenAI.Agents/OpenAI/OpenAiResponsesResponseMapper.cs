@@ -80,7 +80,7 @@ internal sealed class OpenAiResponsesResponseMapper
                 finalText = structured.ToJsonString(SerializerOptions);
             }
 
-            finalOutput = new AgentFinalOutput(finalText, structured, null, response.Id);
+            finalOutput = new AgentFinalOutput(finalText, structured, plan.EffectiveAgent.OutputContract?.ClrType, response.Id);
         }
 
         return new AgentTurnResponse<TContext>(finalOutput, toolCalls, handoffs, items, response.Id, plan.EffectiveAgent);

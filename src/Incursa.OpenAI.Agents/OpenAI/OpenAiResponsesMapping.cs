@@ -102,8 +102,8 @@ internal sealed class OpenAiResponsesRequestMapper
         {
             requestOptions.TextOptions ??= new ResponseTextOptions();
             requestOptions.TextOptions.TextFormat = ResponseTextFormat.CreateJsonSchemaFormat(
-                request.Agent.OutputContract.Name ?? request.Agent.OutputContract.ClrType.Name,
-                BinaryData.FromString(OpenAiJsonSchemaGenerator.CreateSchema(request.Agent.OutputContract.ClrType).ToJsonString(SerializerOptions)),
+                request.Agent.OutputContract.Name ?? "structured_output",
+                BinaryData.FromString(request.Agent.OutputContract.Schema.ToJsonString(SerializerOptions)),
                 jsonSchemaIsStrict: true);
         }
 

@@ -1,3 +1,5 @@
+using System.Text.Json.Nodes;
+
 namespace Incursa.OpenAI.Agents;
 
 /// <summary>
@@ -6,28 +8,44 @@ namespace Incursa.OpenAI.Agents;
 
 public sealed record AgentOutputContract
 {
-    /// <summary>Creates a contract using the provided CLR type and optional output name.</summary>
-    public AgentOutputContract(Type clrType)
-        : this(clrType, null)
+    /// <summary>Creates a contract using an explicit JSON schema.</summary>
+    public AgentOutputContract(JsonNode schema)
+        : this(schema, null, null)
     {
     }
 
-    /// <summary>Creates a contract using CLR type and name metadata.</summary>
-    public AgentOutputContract(Type clrType, string? name)
+    /// <summary>Creates a contract using an explicit JSON schema and optional output name.</summary>
+    public AgentOutputContract(JsonNode schema, string? name)
+        : this(schema, name, null)
     {
+    }
+
+    /// <summary>Creates a contract using an explicit JSON schema, optional output name, and optional CLR type metadata.</summary>
+    public AgentOutputContract(JsonNode schema, string? name, Type? clrType)
+    {
+        ArgumentNullException.ThrowIfNull(schema);
+
+        if (schema is not JsonObject)
+        {
+            throw new ArgumentException("Output schema root must be a JSON object.", nameof(schema));
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            name = clrType?.Name;
+        }
+
+        Schema = schema.DeepClone();
         ClrType = clrType;
         Name = name;
     }
 
-    /// <summary>Gets the CLR type expected for the agent output.</summary>
-    public Type ClrType { get; init; }
+    /// <summary>Gets the JSON schema sent to the model for structured output.</summary>
+    public JsonNode Schema { get; init; }
+
+    /// <summary>Gets the CLR type associated with the structured output, if any.</summary>
+    public Type? ClrType { get; init; }
 
     /// <summary>Gets or sets the named contract used by the model output format.</summary>
     public string? Name { get; init; }
-
-    /// <summary>Creates an output contract using the inferred type name.</summary>
-    public static AgentOutputContract For<T>() => new(typeof(T), typeof(T).Name);
-
-    /// <summary>Creates an output contract with an explicit output name.</summary>
-    public static AgentOutputContract For<T>(string? name) => new(typeof(T), name ?? typeof(T).Name);
 }

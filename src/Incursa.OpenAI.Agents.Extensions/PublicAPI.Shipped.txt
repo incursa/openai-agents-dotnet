@@ -1,4 +1,5 @@
 #nullable enable
+Incursa.OpenAI.Agents.Extensions.AgentOutputContractFactory
 Incursa.OpenAI.Agents.Extensions.AgentRuntimeObservationSinkExtensions
 Incursa.OpenAI.Agents.Extensions.AgentRuntimeOptions
 Incursa.OpenAI.Agents.Extensions.AgentRuntimeOptions.AgentRuntimeOptions() -> void
@@ -45,6 +46,13 @@ Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.OpenAiResponsesOptions()
 Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.ResponsesPath.get -> string!
 Incursa.OpenAI.Agents.Extensions.OpenAiResponsesOptions.ResponsesPath.set -> void
 static Incursa.OpenAI.Agents.Extensions.AgentRuntimeObservationSinkExtensions.ObserveAsync(this Incursa.OpenAI.Agents.Extensions.IAgentRuntimeObservationSink! sink, Incursa.OpenAI.Agents.AgentRuntimeObservation! observation) -> System.Threading.Tasks.ValueTask
+static Incursa.OpenAI.Agents.Extensions.AgentOutputContractFactory.ForJsonSchema(System.Type! type) -> Incursa.OpenAI.Agents.AgentOutputContract!
+static Incursa.OpenAI.Agents.Extensions.AgentOutputContractFactory.ForJsonSchema(System.Type! type, string? name) -> Incursa.OpenAI.Agents.AgentOutputContract!
+static Incursa.OpenAI.Agents.Extensions.AgentOutputContractFactory.ForJsonSchema(System.Type! type, System.Text.Json.JsonSerializerOptions? serializerOptions, string? name, string? description) -> Incursa.OpenAI.Agents.AgentOutputContract!
+static Incursa.OpenAI.Agents.Extensions.AgentOutputContractFactory.ForJsonSchema<T>() -> Incursa.OpenAI.Agents.AgentOutputContract!
+static Incursa.OpenAI.Agents.Extensions.AgentOutputContractFactory.ForJsonSchema<T>(string? name) -> Incursa.OpenAI.Agents.AgentOutputContract!
+static Incursa.OpenAI.Agents.Extensions.AgentOutputContractFactory.ForJsonSchema<T>(System.Text.Json.JsonSerializerOptions! serializerOptions) -> Incursa.OpenAI.Agents.AgentOutputContract!
+static Incursa.OpenAI.Agents.Extensions.AgentOutputContractFactory.ForJsonSchema<T>(System.Text.Json.JsonSerializerOptions! serializerOptions, string? name, string? description) -> Incursa.OpenAI.Agents.AgentOutputContract!
 static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddFileAgentSessions(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, string! directoryPath, System.Action<Incursa.OpenAI.Agents.Extensions.AgentSessionRetentionOptions!>? configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddFileAgentSessions(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, string! directoryPath) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddIncursaAgents(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Incursa.OpenAI.Agents.Extensions.AgentRuntimeOptions!>? configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

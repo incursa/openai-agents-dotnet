@@ -4,16 +4,16 @@
     "defaultBranch": "main"
   },
   "summary": {
-    "total": 50,
-    "compliant": 50,
+    "total": 54,
+    "compliant": 54,
     "missingRequired": 0,
     "invalidFormat": 0
   },
   "byCategory": [
     {
       "category": "Incursa.OpenAI.Agents",
-      "total": 50,
-      "compliant": 50
+      "total": 54,
+      "compliant": 54
     }
   ],
   "byTag": [],
@@ -30,8 +30,8 @@
     },
     {
       "project": "Incursa.OpenAI.Agents.Tests",
-      "total": 44,
-      "compliant": 44
+      "total": 48,
+      "compliant": 48
     }
   ],
   "tests": [
@@ -141,7 +141,7 @@
       "behavior": "Builder output keeps model, instructions, tools, handoffs, MCP definitions, metadata, model settings, and output contracts.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentBuilderTests.cs",
-        "line": 16,
+        "line": 27,
         "member": "Incursa.OpenAI.Agents.Tests.AgentBuilderTests.AgentBuilder_CreatesConfiguredAgent"
       },
       "status": "compliant",
@@ -157,7 +157,7 @@
       "behavior": "Helper APIs carry session, previous-response, and approval-resume data into the resulting request.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/AgentBuilderTests.cs",
-        "line": 56,
+        "line": 68,
         "member": "Incursa.OpenAI.Agents.Tests.AgentBuilderTests.AgentRunRequest_HelpersCreateResumeAndPreviousResponseRequests"
       },
       "status": "compliant",
@@ -516,6 +516,22 @@
       "project": "Incursa.OpenAI.Agents.Tests"
     },
     {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.AgentOutputContract_RejectsNonObjectSchemas",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Invalid output schemas are rejected before the request reaches the OpenAI SDK.",
+      "intent": "Prevent malformed output schemas from surfacing as remote 400 responses.",
+      "scenario": "LIB-OAI-MAP-OUTPUT-001",
+      "behavior": "Constructing an output contract with a non-object schema fails locally.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
+        "line": 120,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.AgentOutputContract_RejectsNonObjectSchemas"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
       "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.OpenAiResponsesRequest_DoesNotSerializeTypedOptionsSnapshot",
       "category": "Incursa.OpenAI.Agents",
       "tags": [],
@@ -525,7 +541,7 @@
       "behavior": "Creating an internal request from typed options succeeds and leaves the compatibility JSON body empty until explicitly provided.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 277,
+        "line": 302,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.OpenAiResponsesRequest_DoesNotSerializeTypedOptionsSnapshot"
       },
       "status": "compliant",
@@ -541,7 +557,7 @@
       "behavior": "Mapped requests preserve model selection, previous-response IDs, tool payloads, MCP payloads, and structured-output metadata.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 22,
+        "line": 33,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_MapsToolsHandoffsAndStructuredOutput"
       },
       "status": "compliant",
@@ -557,7 +573,7 @@
       "behavior": "Normalized model input omits pre-handoff function-call and function-call-output items when that mode is enabled.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 181,
+        "line": 206,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_NormalizesHandoffModelInputAfterHandoff"
       },
       "status": "compliant",
@@ -573,7 +589,7 @@
       "behavior": "Mapped reasoning items omit their IDs when the configured reasoning-item policy is Omit.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 313,
+        "line": 338,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_OmitsReasoningIdsWhenConfigured"
       },
       "status": "compliant",
@@ -589,7 +605,7 @@
       "behavior": "Mapped input reflects the filtered conversation instead of the full stored conversation.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 216,
+        "line": 241,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_UsesRunLevelModelInputFilter"
       },
       "status": "compliant",
@@ -605,8 +621,24 @@
       "behavior": "MCP approval request output items map to approval-required MCP tool calls with parsed arguments.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 344,
+        "line": 369,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponseMapper_MapsMcpApprovalRequestsToApprovalRequiredToolCalls"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponseMapper_PreservesOutputTypeMetadataFromExplicitSchemaContract",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Structured final outputs keep the caller-supplied CLR type metadata for downstream consumers.",
+      "intent": "Preserve typed output metadata after removing CLR-based schema generation.",
+      "scenario": "LIB-OAI-RESP-OUTPUT-001",
+      "behavior": "Mapped final output carries the output contract CLR type when one is supplied.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
+        "line": 421,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponseMapper_PreservesOutputTypeMetadataFromExplicitSchemaContract"
       },
       "status": "compliant",
       "project": "Incursa.OpenAI.Agents.Tests"
@@ -621,7 +653,7 @@
       "behavior": "When typed options and a snapshot disagree, the client uses the typed options for the SDK call.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 249,
+        "line": 274,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponsesClient_PrefersTypedOptionsOverJsonSnapshot"
       },
       "status": "compliant",
@@ -637,7 +669,7 @@
       "behavior": "Completed function arguments appear on emitted tool-call run items and on the final response tool-call data.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 396,
+        "line": 481,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse"
       },
       "status": "compliant",
@@ -653,7 +685,7 @@
       "behavior": "Resolved streamable MCP tools are added to the request body before the turn completes.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs",
-        "line": 107,
+        "line": 132,
         "member": "Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestOptions"
       },
       "status": "compliant",
@@ -735,6 +767,38 @@
         "file": "tests/Incursa.OpenAI.Agents.Tests/RuntimeObservabilityTests.cs",
         "line": 15,
         "member": "Incursa.OpenAI.Agents.Tests.RuntimeObservabilityTests.RunAsync_EmitsLifecycleObservations"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.SchemaGenerationExtensionsTests.ForJsonSchema_GenericCreatesStrictExplicitContract",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Generated contracts from CLR types produce explicit strict object schemas for the core runtime.",
+      "intent": "Protect the optional extensions-based convenience path after removing schema generation from the core package.",
+      "scenario": "LIB-EXT-SCHEMA-001",
+      "behavior": "Generated contracts keep CLR type metadata and produce strict root and nested object schemas.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/SchemaGenerationExtensionsTests.cs",
+        "line": 15,
+        "member": "Incursa.OpenAI.Agents.Tests.SchemaGenerationExtensionsTests.ForJsonSchema_GenericCreatesStrictExplicitContract"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.SchemaGenerationExtensionsTests.ForJsonSchema_TypeOverloadUsesExplicitName",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Type-based generation honors explicit schema names on the resulting output contract.",
+      "intent": "Protect the naming surface used by the OpenAI response format.",
+      "scenario": "LIB-EXT-SCHEMA-002",
+      "behavior": "Explicit names override the default CLR type name.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/SchemaGenerationExtensionsTests.cs",
+        "line": 36,
+        "member": "Incursa.OpenAI.Agents.Tests.SchemaGenerationExtensionsTests.ForJsonSchema_TypeOverloadUsesExplicitName"
       },
       "status": "compliant",
       "project": "Incursa.OpenAI.Agents.Tests"

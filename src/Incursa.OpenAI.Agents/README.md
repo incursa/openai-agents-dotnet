@@ -6,6 +6,7 @@ Included in this package:
 - `Agent<TContext>` with tools, handoffs, hosted MCP, and streamable MCP server definitions
 - `AgentRunner` with max-turn enforcement, session persistence, approvals, guardrails, and streaming-shaped events
 - `OpenAiResponsesClient`, request/response mapping, streaming helpers, and `OpenAiResponsesRunner`
+- explicit JSON-schema-based structured output contracts via `AgentOutputContract`
 - resumable `AgentRunState<TContext>` for approval workflows
 - per-user MCP auth abstractions through `McpAuthContext` and `IUserScopedMcpAuthResolver`
 - typed `AgentRunOptions<TContext>` for previous-response continuation, handoff input normalization, model input filtering, reasoning item ID policy, and run-level guardrails
