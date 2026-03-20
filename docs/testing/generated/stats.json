@@ -4,16 +4,16 @@
     "defaultBranch": "main"
   },
   "summary": {
-    "total": 54,
-    "compliant": 54,
+    "total": 62,
+    "compliant": 62,
     "missingRequired": 0,
     "invalidFormat": 0
   },
   "byCategory": [
     {
       "category": "Incursa.OpenAI.Agents",
-      "total": 54,
-      "compliant": 54
+      "total": 62,
+      "compliant": 62
     }
   ],
   "byTag": [],
@@ -30,8 +30,8 @@
     },
     {
       "project": "Incursa.OpenAI.Agents.Tests",
-      "total": 48,
-      "compliant": 48
+      "total": 56,
+      "compliant": 56
     }
   ],
   "tests": [
@@ -372,6 +372,22 @@
       "project": "Incursa.OpenAI.Agents.Tests"
     },
     {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddOpenAiAudio_AppliesConfiguredApiKeyToHttpClient",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Verifies the configured API key is applied to the named OpenAI audio HttpClient.",
+      "intent": "Protect direct credential configuration for the audio DI surface without requiring environment variables.",
+      "scenario": "LIB-EXT-DI-AUDIO-001",
+      "behavior": "\u0060OpenAiAudioOptions.ApiKey\u0060 sets the bearer token on the configured audio client.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
+        "line": 188,
+        "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddOpenAiAudio_AppliesConfiguredApiKeyToHttpClient"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
       "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddOpenAiResponses_AppliesConfiguredApiKeyToHttpClient",
       "category": "Incursa.OpenAI.Agents",
       "tags": [],
@@ -413,7 +429,7 @@
       "behavior": "Each sink receives the same observation exactly once.",
       "source": {
         "file": "tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs",
-        "line": 188,
+        "line": 212,
         "member": "Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.CompositeAgentRuntimeObserver_FansOutObservationsToAllSinks"
       },
       "status": "compliant",
@@ -511,6 +527,118 @@
         "file": "tests/Incursa.OpenAI.Agents.Tests/McpTests.cs",
         "line": 147,
         "member": "Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_ThrowsHelpfulErrorForJsonRpcErrors"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.GenerateSpeechAsync_MapsRequestAndNormalizesResponse",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Speech-generation requests map repo-owned settings onto the upstream SDK options and normalize the binary output.",
+      "intent": "Protect the public speech-generation surface from drifting away from the upstream OpenAI SDK.",
+      "scenario": "LIB-OAI-AUDIO-SPEECH-001",
+      "behavior": "Speech requests preserve model, voice, format, and tuning options while returning audio bytes and format metadata.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs",
+        "line": 74,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.GenerateSpeechAsync_MapsRequestAndNormalizesResponse"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_AllowsNonSeekableValidAudioAndReplaysPeekedBytes",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Non-seekable streams are still supported after local validation.",
+      "intent": "Keep server-side streaming scenarios viable while still performing empty-input and header checks.",
+      "scenario": "LIB-OAI-AUDIO-TRANSCRIBE-006",
+      "behavior": "Validation peeks the header from non-seekable streams and replays the consumed bytes to the upstream SDK.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs",
+        "line": 180,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_AllowsNonSeekableValidAudioAndReplaysPeekedBytes"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_MapsRequestAndNormalizesResponse",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Transcription requests map repo-owned settings onto the upstream SDK options and normalize the result using a real microset fixture.",
+      "intent": "Protect the public audio transcription surface from drifting away from the upstream OpenAI SDK.",
+      "scenario": "LIB-OAI-AUDIO-TRANSCRIBE-001",
+      "behavior": "Transcription requests preserve model, prompt, language, timestamp choices, and normalized response data.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs",
+        "line": 18,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_MapsRequestAndNormalizesResponse"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsEmptyStreamBeforeCreatingSdkClient",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Empty audio streams are rejected before any SDK client is created.",
+      "intent": "Prevent pointless uploads and clearer caller failures for empty inputs.",
+      "scenario": "LIB-OAI-AUDIO-TRANSCRIBE-002",
+      "behavior": "Seekable empty streams fail local validation before network work begins.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs",
+        "line": 108,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsEmptyStreamBeforeCreatingSdkClient"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsKnownHeaderMismatch",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Known audio headers are checked before upload when content sniffing is enabled.",
+      "intent": "Catch mismatched or obviously invalid binary data before it reaches the OpenAI API.",
+      "scenario": "LIB-OAI-AUDIO-TRANSCRIBE-005",
+      "behavior": "Files whose bytes do not match the declared extension fail local validation before network work begins.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs",
+        "line": 163,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsKnownHeaderMismatch"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsSeekableStreamLargerThanConfiguredMaximum",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Oversized seekable streams are rejected before upload.",
+      "intent": "Enforce a configurable local size cap instead of relying on remote failures.",
+      "scenario": "LIB-OAI-AUDIO-TRANSCRIBE-003",
+      "behavior": "Seekable streams larger than the configured maximum fail local validation before network work begins.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs",
+        "line": 125,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsSeekableStreamLargerThanConfiguredMaximum"
+      },
+      "status": "compliant",
+      "project": "Incursa.OpenAI.Agents.Tests"
+    },
+    {
+      "testId": "Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsUnsupportedFileExtension",
+      "category": "Incursa.OpenAI.Agents",
+      "tags": [],
+      "summary": "Unsupported file extensions are rejected before upload.",
+      "intent": "Block clearly invalid input types at the boundary of the public audio API.",
+      "scenario": "LIB-OAI-AUDIO-TRANSCRIBE-004",
+      "behavior": "Files outside the configured extension allowlist fail local validation before network work begins.",
+      "source": {
+        "file": "tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs",
+        "line": 146,
+        "member": "Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsUnsupportedFileExtension"
       },
       "status": "compliant",
       "project": "Incursa.OpenAI.Agents.Tests"

@@ -1,6 +1,6 @@
 # Incursa.OpenAI.Agents
 
-Total tests: 54
+Total tests: 62
 
 - **Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests:Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.CleanupExpiredSessionsAsync_RemovesExpiredSessions**
   - Summary: The Azure session store removes expired sessions during explicit cleanup.
@@ -107,6 +107,11 @@ Total tests: 54
   - Intent: Protect the public DI registration surface in Incursa.OpenAI.Agents.Extensions.
   - Tags: (none)
   - Source: [tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs#L25](tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs#L25)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddOpenAiAudio_AppliesConfiguredApiKeyToHttpClient**
+  - Summary: Verifies the configured API key is applied to the named OpenAI audio HttpClient.
+  - Intent: Protect direct credential configuration for the audio DI surface without requiring environment variables.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs#L188](tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs#L188)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddOpenAiResponses_AppliesConfiguredApiKeyToHttpClient**
   - Summary: Verifies the configured API key is applied to the named OpenAI HttpClient.
   - Intent: Protect direct credential configuration without requiring environment variables.
@@ -121,7 +126,7 @@ Total tests: 54
   - Summary: Verifies composite extension observers fan out each runtime observation to all registered sinks.
   - Intent: Protect the extensions observability surface from dropping observations when multiple sinks are registered.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs#L188](tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs#L188)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs#L212](tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs#L212)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_AppliesDynamicToolFilterAndSkipsFilterErrors**
   - Summary: Dynamic MCP tool filters can block tools and tolerate filter exceptions.
   - Intent: Protect runtime tool visibility filtering.
@@ -152,6 +157,41 @@ Total tests: 54
   - Intent: Protect caller-facing diagnostics for MCP server-side failures.
   - Tags: (none)
   - Source: [tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L147](tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L147)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.GenerateSpeechAsync_MapsRequestAndNormalizesResponse**
+  - Summary: Speech-generation requests map repo-owned settings onto the upstream SDK options and normalize the binary output.
+  - Intent: Protect the public speech-generation surface from drifting away from the upstream OpenAI SDK.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L74](tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L74)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_AllowsNonSeekableValidAudioAndReplaysPeekedBytes**
+  - Summary: Non-seekable streams are still supported after local validation.
+  - Intent: Keep server-side streaming scenarios viable while still performing empty-input and header checks.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L180](tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L180)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_MapsRequestAndNormalizesResponse**
+  - Summary: Transcription requests map repo-owned settings onto the upstream SDK options and normalize the result using a real microset fixture.
+  - Intent: Protect the public audio transcription surface from drifting away from the upstream OpenAI SDK.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L18](tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L18)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsEmptyStreamBeforeCreatingSdkClient**
+  - Summary: Empty audio streams are rejected before any SDK client is created.
+  - Intent: Prevent pointless uploads and clearer caller failures for empty inputs.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L108](tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L108)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsKnownHeaderMismatch**
+  - Summary: Known audio headers are checked before upload when content sniffing is enabled.
+  - Intent: Catch mismatched or obviously invalid binary data before it reaches the OpenAI API.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L163](tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L163)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsSeekableStreamLargerThanConfiguredMaximum**
+  - Summary: Oversized seekable streams are rejected before upload.
+  - Intent: Enforce a configurable local size cap instead of relying on remote failures.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L125](tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L125)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.TranscribeAsync_RejectsUnsupportedFileExtension**
+  - Summary: Unsupported file extensions are rejected before upload.
+  - Intent: Block clearly invalid input types at the boundary of the public audio API.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L146](tests/Incursa.OpenAI.Agents.Tests/OpenAiAudioTests.cs#L146)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.AgentOutputContract_RejectsNonObjectSchemas**
   - Summary: Invalid output schemas are rejected before the request reaches the OpenAI SDK.
   - Intent: Prevent malformed output schemas from surfacing as remote 400 responses.

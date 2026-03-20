@@ -183,10 +183,57 @@ public static class AgentServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>Registers OpenAI audio client integration using default configuration.</summary>
+    public static IServiceCollection AddOpenAiAudio(this IServiceCollection services)
+        => AddOpenAiAudio(services, null);
+
+    /// <summary>Registers OpenAI audio client integration with optional configuration.</summary>
+    public static IServiceCollection AddOpenAiAudio(
+        this IServiceCollection services,
+        Action<OpenAiAudioOptions>? configure)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        services.AddOptions<OpenAiAudioOptions>();
+        if (configure is not null)
+        {
+            services.Configure(configure);
+        }
+
+        services.AddHttpClient(OpenAiAudioDefaults.OpenAiAudioHttpClientName)
+            .ConfigureHttpClient((sp, client) => ConfigureOpenAiAudioClient(sp, client));
+
+        services.TryAddTransient<IOpenAiAudioClient>(sp =>
+        {
+            OpenAiAudioOptions options = sp.GetRequiredService<IOptions<OpenAiAudioOptions>>().Value;
+            HttpClient client = sp.GetRequiredService<IHttpClientFactory>().CreateClient(options.HttpClientName);
+            ApplyOpenAiAudioOptions(client, options);
+            return new OpenAiAudioClient(client, options);
+        });
+
+        return services;
+    }
+
     private static void ConfigureOpenAiClient(IServiceProvider services, HttpClient client)
         => ApplyOpenAiOptions(client, services.GetRequiredService<IOptions<OpenAiResponsesOptions>>().Value);
 
+    private static void ConfigureOpenAiAudioClient(IServiceProvider services, HttpClient client)
+        => ApplyOpenAiAudioOptions(client, services.GetRequiredService<IOptions<OpenAiAudioOptions>>().Value);
+
     private static void ApplyOpenAiOptions(HttpClient client, OpenAiResponsesOptions options)
+    {
+        if (options.BaseAddress is not null)
+        {
+            client.BaseAddress = options.BaseAddress;
+        }
+
+        if (!string.IsNullOrWhiteSpace(options.ApiKey))
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.ApiKey);
+        }
+    }
+
+    private static void ApplyOpenAiAudioOptions(HttpClient client, OpenAiAudioOptions options)
     {
         if (options.BaseAddress is not null)
         {
@@ -203,5 +250,10 @@ public static class AgentServiceCollectionExtensions
     {
         public const string OpenAiHttpClientName = "openai";
         public const string McpHttpClientName = "incursa-agents-mcp";
+    }
+
+    private static class OpenAiAudioDefaults
+    {
+        public const string OpenAiAudioHttpClientName = "openai-audio";
     }
 }

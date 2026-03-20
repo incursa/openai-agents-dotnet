@@ -3,3 +3,13 @@ static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddAgen
 static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddAgentSessionStore(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, Incursa.OpenAI.Agents.IAgentSessionStore! sessionStore) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddVersionedAgentSessionStore(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Func<System.IServiceProvider!, Incursa.OpenAI.Agents.IVersionedAgentSessionStore!>! sessionStoreFactory) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddVersionedAgentSessionStore(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, Incursa.OpenAI.Agents.IVersionedAgentSessionStore! sessionStore) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+Incursa.OpenAI.Agents.Extensions.OpenAiAudioOptions
+Incursa.OpenAI.Agents.Extensions.OpenAiAudioOptions.ApiKey.get -> string?
+Incursa.OpenAI.Agents.Extensions.OpenAiAudioOptions.ApiKey.set -> void
+Incursa.OpenAI.Agents.Extensions.OpenAiAudioOptions.BaseAddress.get -> System.Uri?
+Incursa.OpenAI.Agents.Extensions.OpenAiAudioOptions.BaseAddress.set -> void
+Incursa.OpenAI.Agents.Extensions.OpenAiAudioOptions.HttpClientName.get -> string!
+Incursa.OpenAI.Agents.Extensions.OpenAiAudioOptions.HttpClientName.set -> void
+Incursa.OpenAI.Agents.Extensions.OpenAiAudioOptions.OpenAiAudioOptions() -> void
+static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddOpenAiAudio(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Incursa.OpenAI.Agents.Extensions.OpenAiAudioOptions!>? configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Incursa.OpenAI.Agents.Extensions.AgentServiceCollectionExtensions.AddOpenAiAudio(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

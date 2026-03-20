@@ -69,6 +69,8 @@ if (first.Status == AgentRunStatus.ApprovalRequired && first.State is not null &
     Console.WriteLine($"Final output: {resumed.FinalOutput?.Text}");
 }
 
+await TryRunAudioSampleAsync();
+
 static McpAuthContext CreateAuthContext(AgentTurnRequest<AppContext> request)
 {
     AppUser user = request.Context.User;
@@ -81,6 +83,46 @@ static McpAuthContext CreateAuthContext(AgentTurnRequest<AppContext> request)
         SessionKey = request.SessionKey,
         AgentName = request.Agent.Name,
     };
+}
+
+static async Task TryRunAudioSampleAsync()
+{
+    string? apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+    string? audioFile = Environment.GetEnvironmentVariable("OPENAI_AUDIO_SAMPLE_FILE");
+    if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(audioFile) || !File.Exists(audioFile))
+    {
+        Console.WriteLine("Audio sample skipped. Set OPENAI_API_KEY and OPENAI_AUDIO_SAMPLE_FILE to run it.");
+        return;
+    }
+
+    using HttpClient httpClient = new()
+    {
+        BaseAddress = new Uri("https://api.openai.com/v1/"),
+    };
+    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+
+    OpenAiAudioClient audioClient = new(httpClient);
+
+    await using FileStream audioStream = File.OpenRead(audioFile);
+    OpenAiAudioTranscriptionResponse transcription = await audioClient.TranscribeAsync(
+        audioStream,
+        Path.GetFileName(audioFile),
+        new OpenAiAudioTranscriptionRequest("gpt-4o-transcribe")
+        {
+            IncludeSegmentTimestamps = true,
+        });
+
+    Console.WriteLine($"Audio transcription: {transcription.Text}");
+
+    OpenAiSpeechGenerationResponse speech = await audioClient.GenerateSpeechAsync(
+        new OpenAiSpeechGenerationRequest("gpt-4o-mini-tts", transcription.Text, "alloy")
+        {
+            Format = "mp3",
+        });
+
+    string outputPath = Path.Combine(global::System.AppContext.BaseDirectory, "audio-sample-output.mp3");
+    await File.WriteAllBytesAsync(outputPath, speech.Audio.ToArray());
+    Console.WriteLine($"Audio sample speech output: {outputPath}");
 }
 
 internal sealed record AppUser

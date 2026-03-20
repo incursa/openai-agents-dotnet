@@ -6,6 +6,7 @@ Included in this package:
 - `Agent<TContext>` with tools, handoffs, hosted MCP, and streamable MCP server definitions
 - `AgentRunner` with max-turn enforcement, session persistence, approvals, guardrails, and streaming-shaped events
 - `OpenAiResponsesClient`, request/response mapping, streaming helpers, and `OpenAiResponsesRunner`
+- `OpenAiAudioClient` with repo-owned request/response contracts for file transcription and text-to-speech
 - explicit JSON-schema-based structured output contracts via `AgentOutputContract`
 - resumable `AgentRunState<TContext>` for approval workflows
 - per-user MCP auth abstractions through `McpAuthContext` and `IUserScopedMcpAuthResolver`
@@ -17,4 +18,4 @@ Included in this package:
 
 Not included:
 - UI or ASP.NET surfaces
-- voice, realtime, browser/computer-use, evals, or tracing exporters
+- realtime voice, browser/computer-use, evals, or tracing exporters

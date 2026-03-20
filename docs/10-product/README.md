@@ -41,10 +41,11 @@ The following upstream areas were intentionally adapted, while non-core or ecosy
 - Guardrails
 - Human-in-the-loop approvals
 - Streaming events and resumed sessions
+- File audio transcription and text-to-speech
 
 ### Deferred
 
-- realtime/voice
+- realtime voice
 - hosted UI and browser/computer-use
 - multi-provider abstractions
 - advanced tracing/evals/distillation tooling

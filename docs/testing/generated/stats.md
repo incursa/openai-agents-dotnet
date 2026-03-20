@@ -6,8 +6,8 @@ Generated at (UTC): 1970-01-01T00:00:00Z
 
 | Metric | Count |
 | --- | ---: |
-| Total | 54 |
-| Compliant | 54 |
+| Total | 62 |
+| Compliant | 62 |
 | Missing required | 0 |
 | Invalid format | 0 |
 
@@ -15,7 +15,7 @@ Generated at (UTC): 1970-01-01T00:00:00Z
 
 | Category | Total | Compliant |
 | --- | ---: | ---: |
-| Incursa.OpenAI.Agents | 54 | 54 |
+| Incursa.OpenAI.Agents | 62 | 62 |
 
 ## By tag
 
@@ -28,4 +28,4 @@ Generated at (UTC): 1970-01-01T00:00:00Z
 | --- | ---: | ---: |
 | Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests | 3 | 3 |
 | Incursa.OpenAI.Agents.Storage.S3.IntegrationTests | 3 | 3 |
-| Incursa.OpenAI.Agents.Tests | 48 | 48 |
+| Incursa.OpenAI.Agents.Tests | 56 | 56 |

@@ -1,13 +1,13 @@
 # Test Documentation
 
-- Total tests: 54
-- Compliant: 54 (100.0%)
+- Total tests: 62
+- Compliant: 62 (100.0%)
 - Missing required: 0
 - Invalid format: 0
 
 ## Top categories
 
-- Incursa.OpenAI.Agents (54)
+- Incursa.OpenAI.Agents (62)
 
 ## Browse
 

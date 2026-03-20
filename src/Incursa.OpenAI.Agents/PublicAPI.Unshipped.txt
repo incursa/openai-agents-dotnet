@@ -1,1 +1,89 @@
 #nullable enable
+Incursa.OpenAI.Agents.IOpenAiAudioClient
+Incursa.OpenAI.Agents.IOpenAiAudioClient.GenerateSpeechAsync(Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse!>!
+Incursa.OpenAI.Agents.IOpenAiAudioClient.TranscribeAsync(System.IO.Stream! audio, string! audioFileName, Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse!>!
+Incursa.OpenAI.Agents.OpenAiAudioClient
+Incursa.OpenAI.Agents.OpenAiAudioClient.OpenAiAudioClient(System.Net.Http.HttpClient! httpClient, Incursa.OpenAI.Agents.OpenAiAudioValidationOptions? validationOptions = null) -> void
+Incursa.OpenAI.Agents.OpenAiAudioClient.GenerateSpeechAsync(Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse!>!
+Incursa.OpenAI.Agents.OpenAiAudioClient.TranscribeAsync(System.IO.Stream! audio, string! audioFileName, Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse!>!
+Incursa.OpenAI.Agents.OpenAiAudioClientExtensions
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.IncludeLogProbabilities.get -> bool
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.IncludeLogProbabilities.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.IncludeSegmentTimestamps.get -> bool
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.IncludeSegmentTimestamps.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.IncludeWordTimestamps.get -> bool
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.IncludeWordTimestamps.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.Language.get -> string?
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.Language.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.Model.get -> string!
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.Model.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.OpenAiAudioTranscriptionRequest(string! model) -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.Prompt.get -> string?
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest.Prompt.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Duration.get -> System.TimeSpan?
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Duration.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Language.get -> string?
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Language.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.OpenAiAudioTranscriptionResponse(string! text, string? language, System.TimeSpan? duration, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.OpenAiTranscribedWord!>? words, System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.OpenAiTranscribedSegment!>? segments, System.Text.Json.Nodes.JsonObject! raw) -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Raw.get -> System.Text.Json.Nodes.JsonObject!
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Raw.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Segments.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.OpenAiTranscribedSegment!>!
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Segments.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Text.get -> string!
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Text.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Words.get -> System.Collections.Generic.IReadOnlyList<Incursa.OpenAI.Agents.OpenAiTranscribedWord!>!
+Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse.Words.init -> void
+Incursa.OpenAI.Agents.OpenAiAudioValidationOptions
+Incursa.OpenAI.Agents.OpenAiAudioValidationOptions.AllowedFileExtensions.get -> System.Collections.Generic.ICollection<string!>!
+Incursa.OpenAI.Agents.OpenAiAudioValidationOptions.AllowedFileExtensions.set -> void
+Incursa.OpenAI.Agents.OpenAiAudioValidationOptions.EnableContentSniffing.get -> bool
+Incursa.OpenAI.Agents.OpenAiAudioValidationOptions.EnableContentSniffing.set -> void
+Incursa.OpenAI.Agents.OpenAiAudioValidationOptions.MaxFileSizeBytes.get -> long?
+Incursa.OpenAI.Agents.OpenAiAudioValidationOptions.MaxFileSizeBytes.set -> void
+Incursa.OpenAI.Agents.OpenAiAudioValidationOptions.OpenAiAudioValidationOptions() -> void
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.Format.get -> string?
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.Format.init -> void
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.Input.get -> string!
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.Input.init -> void
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.Instructions.get -> string?
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.Instructions.init -> void
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.Model.get -> string!
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.Model.init -> void
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.OpenAiSpeechGenerationRequest(string! model, string! input, string! voice) -> void
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.SpeedRatio.get -> float?
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.SpeedRatio.init -> void
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.Voice.get -> string!
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest.Voice.init -> void
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse.Audio.get -> System.BinaryData!
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse.Audio.init -> void
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse.ContentType.get -> string!
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse.ContentType.init -> void
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse.Format.get -> string!
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse.Format.init -> void
+Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse.OpenAiSpeechGenerationResponse(System.BinaryData! audio, string! format, string! contentType) -> void
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.AverageLogProbability.get -> float
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.AverageLogProbability.init -> void
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.EndTime.get -> System.TimeSpan
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.EndTime.init -> void
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.NoSpeechProbability.get -> float
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.NoSpeechProbability.init -> void
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.OpenAiTranscribedSegment(System.TimeSpan startTime, System.TimeSpan endTime, int seekOffset, System.Collections.Generic.IReadOnlyList<int>? tokenIds, float averageLogProbability, float noSpeechProbability) -> void
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.SeekOffset.get -> int
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.SeekOffset.init -> void
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.StartTime.get -> System.TimeSpan
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.StartTime.init -> void
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.TokenIds.get -> System.Collections.Generic.IReadOnlyList<int>!
+Incursa.OpenAI.Agents.OpenAiTranscribedSegment.TokenIds.init -> void
+Incursa.OpenAI.Agents.OpenAiTranscribedWord
+Incursa.OpenAI.Agents.OpenAiTranscribedWord.EndTime.get -> System.TimeSpan
+Incursa.OpenAI.Agents.OpenAiTranscribedWord.EndTime.init -> void
+Incursa.OpenAI.Agents.OpenAiTranscribedWord.OpenAiTranscribedWord(System.TimeSpan startTime, System.TimeSpan endTime) -> void
+Incursa.OpenAI.Agents.OpenAiTranscribedWord.StartTime.get -> System.TimeSpan
+Incursa.OpenAI.Agents.OpenAiTranscribedWord.StartTime.init -> void
+static Incursa.OpenAI.Agents.OpenAiAudioClientExtensions.GenerateSpeechAsync(this Incursa.OpenAI.Agents.IOpenAiAudioClient! client, Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest! request) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse!>!
+static Incursa.OpenAI.Agents.OpenAiAudioClientExtensions.TranscribeAsync(this Incursa.OpenAI.Agents.IOpenAiAudioClient! client, System.IO.Stream! audio, string! audioFileName, Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest! request) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse!>!

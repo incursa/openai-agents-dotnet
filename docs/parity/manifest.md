@@ -1,7 +1,8 @@
 ---
 workbench:
   type: doc
-  workItems: []
+  workItems:
+    - TASK-0008
   codeRefs: []
   pathHistory: []
   path: /docs/parity/manifest.md
@@ -20,13 +21,17 @@ This repo does not aim for full Python SDK parity. It tracks the included server
 
 ## Excluded Surface
 
-- voice and realtime
+- realtime voice
 - browser/computer-use
 - shell/apply-patch tools
 - evals
 - tracing/exporters
 - hosted UI/chat widgets
 - non-OpenAI providers
+
+## Included Additions
+
+- file audio transcription and text-to-speech
 
 ## Upstream Docs To Mirror
 

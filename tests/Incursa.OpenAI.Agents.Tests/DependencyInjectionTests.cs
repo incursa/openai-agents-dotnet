@@ -180,6 +180,30 @@ public sealed class DependencyInjectionTests
         Assert.Equal("test-api-key", client.DefaultRequestHeaders.Authorization?.Parameter);
     }
 
+    /// <summary>Verifies the configured API key is applied to the named OpenAI audio HttpClient.</summary>
+    /// <intent>Protect direct credential configuration for the audio DI surface without requiring environment variables.</intent>
+    /// <scenario>LIB-EXT-DI-AUDIO-001</scenario>
+    /// <behavior>`OpenAiAudioOptions.ApiKey` sets the bearer token on the configured audio client.</behavior>
+    [Fact]
+    public void AddOpenAiAudio_AppliesConfiguredApiKeyToHttpClient()
+    {
+        ServiceCollection services = new();
+        services.AddLogging();
+        services.AddIncursaAgents();
+        services.AddOpenAiAudio(options =>
+        {
+            options.ApiKey = "test-audio-api-key";
+        });
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        IHttpClientFactory clientFactory = provider.GetRequiredService<IHttpClientFactory>();
+        HttpClient client = clientFactory.CreateClient("openai-audio");
+
+        Assert.Equal("Bearer", client.DefaultRequestHeaders.Authorization?.Scheme);
+        Assert.Equal("test-audio-api-key", client.DefaultRequestHeaders.Authorization?.Parameter);
+        Assert.IsType<OpenAiAudioClient>(provider.GetRequiredService<IOpenAiAudioClient>());
+    }
+
     /// <summary>Verifies composite extension observers fan out each runtime observation to all registered sinks.</summary>
     /// <intent>Protect the extensions observability surface from dropping observations when multiple sinks are registered.</intent>
     /// <scenario>LIB-EXT-OBS-001</scenario>

@@ -16,7 +16,8 @@ Upstream source of truth: [openai/openai-agents-python](https://github.com/opena
 
 - Includes: server-side agent orchestration, handoffs, approvals, guardrails, sessions, and MCP-driven tool execution using OpenAI Responses.
 - Includes: both direct runner usage and host-oriented Dependency Injection wiring.
-- Excludes: voice/realtime, browser/computer-use tools, tracing/eval/exporter suite, and multi-provider model abstractions.
+- Includes: standalone OpenAI audio APIs for file transcription and text-to-speech.
+- Excludes: realtime voice, browser/computer-use tools, tracing/eval/exporter suite, and multi-provider model abstractions.
 - Includes explicit quality and operational controls in this repository via Workbench and tested quality workflows.
 
 ## 10-minute mini guide

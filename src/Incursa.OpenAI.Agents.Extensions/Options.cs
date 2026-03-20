@@ -138,3 +138,24 @@ public sealed class OpenAiResponsesOptions
             Observer = observer,
         };
 }
+
+/// <summary>
+/// Configures the OpenAI audio integration.
+/// </summary>
+public sealed class OpenAiAudioOptions : OpenAiAudioValidationOptions
+{
+    /// <summary>
+    /// Gets or sets the named <see cref="HttpClient"/> used for OpenAI audio calls.
+    /// </summary>
+    public string HttpClientName { get; set; } = "openai-audio";
+
+    /// <summary>
+    /// Gets or sets the base address applied to the OpenAI audio <see cref="HttpClient"/>.
+    /// </summary>
+    public Uri? BaseAddress { get; set; }
+
+    /// <summary>
+    /// Gets or sets the API key used for OpenAI authentication.
+    /// </summary>
+    public string? ApiKey { get; set; }
+}
