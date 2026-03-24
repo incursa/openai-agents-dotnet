@@ -14,6 +14,11 @@ Quality governance in this repo applies to the included .NET surface described i
 - `Incursa.OpenAI.Agents`
 - `Incursa.OpenAI.Agents.Extensions`
 
+The storage adapter packages are separate public release surfaces and are governed through their own public API baselines and integration tests:
+
+- `Incursa.OpenAI.Agents.Storage.Azure`
+- `Incursa.OpenAI.Agents.Storage.S3`
+
 Out of scope for the conformance matrix:
 
 - sample applications

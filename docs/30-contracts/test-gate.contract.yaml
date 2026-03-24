@@ -69,6 +69,9 @@ related:
     - scripts/quality/run-quality-evidence.ps1
     - scripts/quality/run-workbench-evidence.ps1
     - scripts/quality/run-library-coverage.ps1
+    - scripts/testing/prepull-test-images.ps1
+    - tests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.csproj
+    - tests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.csproj
     - .github/workflows/library-fast-quality.yml
     - .github/workflows/workbench-quality.yml
     - .github/workflows/testdocs.yml

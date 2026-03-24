@@ -1,1 +1,23 @@
 #nullable enable
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionServiceCollectionExtensions
+static Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionServiceCollectionExtensions.AddS3AgentSessions(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions!>? configure = null) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStore
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStore.S3AgentSessionStore(Amazon.S3.IAmazonS3! client, Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions? options = null) -> void
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStore.CleanupExpiredSessionsAsync() -> System.Threading.Tasks.ValueTask<int>
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStore.CleanupExpiredSessionsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<int>
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStore.LoadAsync(string! sessionKey) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentSession?>
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStore.LoadAsync(string! sessionKey, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentSession?>
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStore.SaveAsync(Incursa.OpenAI.Agents.AgentSession! session) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStore.SaveAsync(Incursa.OpenAI.Agents.AgentSession! session, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions.S3AgentSessionStoreOptions() -> void
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions.Client.get -> Amazon.S3.IAmazonS3?
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions.Client.set -> void
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions.BucketName.get -> string!
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions.BucketName.set -> void
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions.Prefix.get -> string!
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions.Prefix.set -> void
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions.CreateBucketIfMissing.get -> bool
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions.CreateBucketIfMissing.set -> void
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions.SessionOptions.get -> Incursa.OpenAI.Agents.AgentSessionStoreOptions!
+Incursa.OpenAI.Agents.Storage.S3.S3AgentSessionStoreOptions.SessionOptions.set -> void

@@ -1,1 +1,25 @@
 #nullable enable
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionServiceCollectionExtensions
+static Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionServiceCollectionExtensions.AddAzureAgentSessions(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions!>? configure = null) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStore
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStore.AzureAgentSessionStore(Azure.Storage.Blobs.BlobContainerClient! containerClient, Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions? options = null) -> void
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStore.CleanupExpiredSessionsAsync() -> System.Threading.Tasks.ValueTask<int>
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStore.CleanupExpiredSessionsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<int>
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStore.LoadAsync(string! sessionKey) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentSession?>
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStore.LoadAsync(string! sessionKey, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Incursa.OpenAI.Agents.AgentSession?>
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStore.SaveAsync(Incursa.OpenAI.Agents.AgentSession! session) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStore.SaveAsync(Incursa.OpenAI.Agents.AgentSession! session, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.AzureAgentSessionStoreOptions() -> void
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.ContainerClient.get -> Azure.Storage.Blobs.BlobContainerClient?
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.ContainerClient.set -> void
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.ConnectionString.get -> string?
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.ConnectionString.set -> void
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.ContainerName.get -> string!
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.ContainerName.set -> void
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.CreateContainerIfMissing.get -> bool
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.CreateContainerIfMissing.set -> void
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.Prefix.get -> string!
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.Prefix.set -> void
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.SessionOptions.get -> Incursa.OpenAI.Agents.AgentSessionStoreOptions!
+Incursa.OpenAI.Agents.Storage.Azure.AzureAgentSessionStoreOptions.SessionOptions.set -> void
