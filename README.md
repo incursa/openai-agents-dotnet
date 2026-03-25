@@ -53,16 +53,16 @@ dotnet tool run workbench sync -- --issues --import-issues --docs --nav
 
 ## Repository at a glance
 
-- Core runtime: `src/Incursa.OpenAI.Agents`
-- DI/hosting layer: `src/Incursa.OpenAI.Agents.Extensions`
-- Console sample: `samples/Incursa.OpenAI.Agents.ConsoleSample`
-- Hosted sample: `samples/Incursa.OpenAI.Agents.HostSample`
-- Tests: `tests/Incursa.OpenAI.Agents.Tests`
-- Docs: `docs/`
+- Core runtime: [``src/Incursa.OpenAI.Agents``](src/Incursa.OpenAI.Agents)
+- DI/hosting layer: [``src/Incursa.OpenAI.Agents.Extensions``](src/Incursa.OpenAI.Agents.Extensions)
+- Console sample: [``samples/Incursa.OpenAI.Agents.ConsoleSample``](samples/Incursa.OpenAI.Agents.ConsoleSample)
+- Hosted sample: [``samples/Incursa.OpenAI.Agents.HostSample``](samples/Incursa.OpenAI.Agents.HostSample)
+- Tests: [``tests/Incursa.OpenAI.Agents.Tests``](tests/Incursa.OpenAI.Agents.Tests)
+- Docs: [``docs/``](docs/)
 
 ## Requirements
 
-- .NET SDK `10.0.200+` (managed by `global.json`)
+- .NET SDK `10.0.200+` (managed by [``global.json``](global.json))
 - OpenAI API key (for live calls)
 - Network access to OpenAI-compatible endpoint (default: responses API)
 - MCP target services reachable from host runtime when MCP tools are enabled
@@ -129,10 +129,10 @@ dotnet test
   - `PublicAPI.Shipped.txt` additive changes require at least a minor version bump.
   - `PublicAPI.Shipped.txt` removals/compatibility changes require a major version bump.
   - `PublicAPI.Unshipped.txt` changes are allowed to track work-in-progress API additions and are not treated as release-breaking by the policy gate.
-- Publishing uses the GitHub workflow `.github/workflows/publish-nuget-packages.yml`.
+- Publishing uses the GitHub workflow [``.github/workflows/publish-nuget-packages.yml``](.github/workflows/publish-nuget-packages.yml).
   - Tag with `vX.Y.Z` (for example `v1.0.12`) and push, or run workflow dispatch with `version` set to `X.Y.Z`.
-  - The workflow validates policy using `scripts/release/validate-public-api-versioning.ps1` before packing and pushing both packages to nuget.org.
-- Standard CI uses `.github/workflows/ci.yml` for push and pull request validation without publishing.
+  - The workflow validates policy using [``scripts/release/validate-public-api-versioning.ps1``](scripts/release/validate-public-api-versioning.ps1) before packing and pushing both packages to nuget.org.
+- Standard CI uses [``.github/workflows/ci.yml``](.github/workflows/ci.yml) for push and pull request validation without publishing.
 
 ### 2) Run samples
 
@@ -226,12 +226,12 @@ sealed class DemoAuthResolver : IUserScopedMcpAuthResolver
 
 ## Quality and operations
 
-- **Quality lanes**: `dotnet test`, plus scripted quality workflows in `scripts/quality/`.
-- **Workbench sync evidence**: `scripts/quality/run-quality-evidence.ps1` and `.github/workflows/workbench-quality.yml`.
-- **Nightly issue sync**: `.github/workflows/workbench-nightly-sync.yml` (dry-run validation + artifact output).
-- **Scope parity tracking**: `docs/parity/manifest.md`.
-- **Maintenance checklist**: `docs/parity/maintenance-checklist.md`.
-- **Repository boundaries and quality contracts**: `docs/quality/repo-scope-boundary.md`, `docs/30-contracts/test-gate.contract.yaml`.
+- **Quality lanes**: `dotnet test`, plus scripted quality workflows in [``scripts/quality/``](scripts/quality/).
+- **Workbench sync evidence**: [``scripts/quality/run-quality-evidence.ps1``](scripts/quality/run-quality-evidence.ps1) and [``.github/workflows/workbench-quality.yml``](.github/workflows/workbench-quality.yml).
+- **Nightly issue sync**: [``.github/workflows/workbench-nightly-sync.yml``](.github/workflows/workbench-nightly-sync.yml) (dry-run validation + artifact output).
+- **Scope parity tracking**: [``docs/parity/manifest.md``](docs/parity/manifest.md).
+- **Maintenance checklist**: [``docs/parity/maintenance-checklist.md``](docs/parity/maintenance-checklist.md).
+- **Repository boundaries and quality contracts**: [``docs/quality/repo-scope-boundary.md``](docs/quality/repo-scope-boundary.md), [``docs/30-contracts/test-gate.contract.yaml``](docs/30-contracts/test-gate.contract.yaml).
 
 ### Direct verification commands
 
@@ -261,7 +261,8 @@ When changing behavior mirrored from upstream:
 2. Update the .NET implementation and relevant tests.
 3. Update docs/examples if behavior or API changed.
 4. Run the quality/sync workflows before opening PR.
+5. When editing Markdown, link repo-local references with relative links and keep code-styled labels inside the link text; use absolute URLs only for package-facing or external docs.
 
 ## License
 
-See `LICENSE` in the repository root.
+See [``LICENSE``](LICENSE) in the repository root.

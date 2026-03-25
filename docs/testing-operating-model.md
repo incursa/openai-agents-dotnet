@@ -33,9 +33,9 @@ The Azure Blob and S3 suites are Docker-backed by design. When Docker is unavail
 
 Traceability is governed by:
 
-- `specs/libraries/*.md`
-- `specs/libraries/library-conformance-matrix.md`
-- `scripts/quality/validate-library-traceability.ps1`
-- `src/*/PublicAPI.Shipped.txt`
+- [``specs/libraries/*.md``](../specs/libraries/library-conformance-matrix.md)
+- [``specs/libraries/library-conformance-matrix.md``](../specs/libraries/library-conformance-matrix.md)
+- [``scripts/quality/validate-library-traceability.ps1``](../scripts/quality/validate-library-traceability.ps1)
+- [``src/*/PublicAPI.Shipped.txt``](../src/)
 
 The Microsoft public API analyzer baselines and the authored `LIB-*` scenarios are both treated as quality evidence: a public API row is only considered covered when it maps to baseline files and automated tests.

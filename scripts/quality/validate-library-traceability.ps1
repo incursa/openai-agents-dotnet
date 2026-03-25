@@ -51,6 +51,7 @@ $duplicateIds = New-Object System.Collections.Generic.List[string]
 $invalidPaths = New-Object System.Collections.Generic.List[string]
 $coveredApiLibraries = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
 $publicApiBaselineLibraries = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+$matrixDir = Split-Path $matrixFullPath -Parent
 
 $baselineFiles = @(
     Get-ChildItem -Path (Join-Path $repoRoot "src") -Filter "PublicAPI.Shipped.txt" -File -Recurse -ErrorAction SilentlyContinue |
@@ -78,26 +79,55 @@ foreach ($line in Get-Content $matrixFullPath) {
             [void]$matrixIds.Add($scenarioId)
         }
 
-        $paths = @([regex]::Matches($mappedCell, '`([^`]+)`') | ForEach-Object { $_.Groups[1].Value })
+        $pathCandidates = New-Object System.Collections.Generic.List[object]
+        $seenPathKeys = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+
+        foreach ($linkMatch in [regex]::Matches($mappedCell, '\[[^\]]*\]\(([^)]+)\)')) {
+            $entry = [pscustomobject]@{
+                Path = $linkMatch.Groups[1].Value
+                Root = $matrixDir
+            }
+
+            if ($seenPathKeys.Add("$($entry.Root)|$($entry.Path)")) {
+                [void]$pathCandidates.Add($entry)
+            }
+        }
+
+        # Keep supporting any standalone code spans that are used as plain path references.
+        $cellWithoutLinks = [regex]::Replace($mappedCell, '\[[^\]]*\]\([^)]+\)', ' ')
+        foreach ($codeSpanMatch in [regex]::Matches($cellWithoutLinks, '(?<!`)`([^`]+)`(?!`)')) {
+            $entry = [pscustomobject]@{
+                Path = $codeSpanMatch.Groups[1].Value
+                Root = $repoRoot
+            }
+
+            if ($seenPathKeys.Add("$($entry.Root)|$($entry.Path)")) {
+                [void]$pathCandidates.Add($entry)
+            }
+        }
+
+        $paths = $pathCandidates
         if ($status -eq "Covered") {
             if (-not $paths -or $paths.Count -eq 0) {
                 $invalidPaths.Add("$scenarioId (line $lineNumber): Covered row has no mapped path.") | Out-Null
             } else {
                 $hasPublicApiBaseline = $false
                 $hasTestArtifact = $false
-                foreach ($path in $paths) {
-                    $candidate = Join-Path $repoRoot $path
+                foreach ($entry in $paths) {
+                    $candidate = Join-Path $entry.Root $entry.Path
+                    $repoRelativePath = [System.IO.Path]::GetRelativePath($repoRoot, $candidate)
+
                     if (-not (Test-Path $candidate)) {
-                        $invalidPaths.Add("$scenarioId (line $lineNumber): Path not found '$path'.") | Out-Null
+                        $invalidPaths.Add("$scenarioId (line $lineNumber): Path not found '$($entry.Path)'.") | Out-Null
                     }
 
-                    if ($path -match 'PublicAPI\.(Shipped|Unshipped)\.txt$') {
+                    if ($repoRelativePath -match '(^|[\\/])PublicAPI\.(Shipped|Unshipped)\.txt$') {
                         $hasPublicApiBaseline = $true
-                        $libraryName = [System.IO.Path]::GetFileName((Split-Path (Join-Path $repoRoot $path) -Parent))
+                        $libraryName = [System.IO.Path]::GetFileName((Split-Path $candidate -Parent))
                         [void]$coveredApiLibraries.Add($libraryName)
                     }
 
-                    if ($path -match '^tests/' -or $path -match '^tests\\') {
+                    if ($repoRelativePath -match '^tests[\\/]') {
                         $hasTestArtifact = $true
                     }
                 }

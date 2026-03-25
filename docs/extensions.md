@@ -18,32 +18,32 @@ runtime integration surface implemented specifically for this repository.
 
 ## Concept
 
-`Incursa.OpenAI.Agents.Extensions` standardizes startup for host-based applications:
+[`Incursa.OpenAI.Agents.Extensions`](../src/Incursa.OpenAI.Agents.Extensions/README.md) standardizes startup for host-based applications:
 
 - Runner and session registration in DI.
-- Optional file-backed sessions or custom `IAgentSessionStore` implementations.
-- Optional production adapters live in separate packages, including Azure Blob and S3-backed session stores.
+- Optional file-backed sessions or custom [`IAgentSessionStore`](../src/Incursa.OpenAI.Agents/Core/IAgentSessionStore.cs) implementations.
+- Optional production adapters live in separate packages, including [`Incursa.OpenAI.Agents.Storage.Azure`](../src/Incursa.OpenAI.Agents.Storage.Azure/README.md) and [`Incursa.OpenAI.Agents.Storage.S3`](../src/Incursa.OpenAI.Agents.Storage.S3/README.md)-backed session stores.
 - OpenAI Responses + MCP wiring in one hosted step.
 
 ## API surface
 
-- `AddIncursaAgents(IServiceCollection)` registers the baseline runtime services.
-- `AddIncursaAgents(IServiceCollection, Action<AgentRuntimeOptions>?)` accepts runtime-level configuration.
-- `AddAgentSessionStore(IServiceCollection, IAgentSessionStore)` and `AddVersionedAgentSessionStore(IServiceCollection, IVersionedAgentSessionStore)` replace the default store with a custom backend.
-- `AddFileAgentSessions(IServiceCollection, string directoryPath, Action<AgentSessionRetentionOptions>?)` configures durable, file-backed state.
-- `AddAzureAgentSessions(IServiceCollection, Action<AzureAgentSessionStoreOptions>?)` and `AddS3AgentSessions(IServiceCollection, Action<S3AgentSessionStoreOptions>?)` live in the provider packages for cloud-backed durable state.
-- `AddOpenAiResponses(IServiceCollection, Action<OpenAiResponsesOptions>?)` registers responses + runner dependencies.
+- [`AddIncursaAgents(IServiceCollection)`](../src/Incursa.OpenAI.Agents.Extensions/ServiceCollectionExtensions.cs) registers the baseline runtime services.
+- [`AddIncursaAgents(IServiceCollection, Action<AgentRuntimeOptions>?)`](../src/Incursa.OpenAI.Agents.Extensions/ServiceCollectionExtensions.cs) accepts runtime-level configuration.
+- [`AddAgentSessionStore(IServiceCollection, IAgentSessionStore)`](../src/Incursa.OpenAI.Agents.Extensions/ServiceCollectionExtensions.cs) and [`AddVersionedAgentSessionStore(IServiceCollection, IVersionedAgentSessionStore)`](../src/Incursa.OpenAI.Agents.Extensions/ServiceCollectionExtensions.cs) replace the default store with a custom backend.
+- [`AddFileAgentSessions(IServiceCollection, string directoryPath, Action<AgentSessionRetentionOptions>?)`](../src/Incursa.OpenAI.Agents.Extensions/ServiceCollectionExtensions.cs) configures durable, file-backed state.
+- [`AddAzureAgentSessions(IServiceCollection, Action<AzureAgentSessionStoreOptions>?)`](../src/Incursa.OpenAI.Agents.Storage.Azure/AzureAgentSessionServiceCollectionExtensions.cs) and [`AddS3AgentSessions(IServiceCollection, Action<S3AgentSessionStoreOptions>?)`](../src/Incursa.OpenAI.Agents.Storage.S3/S3AgentSessionServiceCollectionExtensions.cs) live in the provider packages for cloud-backed durable state.
+- [`AddOpenAiResponses(IServiceCollection, Action<OpenAiResponsesOptions>?)`](../src/Incursa.OpenAI.Agents.Extensions/ServiceCollectionExtensions.cs) registers responses + runner dependencies.
 
 ## Option surface
 
-- `AgentSessionRetentionOptions` controls retention and cleanup:
+- [`AgentSessionRetentionOptions`](../src/Incursa.OpenAI.Agents.Extensions/Options.cs) controls retention and cleanup:
   - `MaxConversationItems`
   - `MaxTurns`
   - `CompactionMode`
   - `AbsoluteLifetime`
   - `SlidingExpiration`
   - cleanup behavior on load/save
-- `OpenAiResponsesOptions` controls transport and retry behavior:
+- [`OpenAiResponsesOptions`](../src/Incursa.OpenAI.Agents.Extensions/Options.cs) controls transport and retry behavior:
   - `ApiKey`
   - `BaseAddress`
   - `ResponsesPath`
@@ -95,9 +95,9 @@ class DemoAuthResolver : IUserScopedMcpAuthResolver
 
 ## Recommended references
 
-- `samples/Incursa.OpenAI.Agents.HostSample/Program.cs` for a complete hosted workflow.
-- `samples/Incursa.OpenAI.Agents.ConsoleSample/Program.cs` for direct construction.
-- `tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs` for service registration guarantees.
+- [``samples/Incursa.OpenAI.Agents.HostSample/Program.cs``](../samples/Incursa.OpenAI.Agents.HostSample/Program.cs) for a complete hosted workflow.
+- [``samples/Incursa.OpenAI.Agents.ConsoleSample/Program.cs``](../samples/Incursa.OpenAI.Agents.ConsoleSample/Program.cs) for direct construction.
+- [``tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs``](../tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs) for service registration guarantees.
 
 ## Next steps
 

@@ -22,12 +22,12 @@ This repository focuses on the same primitives shown in the upstream Agents SDK 
 
 ## Operational stance
 
-`Incursa.OpenAI.Agents` is intentionally conservative in scope:
+[`Incursa.OpenAI.Agents`](../../src/Incursa.OpenAI.Agents/README.md) is intentionally conservative in scope:
 
 - OpenAI Responses is the primary runtime integration.
-- Per-user MCP context is handled through `IUserScopedMcpAuthResolver`.
+- Per-user MCP context is handled through [`IUserScopedMcpAuthResolver`](../../src/Incursa.OpenAI.Agents/Mcp/IUserScopedMcpAuthResolver.cs).
 - Runtime behavior is built to be deterministic and hostable in DI containers.
-- Durable local session state is provided through `FileAgentSessionStore` and retention options, while alternate backends can plug in through `IAgentSessionStore`.
+- Durable local session state is provided through [`FileAgentSessionStore`](../../src/Incursa.OpenAI.Agents/Core/FileAgentSessionStore.cs) and retention options, while alternate backends can plug in through [`IAgentSessionStore`](../../src/Incursa.OpenAI.Agents/Core/IAgentSessionStore.cs).
 
 ## Mapping from upstream
 
@@ -52,5 +52,5 @@ The following upstream areas were intentionally adapted, while non-core or ecosy
 
 Parity intent and maintenance expectations for these included areas are tracked in:
 
-- `docs/parity/manifest.md`
-- `docs/parity/maintenance-checklist.md`
+- [``docs/parity/manifest.md``](../parity/manifest.md)
+- [``docs/parity/maintenance-checklist.md``](../parity/maintenance-checklist.md)

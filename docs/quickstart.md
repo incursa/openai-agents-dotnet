@@ -26,7 +26,7 @@ The .NET flavor keeps core orchestration concepts intact:
 
 ## Before you begin
 
-- .NET SDK from `global.json`
+- .NET SDK from [``global.json``](../global.json)
 - OpenAI API key
 - A terminal with this repo checked out
 

@@ -1,7 +1,7 @@
 # Library Interface Quality Specification
 
 ## Meta
-- Scope: Cross-library hardening and traceability for the public packages under `src/`
+- Scope: Cross-library hardening and traceability for the public packages under [``src/``](../../src/)
 - Status: Active
 - Last Updated: 2026-03-17
 - Scope Owner: AI Agents library maintainers
@@ -14,7 +14,7 @@ This specification defines the minimum production-readiness contract for the rep
 - tests and quality lanes are traceable to authored scenarios
 - coverage, mutation, and Workbench evidence are wired into the repo lifecycle
 
-All requirements use stable scenario IDs (`LIB-*`) and are traceable via `specs/libraries/library-conformance-matrix.md`.
+All requirements use stable scenario IDs (`LIB-*`) and are traceable via [``specs/libraries/library-conformance-matrix.md``](library-conformance-matrix.md).
 
 ## Governance Requirements
 - `LIB-GOV-SPEC-001`: Every major public domain has an authored specification with stable `LIB-*` identifiers.

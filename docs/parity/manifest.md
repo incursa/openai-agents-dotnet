@@ -85,31 +85,31 @@ This repo does not aim for full Python SDK parity. It tracks the included server
 
 - Runner, approvals, guardrails, and sessions:
   - status: `covered`
-  - `src/Incursa.OpenAI.Agents/Core/*`
-  - `tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs`
-  - `tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs`
-  - `tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs`
-  - `tests/Incursa.OpenAI.Agents.Tests/AgentBuilderTests.cs`
+  - [``src/Incursa.OpenAI.Agents/Core/*``](../../src/Incursa.OpenAI.Agents/Core/)
+  - [``tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/AgentRunnerTests.cs)
+  - [``tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs)
+  - [``tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/SessionStoreTests.cs)
+  - [``tests/Incursa.OpenAI.Agents.Tests/AgentBuilderTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/AgentBuilderTests.cs)
 - MCP:
   - status: `covered`
   - `src/Incursa.OpenAI.Agents/Mcp/Mcp.cs`
-  - `tests/Incursa.OpenAI.Agents.Tests/McpTests.cs`
+  - [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs)
 - OpenAI Responses:
   - status: `covered`
-  - `src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesClient.cs`
-  - `src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesMapping.cs`
-  - `src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesRunner.cs`
-  - `src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesStreaming.cs`
-  - `tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs`
+  - [``src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesClient.cs``](../../src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesClient.cs)
+  - [``src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesMapping.cs``](../../src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesMapping.cs)
+  - [``src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesRunner.cs``](../../src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesRunner.cs)
+  - [``src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesStreaming.cs``](../../src/Incursa.OpenAI.Agents/OpenAI/OpenAiResponsesStreaming.cs)
+  - [``tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs)
 - Sample application:
   - status: `covered`
-  - `samples/Incursa.OpenAI.Agents.ConsoleSample/Program.cs`
-  - `samples/Incursa.OpenAI.Agents.HostSample/Program.cs`
+  - [``samples/Incursa.OpenAI.Agents.ConsoleSample/Program.cs``](../../samples/Incursa.OpenAI.Agents.ConsoleSample/Program.cs)
+  - [``samples/Incursa.OpenAI.Agents.HostSample/Program.cs``](../../samples/Incursa.OpenAI.Agents.HostSample/Program.cs)
 - Host integration and observability:
   - status: `covered`
-  - `src/Incursa.OpenAI.Agents.Extensions/*`
-  - `tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs`
-  - `tests/Incursa.OpenAI.Agents.Tests/RuntimeObservabilityTests.cs`
+  - [``src/Incursa.OpenAI.Agents.Extensions/*``](../../src/Incursa.OpenAI.Agents.Extensions/)
+  - [``tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs)
+  - [``tests/Incursa.OpenAI.Agents.Tests/RuntimeObservabilityTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/RuntimeObservabilityTests.cs)
 
 ## Translation Rule
 
