@@ -49,15 +49,16 @@ Status values:
 | LIB-MCP-API-001 | Agents | PublicApi | Covered | [``src/Incursa.OpenAI.Agents/PublicAPI.Shipped.txt``](../../src/Incursa.OpenAI.Agents/PublicAPI.Shipped.txt), [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
 | LIB-MCP-AUTH-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
 | LIB-MCP-META-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
-| LIB-MCP-FILTER-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
+| LIB-MCP-FILTER-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-FILTER-001.cs``](../../tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-FILTER-001.cs) |
 | LIB-MCP-CACHE-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
-| LIB-MCP-ERROR-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
+| LIB-MCP-ERROR-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-ERROR-001.cs``](../../tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-ERROR-001.cs) |
 | LIB-MCP-RETRY-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
-| LIB-MCP-AUTHFAIL-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
+| LIB-MCP-AUTHFAIL-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-AUTHFAIL-001.cs``](../../tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-AUTHFAIL-001.cs) |
 | LIB-OAI-API-001 | OpenAI | PublicApi | Covered | [``src/Incursa.OpenAI.Agents/PublicAPI.Shipped.txt``](../../src/Incursa.OpenAI.Agents/PublicAPI.Shipped.txt), [``tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs) |
-| LIB-OAI-MAP-001 | OpenAI | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs) |
+| LIB-OAI-MAP-001 | OpenAI | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-001.cs``](../../tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-001.cs) |
+| LIB-OAI-MAP-002 | OpenAI | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-002.cs``](../../tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-002.cs) |
 | LIB-OAI-MCP-001 | OpenAI | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs) |
 | LIB-OAI-HANDOFF-001 | OpenAI | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs) |
 | LIB-OAI-FILTER-001 | OpenAI | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs) |
 | LIB-OAI-REASONING-001 | OpenAI | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs) |
-| LIB-OAI-STREAM-001 | OpenAI | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs) |
+| LIB-OAI-STREAM-001 | OpenAI | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-STREAM-001.cs``](../../tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-STREAM-001.cs) |

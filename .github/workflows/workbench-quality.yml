@@ -39,4 +39,6 @@ jobs:
           path: |
             artifacts/test-results/advisory/
             artifacts/coverage/advisory/
+            artifacts/quality/library-mutation-summary.md
+            artifacts/quality/fuzz-corpus-summary.md
             artifacts/quality/testing/

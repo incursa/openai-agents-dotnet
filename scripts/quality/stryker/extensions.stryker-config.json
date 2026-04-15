@@ -1,19 +1,21 @@
 {
   "$schema": "https://stryker-mutator.io/stryker.schema.json",
-  "solution": "Incursa.OpenAI.Agents.slnx",
-  "testProjects": [
-    "tests/Incursa.OpenAI.Agents.Tests/Incursa.OpenAI.Agents.Tests.csproj"
-  ],
-  "project": "src/Incursa.OpenAI.Agents.Extensions/Incursa.OpenAI.Agents.Extensions.csproj",
-  "reporters": [
-    "html",
-    "progress",
-    "cleartext"
-  ],
-  "thresholds": {
-    "high": 80,
-    "low": 60,
-    "break": 0
-  },
-  "logLevel": "info"
+  "stryker-config": {
+    "solution": "Incursa.OpenAI.Agents.slnx",
+    "test-projects": [
+      "tests/Incursa.OpenAI.Agents.Tests/Incursa.OpenAI.Agents.Tests.csproj"
+    ],
+    "project": "src/Incursa.OpenAI.Agents.Extensions/Incursa.OpenAI.Agents.Extensions.csproj",
+    "reporters": [
+      "html",
+      "progress",
+      "cleartext"
+    ],
+    "thresholds": {
+      "high": 80,
+      "low": 60,
+      "break": 0
+    },
+    "verbosity": "info"
+  }
 }

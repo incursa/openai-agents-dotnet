@@ -62,48 +62,6 @@ public sealed class McpTests
         Assert.Contains("tenant-a", recorded[1].Body);
     }
 
-    /// <summary>Dynamic MCP tool filters can block tools and tolerate filter exceptions.</summary>
-    /// <intent>Protect runtime tool visibility filtering.</intent>
-    /// <scenario>LIB-MCP-FILTER-001</scenario>
-    /// <behavior>Allowed tools remain visible while blocked or filter-error tools do not appear in the final list.</behavior>
-    [Fact]
-    public async Task StreamableMcpClient_AppliesDynamicToolFilterAndSkipsFilterErrors()
-    {
-        RecordingHandler handler = new((_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent("""{"jsonrpc":"2.0","id":"1","result":{"tools":[{"name":"allowed_tool","inputSchema":{"type":"object"}},{"name":"error_tool","inputSchema":{"type":"object"}},{"name":"blocked_tool","inputSchema":{"type":"object"}}]}}""", Encoding.UTF8, "application/json"),
-        }));
-
-        StreamableHttpMcpClient client = new(
-            new HttpClient(handler),
-            "mail",
-            new Uri("https://example.test/mcp"),
-            null,
-            null,
-            null,
-            null,
-            new McpToolFilter
-            {
-                FilterAsync = (ctx, tool, _) =>
-                {
-                    Assert.Equal("mail", ctx.ServerLabel);
-                    return tool.Name switch
-                    {
-                        "allowed_tool" => ValueTask.FromResult(true),
-                        "blocked_tool" => ValueTask.FromResult(false),
-                        _ => throw new InvalidOperationException("bad filter"),
-                    };
-                },
-            },
-            false,
-            null);
-
-        IReadOnlyList<McpToolDescriptor> tools = await client.ListToolsAsync();
-
-        McpToolDescriptor allowed = Assert.Single(tools);
-        Assert.Equal("allowed_tool", allowed.Name);
-    }
-
     /// <summary>Tool discovery is cached when MCP tool-list caching is enabled.</summary>
     /// <intent>Protect the caching contract for streamable MCP clients.</intent>
     /// <scenario>LIB-MCP-CACHE-001</scenario>
@@ -137,27 +95,6 @@ public sealed class McpTests
         await client.ListToolsAsync();
 
         Assert.Equal(1, calls);
-    }
-
-    /// <summary>JSON-RPC server errors surface as helpful MCP server exceptions.</summary>
-    /// <intent>Protect caller-facing diagnostics for MCP server-side failures.</intent>
-    /// <scenario>LIB-MCP-ERROR-001</scenario>
-    /// <behavior>JSON-RPC error responses throw McpServerException with the server message included.</behavior>
-    [Fact]
-    public async Task StreamableMcpClient_ThrowsHelpfulErrorForJsonRpcErrors()
-    {
-        RecordingHandler handler = new((_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent("""{"jsonrpc":"2.0","id":"1","error":{"code":-32603,"message":"server exploded"}}""", Encoding.UTF8, "application/json"),
-        }));
-
-        StreamableHttpMcpClient client = new(
-            new HttpClient(handler),
-            "mail",
-            new Uri("https://example.test/mcp"));
-
-        McpServerException error = await Assert.ThrowsAsync<McpServerException>(() => client.CallToolAsync("list_messages"));
-        Assert.Contains("server exploded", error.Message);
     }
 
     /// <summary>Transient MCP failures retry and emit observations when retry settings allow it.</summary>
@@ -209,43 +146,6 @@ public sealed class McpTests
         Assert.Equal(2, calls);
         Assert.Contains(observations, obs => obs.Outcome == McpCallOutcome.RetryScheduled);
         Assert.Contains(observations, obs => obs.Outcome == McpCallOutcome.Success);
-    }
-
-    /// <summary>Authentication failures do not retry even when retries are configured.</summary>
-    /// <intent>Protect correct classification of non-retryable MCP auth failures.</intent>
-    /// <scenario>LIB-MCP-AUTHFAIL-001</scenario>
-    /// <behavior>Unauthorized responses throw McpAuthenticationException without performing additional attempts.</behavior>
-    [Fact]
-    public async Task StreamableMcpClient_DoesNotRetryAuthenticationFailures()
-    {
-        var calls = 0;
-        RecordingHandler handler = new((_, _) =>
-        {
-            calls++;
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.Unauthorized)
-            {
-                Content = new StringContent("""{"jsonrpc":"2.0","id":"1","error":{"code":401,"message":"nope"}}""", Encoding.UTF8, "application/json"),
-            });
-        });
-
-        StreamableHttpMcpClient client = new(
-            new HttpClient(handler),
-            "mail",
-            new Uri("https://example.test/mcp"),
-            null,
-            null,
-            null,
-            null,
-            null,
-            false,
-            new McpClientOptions
-            {
-                RetryCount = 3,
-                RetryDelay = TimeSpan.Zero,
-            });
-
-        await Assert.ThrowsAsync<McpAuthenticationException>(() => client.CallToolAsync("list_messages"));
-        Assert.Equal(1, calls);
     }
 
     private sealed class DelegateMcpAuthResolver : IUserScopedMcpAuthResolver

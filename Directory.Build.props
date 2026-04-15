@@ -1,8 +1,8 @@
-﻿<Project>
+<Project>
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>2.1.0</Version>
+    <Version>2.1.1</Version>
     <Authors>Samuel McAravey</Authors>
     <Company>Incursa</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -19,3 +19,4 @@
     <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == '' and ('$(CI)' == 'true' or '$(TF_BUILD)' == 'True' or '$(GITHUB_ACTIONS)' == 'true')">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 </Project>
+

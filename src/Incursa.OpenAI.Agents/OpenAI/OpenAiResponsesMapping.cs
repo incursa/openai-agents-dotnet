@@ -107,7 +107,7 @@ internal sealed class OpenAiResponsesRequestMapper
                 jsonSchemaIsStrict: true);
         }
 
-        ApplyModelSettings(requestOptions, request.Agent.ModelSettings);
+        ApplyModelSettings(ref requestOptions, request.Agent.ModelSettings);
         return new OpenAiResponsesTurnPlan<TContext>(requestOptions, request.Agent, handoffMap);
     }
 
@@ -277,8 +277,9 @@ internal sealed class OpenAiResponsesRequestMapper
         return tool;
     }
 
-    private static void ApplyModelSettings(CreateResponseOptions options, IReadOnlyDictionary<string, object?> modelSettings)
+    private static void ApplyModelSettings(ref CreateResponseOptions options, IReadOnlyDictionary<string, object?> modelSettings)
     {
+        ref JsonPatch patch = ref options.Patch;
         foreach (KeyValuePair<string, object?> pair in modelSettings)
         {
             if (IsExplicitTopLevelField(pair.Key))
@@ -287,17 +288,17 @@ internal sealed class OpenAiResponsesRequestMapper
             }
 
             JsonNode? node = JsonSerializer.SerializeToNode(pair.Value, SerializerOptions);
-            ApplyJsonPatchValue(options.Patch, BuildJsonPath(pair.Key), node);
+            ApplyJsonPatchValue(ref patch, BuildJsonPath(pair.Key), node);
         }
     }
 
-    private static void ApplyJsonPatchValue(JsonPatch patch, string path, JsonNode? node)
+    private static void ApplyJsonPatchValue(ref JsonPatch patch, string path, JsonNode? node)
     {
         if (node is JsonObject obj)
         {
             foreach (KeyValuePair<string, JsonNode?> property in obj)
             {
-                ApplyJsonPatchValue(patch, $"{path}.{property.Key}", property.Value);
+                ApplyJsonPatchValue(ref patch, $"{path}.{property.Key}", property.Value);
             }
 
             return;
@@ -327,7 +328,7 @@ internal sealed class OpenAiResponsesRequestMapper
             case JsonArray array:
                 for (int i = 0; i < array.Count; i++)
                 {
-                    ApplyJsonPatchValue(patch, $"{path}[{i}]", array[i]);
+                    ApplyJsonPatchValue(ref patch, $"{path}[{i}]", array[i]);
                 }
                 return;
             default:

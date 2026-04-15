@@ -9,6 +9,12 @@
     <Project Path="samples/Incursa.OpenAI.Agents.ConsoleSample/Incursa.OpenAI.Agents.ConsoleSample.csproj" />
     <Project Path="samples/Incursa.OpenAI.Agents.HostSample/Incursa.OpenAI.Agents.HostSample.csproj" />
   </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Incursa.OpenAI.Agents.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/fuzz/">
+    <Project Path="fuzz/Incursa.OpenAI.Agents.Fuzz.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.csproj" />
     <Project Path="tests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.csproj" />

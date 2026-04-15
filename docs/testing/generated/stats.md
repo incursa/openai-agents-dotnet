@@ -1,13 +1,13 @@
 # Test documentation stats
 
-Generated at (UTC): 1970-01-01T00:00:00Z
+Generated at (UTC): 2026-04-15T21:10:57.4004204Z
 
 ## Summary
 
 | Metric | Count |
 | --- | ---: |
-| Total | 62 |
-| Compliant | 62 |
+| Total | 79 |
+| Compliant | 79 |
 | Missing required | 0 |
 | Invalid format | 0 |
 
@@ -15,7 +15,7 @@ Generated at (UTC): 1970-01-01T00:00:00Z
 
 | Category | Total | Compliant |
 | --- | ---: | ---: |
-| Incursa.OpenAI.Agents | 62 | 62 |
+| Incursa.OpenAI.Agents | 79 | 79 |
 
 ## By tag
 
@@ -28,4 +28,4 @@ Generated at (UTC): 1970-01-01T00:00:00Z
 | --- | ---: | ---: |
 | Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests | 3 | 3 |
 | Incursa.OpenAI.Agents.Storage.S3.IntegrationTests | 3 | 3 |
-| Incursa.OpenAI.Agents.Tests | 56 | 56 |
+| Incursa.OpenAI.Agents.Tests | 73 | 73 |

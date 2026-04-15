@@ -21,7 +21,7 @@ coverage:
   lineMin: 0.00
   branchMin: 0.00
 expectations:
-  confidenceTarget: advisory confidence based on a required smoke precheck, the required non-Docker blocking lane, and advisory Workbench evidence from the curated advisory lane
+  confidenceTarget: advisory confidence based on a required smoke precheck, the required non-Docker blocking lane, and advisory Workbench evidence from the curated advisory lane, mutation evidence, and fuzz corpus checks
   evidence:
     - inventory
     - results
@@ -32,6 +32,8 @@ artifacts:
   observationalResults: artifacts/test-results/observational
   advisoryResults: artifacts/test-results/advisory
   advisoryCoverage: artifacts/coverage/advisory
+  mutationSummary: artifacts/quality/library-mutation-summary.md
+  fuzzSummary: artifacts/quality/fuzz-corpus-summary.md
   normalizedQuality: artifacts/quality/testing
 lanes:
   smoke:
@@ -50,7 +52,7 @@ lanes:
   advisory:
     entrypoint: scripts/quality/run-quality-evidence.ps1
     policy: advisory
-    intent: broader confidence and Workbench evidence lane using advisory TRX plus package coverage artifacts for agents, extensions, and OpenAI surfaces
+    intent: broader confidence and Workbench evidence lane using advisory TRX plus package coverage, mutation evidence, and fuzz corpus artifacts for agents, extensions, and OpenAI surfaces
 related:
   docs:
     - docs/testing-operating-model.md
@@ -69,7 +71,11 @@ related:
     - scripts/quality/run-quality-evidence.ps1
     - scripts/quality/run-workbench-evidence.ps1
     - scripts/quality/run-library-coverage.ps1
+    - scripts/quality/run-library-mutation.ps1
+    - scripts/quality/run-fuzz-corpus.ps1
     - scripts/testing/prepull-test-images.ps1
+    - fuzz/corpus/README.md
+    - .github/workflows/ci.yml
     - tests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.csproj
     - tests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.csproj
     - .github/workflows/library-fast-quality.yml
@@ -78,5 +84,5 @@ related:
 intentionalGaps:
   - subject: Empty observational lane in the first pass
     rationale: The KnownIssue taxonomy and artifact path are standardized, but no current tests are intentionally left failing in automation.
-  - subject: Advisory-only mutation execution
-    rationale: Mutation configs are wired for all public packages, but remain outside the default required CI lane to keep the happy path fast.
+  - subject: Bounded fuzz corpus
+    rationale: The fuzz harness and mutation lane now run in CI/CD, but the corpus remains a checked-in seed suite rather than a long-running continuous fuzz farm.

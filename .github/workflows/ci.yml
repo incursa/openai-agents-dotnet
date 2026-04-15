@@ -29,9 +29,29 @@ jobs:
         run: dotnet restore Incursa.OpenAI.Agents.slnx
 
       - name: Build
+        id: build
         run: dotnet build Incursa.OpenAI.Agents.slnx --no-restore --configuration Release -p:ContinuousIntegrationBuild=true
 
       - name: Run blocking tests
         shell: pwsh
         run: |
           & (Join-Path $env:GITHUB_WORKSPACE "scripts/quality/run-blocking-tests.ps1") -NoRestore -NoBuild
+
+      - name: Run full quality evidence
+        if: always() && steps.build.outcome == 'success'
+        shell: pwsh
+        run: |
+          & (Join-Path $env:GITHUB_WORKSPACE "scripts/quality/run-quality-evidence.ps1") -NoRestore -NoBuild
+
+      - name: Upload quality artifacts
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ci-quality-artifacts
+          path: |
+            artifacts/test-results/blocking/
+            artifacts/test-results/advisory/
+            artifacts/coverage/advisory/
+            artifacts/quality/testing/
+            artifacts/quality/library-mutation-summary.md
+            artifacts/quality/fuzz-corpus-summary.md

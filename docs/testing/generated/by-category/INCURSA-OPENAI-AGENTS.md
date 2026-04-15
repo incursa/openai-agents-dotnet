@@ -1,6 +1,6 @@
 # Incursa.OpenAI.Agents
 
-Total tests: 62
+Total tests: 79
 
 - **Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests:Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.AzureAgentSessionStoreIntegrationTests.CleanupExpiredSessionsAsync_RemovesExpiredSessions**
   - Summary: The Azure session store removes expired sessions during explicit cleanup.
@@ -92,6 +92,26 @@ Total tests: 62
   - Intent: Protect the caller-facing rejection message contract.
   - Tags: (none)
   - Source: [tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs#L67](tests/Incursa.OpenAI.Agents.Tests/ApprovalAndGuardrailTests.cs#L67)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.CoverageTypeAttributeTests.AttributeUsageAllowsMethodAndClassTargetsWithMultipleInstances**
+  - Summary: Ensures the attribute can be applied to classes and methods more than once.
+  - Intent: Protect the trait-annotation contract used by requirement-home tests.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/CoverageTypeAttributeTests.cs#L14](tests/Incursa.OpenAI.Agents.Tests/CoverageTypeAttributeTests.cs#L14)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.CoverageTypeAttributeTests.ConstructorStoresTheCoverageType**
+  - Summary: Ensures the attribute stores the requested evidence classification.
+  - Intent: Protect the coverage-type payload carried by the trait.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/CoverageTypeAttributeTests.cs#L29](tests/Incursa.OpenAI.Agents.Tests/CoverageTypeAttributeTests.cs#L29)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.CoverageTypeAttributeTests.MultipleAttributesCanBeAppliedToOneMethod**
+  - Summary: Ensures multiple coverage classifications can annotate the same method.
+  - Intent: Protect the multi-coverage annotation pattern used by mixed-evidence tests.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/CoverageTypeAttributeTests.cs#L41](tests/Incursa.OpenAI.Agents.Tests/CoverageTypeAttributeTests.cs#L41)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.CoverageTypeAttributeTests.TraitDiscovererMapsTheCoverageTypeToATrait**
+  - Summary: Ensures the trait discoverer emits the expected xUnit trait key and value.
+  - Intent: Protect the trait discovery contract used by xUnit filtering.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/CoverageTypeAttributeTests.cs#L58](tests/Incursa.OpenAI.Agents.Tests/CoverageTypeAttributeTests.cs#L58)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.DependencyInjectionTests.AddAgentSessionStore_RegistersCustomStore**
   - Summary: Verifies custom session stores can replace the default runtime store without being versioned.
   - Intent: Protect the extension hook used by future non-file backends.
@@ -127,21 +147,11 @@ Total tests: 62
   - Intent: Protect the extensions observability surface from dropping observations when multiple sinks are registered.
   - Tags: (none)
   - Source: [tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs#L212](tests/Incursa.OpenAI.Agents.Tests/DependencyInjectionTests.cs#L212)
-- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_AppliesDynamicToolFilterAndSkipsFilterErrors**
-  - Summary: Dynamic MCP tool filters can block tools and tolerate filter exceptions.
-  - Intent: Protect runtime tool visibility filtering.
-  - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L70](tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L70)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_CachesToolListWhenEnabled**
   - Summary: Tool discovery is cached when MCP tool-list caching is enabled.
   - Intent: Protect the caching contract for streamable MCP clients.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L112](tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L112)
-- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_DoesNotRetryAuthenticationFailures**
-  - Summary: Authentication failures do not retry even when retries are configured.
-  - Intent: Protect correct classification of non-retryable MCP auth failures.
-  - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L219](tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L219)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L70](tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L70)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_InsertsDynamicHeadersAndMetadataPerRequest**
   - Summary: Streamable MCP requests apply dynamic auth headers and metadata on each request.
   - Intent: Protect per-user MCP request shaping for hosted application scenarios.
@@ -151,12 +161,7 @@ Total tests: 62
   - Summary: Transient MCP failures retry and emit observations when retry settings allow it.
   - Intent: Protect resiliency and observation behavior for MCP tool calls.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L168](tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L168)
-- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.McpTests.StreamableMcpClient_ThrowsHelpfulErrorForJsonRpcErrors**
-  - Summary: JSON-RPC server errors surface as helpful MCP server exceptions.
-  - Intent: Protect caller-facing diagnostics for MCP server-side failures.
-  - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L147](tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L147)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L105](tests/Incursa.OpenAI.Agents.Tests/McpTests.cs#L105)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiAudioTests.GenerateSpeechAsync_MapsRequestAndNormalizesResponse**
   - Summary: Speech-generation requests map repo-owned settings onto the upstream SDK options and normalize the binary output.
   - Intent: Protect the public speech-generation surface from drifting away from the upstream OpenAI SDK.
@@ -196,57 +201,137 @@ Total tests: 62
   - Summary: Invalid output schemas are rejected before the request reaches the OpenAI SDK.
   - Intent: Prevent malformed output schemas from surfacing as remote 400 responses.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L120](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L120)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L32](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L32)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.OpenAiResponsesRequest_DoesNotSerializeTypedOptionsSnapshot**
   - Summary: Wrapping typed options does not force snapshot serialization for SDK-only tool types.
   - Intent: Prevent request construction from crashing on hosted MCP tools due to SDK serializer limitations.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L302](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L302)
-- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_MapsToolsHandoffsAndStructuredOutput**
-  - Summary: Request mapping includes tools, handoffs, hosted MCP tools, and structured output definitions.
-  - Intent: Protect the main request-mapping contract for the OpenAI Responses adapter.
-  - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L33](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L33)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L214](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L214)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_NormalizesHandoffModelInputAfterHandoff**
   - Summary: Handoff normalization can strip pre-handoff tool-call items from mapped model input.
   - Intent: Protect run-level handoff history shaping in the adapter.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L206](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L206)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L118](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L118)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_OmitsReasoningIdsWhenConfigured**
   - Summary: Reasoning item IDs can be omitted from mapped input when configured.
   - Intent: Protect request-shaping options for reasoning items.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L338](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L338)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L250](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L250)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.RequestMapper_UsesRunLevelModelInputFilter**
   - Summary: Run-level model input filters are applied during request mapping.
   - Intent: Protect consumer control over the model-visible conversation input.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L241](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L241)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L153](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L153)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponseMapper_MapsMcpApprovalRequestsToApprovalRequiredToolCalls**
   - Summary: Hosted MCP approval requests are surfaced as approval-required tool calls.
   - Intent: Protect MCP approval handling after switching to the official Responses SDK item models.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L369](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L369)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L281](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L281)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponseMapper_PreservesOutputTypeMetadataFromExplicitSchemaContract**
   - Summary: Structured final outputs keep the caller-supplied CLR type metadata for downstream consumers.
   - Intent: Preserve typed output metadata after removing CLR-based schema generation.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L421](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L421)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L333](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L333)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.ResponsesClient_PrefersTypedOptionsOverJsonSnapshot**
   - Summary: Runtime execution uses typed SDK options instead of rebuilding them from the JSON snapshot.
   - Intent: Prevent the compatibility request snapshot from becoming the live transport source of truth.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L274](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L274)
-- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse**
-  - Summary: Streaming execution reconstructs completed function arguments for emitted tool-call items and final tool-call results.
-  - Intent: Protect streamed function-call fidelity when argument fragments complete later in the stream.
-  - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L481](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L481)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L186](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L186)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.OpenAiResponsesTests.TurnExecutor_AddsLocalMcpToolsToRequestOptions**
   - Summary: Turn execution resolves local MCP servers into OpenAI tool definitions before sending the request.
   - Intent: Protect local MCP server translation in the OpenAI adapter.
   - Tags: (none)
-  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L132](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L132)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L44](tests/Incursa.OpenAI.Agents.Tests/OpenAiResponsesTests.cs#L44)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_EXT_DI_002.AddAgentSessionStore_FactoryOverloadResolvesSuppliedStoreAndRemovesVersionedRegistration**
+  - Summary: Factory-based session-store replacement removes the versioned registration and uses the supplied store.
+  - Intent: Protect the non-versioned session-store override hook.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L56](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L56)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_EXT_DI_002.AddFileAgentSessions_DefaultOverloadRegistersVersionedStoreAndRetentionDefaults**
+  - Summary: Default file-backed sessions wire the versioned store and keep the retention defaults intact.
+  - Intent: Protect the default file-session overload and its retention baseline.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L21](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L21)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_EXT_DI_002.AddOpenAiAudio_ConfiguredBaseAddressFlowsToNamedHttpClient**
+  - Summary: Configured OpenAI audio registration applies the base address to the named client.
+  - Intent: Protect the HttpClient configuration path used by OpenAI audio.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L167](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L167)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_EXT_DI_002.AddOpenAiAudio_DefaultOverloadRegistersNamedClientWithoutConfiguration**
+  - Summary: Default OpenAI audio registration exposes the named client without requiring configuration.
+  - Intent: Protect the default OpenAI audio DI surface.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L146](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L146)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_EXT_DI_002.AddOpenAiResponses_ConfiguredBaseAddressFlowsToNamedHttpClient**
+  - Summary: Configured OpenAI Responses registration applies the base address to the named client.
+  - Intent: Protect the HttpClient configuration path used by OpenAI Responses.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L122](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L122)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_EXT_DI_002.AddOpenAiResponses_DefaultOverloadRegistersNamedClientWithoutConfiguration**
+  - Summary: Default OpenAI Responses registration exposes the named clients and default option shape without configuration.
+  - Intent: Protect the default OpenAI Responses DI surface.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L98](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L98)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_EXT_DI_002.AddVersionedAgentSessionStore_FactoryOverloadResolvesSuppliedVersionedStore**
+  - Summary: Factory-based versioned-store replacement keeps the session and versioned interfaces aligned.
+  - Intent: Protect the versioned session-store override hook.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L77](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Extensions/REQ-LIB-EXT-DI-002.cs#L77)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_MCP_AUTHFAIL_001.StreamableMcpClient_DoesNotRetryAuthenticationFailures**
+  - Summary: Authentication failures do not retry and surface as `McpAuthenticationException`.
+  - Intent: Protect correct classification of non-retryable MCP auth failures.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-AUTHFAIL-001.cs#L17](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-AUTHFAIL-001.cs#L17)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_MCP_ERROR_001.StreamableMcpClient_ThrowsHelpfulErrorForJsonRpcErrors**
+  - Summary: JSON-RPC server errors surface as helpful MCP server exceptions.
+  - Intent: Protect caller-facing diagnostics for MCP server-side failures.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-ERROR-001.cs#L17](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-ERROR-001.cs#L17)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_MCP_FILTER_001.StreamableMcpClient_AppliesDynamicToolFilterAndSkipsFilterErrors**
+  - Summary: Dynamic tool filters can hide tools and tolerate filter failures without leaking blocked tools into the final tool list.
+  - Intent: Protect runtime tool visibility filtering for hosted MCP discovery.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-FILTER-001.cs#L19](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-FILTER-001.cs#L19)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_OAI_CLIENT_002.OpenAiResponsesClient_RejectsClientsWithoutBearerAuthorizationHeader**
+  - Summary: HttpClient construction rejects calls that do not carry a bearer authorization header.
+  - Intent: Protect the SDK handoff guard so consumers get an immediate local failure.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-CLIENT-002.cs#L40](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-CLIENT-002.cs#L40)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_OAI_CLIENT_002.OpenAiResponsesClient_ResolvesEndpointVariants**
+  - Summary: Endpoint resolution keeps the documented base URI behavior for blank, responses, and v1-responses paths.
+  - Intent: Protect the client endpoint normalization contract used by the OpenAI transport adapter.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-CLIENT-002.cs#L21](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-CLIENT-002.cs#L21)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_OAI_CLIENT_002.OpenAiResponsesClient_WrapsApiFailuresWithResponseBodyDetail**
+  - Summary: API failures retain the response body details when the OpenAI SDK raises a client error.
+  - Intent: Protect the public exception surface so troubleshooting includes the upstream response body.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-CLIENT-002.cs#L58](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-CLIENT-002.cs#L58)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_OAI_MAP_001.RequestMapper_MapsToolsHandoffsAndStructuredOutput**
+  - Summary: Request mapping keeps the model, continuation, tools, handoffs, hosted MCP tools, and structured output contract.
+  - Intent: Protect the core OpenAI Responses request-mapping contract used by turn execution.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-001.cs#L32](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-001.cs#L32)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_OAI_MAP_002.RequestMapper_MapsMetadataToolsHandoffsHostedMcpAndModelSettings**
+  - Summary: Request mapping preserves request metadata, tool schemas, handoff translation, hosted MCP translation, and model-setting patches.
+  - Intent: Protect the public request shape that is sent to the OpenAI Responses API.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-002.cs#L25](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-002.cs#L25)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_OAI_MAP_002.RequestMapper_PreservesReasoningSummaryStatusEncryptedContentAndIdPolicy**
+  - Summary: Reasoning items preserve the joined summary text, status, encrypted content, and omission policy.
+  - Intent: Protect reasoning-item fidelity when mapped into the OpenAI Responses SDK model.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-002.cs#L276](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-002.cs#L276)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_OAI_MAP_002.RequestMapper_SerializesCustomModelSettingsOntoTheWire**
+  - Summary: Custom model-setting patches survive SDK transport serialization and reach the wire body.
+  - Intent: Prove that the public model-settings dictionary is not just retained in-memory but actually serialized into the outgoing Responses request.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-002.cs#L183](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-MAP-002.cs#L183)
+- **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.REQ_LIB_OAI_STREAM_001.StreamingTurnExecutor_UsesCompletedFunctionArgumentsForRunItemAndResponse**
+  - Summary: Streaming execution reconstructs completed function-call arguments for emitted tool-call run items and final tool-call results.
+  - Intent: Protect streamed function-call fidelity when argument fragments complete later in the stream.
+  - Tags: (none)
+  - Source: [tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-STREAM-001.cs#L20](tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/OpenAI/REQ-LIB-OAI-STREAM-001.cs#L20)
 - **Incursa.OpenAI.Agents.Tests:Incursa.OpenAI.Agents.Tests.ReleaseVersioningScriptTests.InvokeReleaseVersioning_AllowsDirtyTreeOnTaggedHead_WhenTagCreationIsSkipped**
   - Summary: The release versioning script can advance from a tagged commit when the working tree is dirty.
   - Intent: Protect release versioning for local release preparation on top of an already-tagged HEAD commit.

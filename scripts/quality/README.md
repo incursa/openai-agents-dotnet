@@ -14,8 +14,8 @@
   - Produces advisory TRX and curated Cobertura evidence without syncing Workbench.
   - Default outputs: `artifacts/test-results/advisory/` and `artifacts/coverage/advisory/`
 - [``scripts/quality/run-quality-evidence.ps1``](run-quality-evidence.ps1)
-  - Runs the advisory lane, syncs Workbench quality evidence, and shows the latest advisory report.
-  - Default outputs: `artifacts/test-results/advisory/`, `artifacts/coverage/advisory/`, and `artifacts/quality/testing/`
+  - Runs the advisory lane, mutation evidence, and fuzz corpus checks before syncing Workbench quality evidence and showing the latest advisory report.
+  - Default outputs: `artifacts/test-results/advisory/`, `artifacts/coverage/advisory/`, `artifacts/quality/library-mutation-summary.md`, `artifacts/quality/fuzz-corpus-summary.md`, and `artifacts/quality/testing/`
 - [``scripts/quality/run-workbench-evidence.ps1``](run-workbench-evidence.ps1)
   - Compatibility entrypoint that forwards to the advisory evidence runner.
   - Default outputs: `artifacts/test-results/advisory/` and `artifacts/coverage/advisory/`
@@ -24,11 +24,16 @@
   - Supports line threshold, optional branch threshold, and custom output roots.
 - [``scripts/quality/run-library-mutation.ps1``](run-library-mutation.ps1)
   - Runs required mutation configs for the public packages in this repo.
+  - Default output: `artifacts/quality/library-mutation-summary.md`
+- [``scripts/quality/run-fuzz-corpus.ps1``](run-fuzz-corpus.ps1)
+  - Builds the fuzz harness and runs the checked-in seed corpus from [``fuzz/corpus/README.md``](../../fuzz/corpus/README.md).
+  - Default output: `artifacts/quality/fuzz-corpus-summary.md`
 - [``scripts/quality/validate-library-traceability.ps1``](validate-library-traceability.ps1)
   - Verifies that `LIB-*` scenario IDs in specs are fully represented in the library conformance matrix.
   - Validates matrix mapped file paths for `Covered` rows, including PublicAPI baseline references for `PublicApi` coverage rows.
 
 ## Related Workflows
+- [``.github/workflows/ci.yml``](../../.github/workflows/ci.yml) - Standard push/PR CI that now includes blocking tests plus the full quality evidence lane
 - [``.github/workflows/library-fast-quality.yml``](../../.github/workflows/library-fast-quality.yml)
 - PR/manual fast library validation for traceability, public API baselines, coverage, and non-Docker tests
 - [``.github/workflows/workbench-quality.yml``](../../.github/workflows/workbench-quality.yml)

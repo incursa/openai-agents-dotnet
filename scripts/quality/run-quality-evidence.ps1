@@ -24,11 +24,33 @@ $contractPath = Resolve-RepoPath -RepoRoot $repoRoot -Path $Contract
 $resultsPath = Resolve-RepoPath -RepoRoot $repoRoot -Path $ResultsDirectory
 $coveragePath = Resolve-RepoPath -RepoRoot $repoRoot -Path $CoverageDirectory
 $outDirPath = Resolve-RepoPath -RepoRoot $repoRoot -Path $OutDir
+$mutationSummaryPath = Join-Path $repoRoot "artifacts\quality\library-mutation-summary.md"
+$fuzzSummaryPath = Join-Path $repoRoot "artifacts\quality\fuzz-corpus-summary.md"
 
 if (-not $SkipTests) {
+    Remove-Item -Path $mutationSummaryPath, $fuzzSummaryPath -Force -ErrorAction SilentlyContinue
+
     & (Join-Path $repoRoot "scripts/quality/run-advisory-quality-tests.ps1") -Configuration $Configuration -ResultsDirectory $resultsPath -CoverageDirectory $coveragePath -NoRestore:$NoRestore -NoBuild:$NoBuild
     if ($LASTEXITCODE -ne 0) {
         throw "Advisory quality test lane failed with exit code $LASTEXITCODE."
+    }
+
+    Write-Host "Running mutation evidence..." -ForegroundColor Cyan
+    & (Join-Path $repoRoot "scripts/quality/run-library-mutation.ps1") -FailOnThreshold
+    if (Test-Path $mutationSummaryPath) {
+        Append-GitHubStepSummary -SummaryPath $mutationSummaryPath
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw "Library mutation lane failed with exit code $LASTEXITCODE."
+    }
+
+    Write-Host "Running fuzz corpus evidence..." -ForegroundColor Cyan
+    & (Join-Path $repoRoot "scripts/quality/run-fuzz-corpus.ps1") -NoRestore -NoBuild
+    if (Test-Path $fuzzSummaryPath) {
+        Append-GitHubStepSummary -SummaryPath $fuzzSummaryPath
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw "Fuzz corpus lane failed with exit code $LASTEXITCODE."
     }
 }
 

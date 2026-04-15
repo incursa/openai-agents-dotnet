@@ -1,0 +1,367 @@
+#pragma warning disable OPENAI001
+#pragma warning disable SCME0001
+
+using System.Text;
+using System.Text.Json.Nodes;
+using System.Net;
+using System.Net.Http.Headers;
+using Incursa.OpenAI.Agents;
+using Incursa.OpenAI.Agents.Mcp;
+using System.ClientModel.Primitives;
+using OpenAI.Responses;
+
+namespace Incursa.OpenAI.Agents.Tests;
+
+/// <summary>Request mapping preserves the OpenAI Responses turn shape for public consumption.</summary>
+public sealed class REQ_LIB_OAI_MAP_002
+{
+    /// <summary>Request mapping preserves request metadata, tool schemas, handoff translation, hosted MCP translation, and model-setting patches.</summary>
+    /// <intent>Protect the public request shape that is sent to the OpenAI Responses API.</intent>
+    /// <scenario>LIB-OAI-MAP-002</scenario>
+    /// <behavior>Mapped requests keep metadata, preserve explicit tool schemas, fall back to default tool schemas, honor handoff overrides, translate hosted MCP tools, and ignore explicit top-level transport fields in model settings.</behavior>
+    [Trait("Category", "Smoke")]
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_MapsMetadataToolsHandoffsHostedMcpAndModelSettings()
+    {
+        Agent<TestContext> mailAgent = new()
+        {
+            Name = "mail specialist",
+            Model = "gpt-5.4",
+            Instructions = "Handle mail",
+            HandoffDescription = "Fallback mail handoff description.",
+        };
+
+        Agent<TestContext> triage = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = null,
+            Tools =
+            [
+                new AgentTool<TestContext>
+                {
+                    Name = "lookup_customer",
+                    Description = "Look up a customer",
+                    InputSchema = new JsonObject
+                    {
+                        ["type"] = "object",
+                        ["properties"] = new JsonObject
+                        {
+                            ["customer_id"] = new JsonObject { ["type"] = "string" },
+                        },
+                        ["required"] = new JsonArray("customer_id"),
+                        ["additionalProperties"] = false,
+                    },
+                    ExecuteAsync = (_, _) => ValueTask.FromResult(AgentToolResult.FromText("ok")),
+                },
+                new AgentTool<TestContext>
+                {
+                    Name = "lookup_order",
+                    Description = "Look up an order",
+                    ExecuteAsync = (_, _) => ValueTask.FromResult(AgentToolResult.FromText("ok")),
+                },
+            ],
+            Handoffs =
+            [
+                new AgentHandoff<TestContext>
+                {
+                    Name = "mail",
+                    TargetAgent = mailAgent,
+                    ToolNameOverride = "route_to_mail",
+                    Description = "Explicit handoff description.",
+                },
+            ],
+            HostedMcpTools =
+            [
+                new HostedMcpToolDefinition(
+                    "mail",
+                    new Uri("https://mail.example.test/mcp"),
+                    "connector-1",
+                    "Bearer hosted-token",
+                    true,
+                    new Dictionary<string, string>(StringComparer.Ordinal)
+                    {
+                        ["x-trace"] = "abc",
+                        ["x-tenant"] = "tenant-1",
+                    },
+                    "approval because hosted",
+                    "Hosted mail connector"),
+            ],
+            ModelSettings = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["model"] = "wrong-model",
+                ["instructions"] = "wrong instructions",
+                ["previous_response_id"] = "wrong-response",
+                ["metadata"] = new JsonObject { ["spoof"] = "bad" },
+                ["input"] = new JsonArray("bad"),
+                ["tools"] = new JsonArray("bad"),
+                ["stream"] = true,
+                ["custom_string"] = "value",
+                ["custom_bool"] = true,
+                ["custom_int"] = 42,
+                ["custom_long"] = 1234567890123L,
+                ["custom_double"] = 12.5d,
+                ["custom_null"] = null,
+                ["custom_object"] = new JsonObject
+                {
+                    ["nested_text"] = "inner",
+                    ["nested_flag"] = false,
+                    ["nested_count"] = 7,
+                    ["nested_fallback"] = 12345678901234567890m,
+                },
+                ["custom_array"] = new JsonArray("alpha", 2, null),
+            },
+        };
+
+        OpenAiResponsesRequestMapper mapper = new();
+        OpenAiResponsesTurnPlan<TestContext> plan = await mapper.CreateAsync(new AgentTurnRequest<TestContext>(
+            triage,
+            new TestContext("user-1", "tenant-1"),
+            "session-1",
+            4,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "Need mail help" },
+            ],
+            "Need mail help",
+            "resp-previous",
+            null));
+
+        Assert.Null(plan.Options.Instructions);
+        Assert.Equal("gpt-5.4", plan.Options.Model);
+        Assert.Equal("resp-previous", plan.Options.PreviousResponseId);
+        Assert.Equal("session-1", plan.Options.Metadata["session_key"]);
+        Assert.Equal("triage", plan.Options.Metadata["agent_name"]);
+        Assert.Equal("4", plan.Options.Metadata["turn_number"]);
+        Assert.False(plan.Options.Patch.Contains(Encoding.UTF8.GetBytes("$.model")));
+        Assert.False(plan.Options.Patch.Contains(Encoding.UTF8.GetBytes("$.instructions")));
+        Assert.False(plan.Options.Patch.Contains(Encoding.UTF8.GetBytes("$.previous_response_id")));
+        Assert.False(plan.Options.Patch.Contains(Encoding.UTF8.GetBytes("$.metadata")));
+        Assert.False(plan.Options.Patch.Contains(Encoding.UTF8.GetBytes("$.input")));
+        Assert.False(plan.Options.Patch.Contains(Encoding.UTF8.GetBytes("$.tools")));
+        Assert.False(plan.Options.Patch.Contains(Encoding.UTF8.GetBytes("$.stream")));
+
+        Assert.Equal(4, plan.Options.Tools.Count);
+
+        FunctionTool explicitTool = Assert.Single(plan.Options.Tools.OfType<FunctionTool>(), tool => tool.FunctionName == "lookup_customer");
+        string explicitToolJson = OpenAiSdkSerialization.ToJsonObject(explicitTool).ToJsonString();
+        Assert.Contains("\"lookup_customer\"", explicitToolJson);
+        Assert.Contains("\"customer_id\"", explicitToolJson);
+        Assert.Contains("\"additionalProperties\":false", explicitToolJson);
+
+        FunctionTool fallbackTool = Assert.Single(plan.Options.Tools.OfType<FunctionTool>(), tool => tool.FunctionName == "lookup_order");
+        string fallbackToolJson = OpenAiSdkSerialization.ToJsonObject(fallbackTool).ToJsonString();
+        Assert.Contains("\"lookup_order\"", fallbackToolJson);
+        Assert.Contains("\"additionalProperties\":true", fallbackToolJson);
+
+        FunctionTool handoffTool = Assert.Single(plan.Options.Tools.OfType<FunctionTool>(), tool => tool.FunctionName == "route_to_mail");
+        string handoffToolJson = OpenAiSdkSerialization.ToJsonObject(handoffTool).ToJsonString();
+        Assert.Contains("\"route_to_mail\"", handoffToolJson);
+        Assert.Contains("Explicit handoff description.", handoffToolJson);
+        Assert.DoesNotContain("Fallback mail handoff description.", handoffToolJson);
+        Assert.Contains("\"additionalProperties\":true", handoffToolJson);
+
+        Assert.Single(plan.HandoffMap);
+        Assert.Contains("route_to_mail", plan.HandoffMap);
+
+        McpTool hostedTool = Assert.Single(plan.Options.Tools.OfType<McpTool>());
+        Assert.Equal("connector-1", hostedTool.ConnectorId);
+        Assert.Equal("Bearer hosted-token", hostedTool.AuthorizationToken);
+        Assert.Equal("Hosted mail connector", hostedTool.ServerDescription);
+        Assert.Equal("abc", hostedTool.Headers?["x-trace"]);
+        Assert.Equal("tenant-1", hostedTool.Headers?["x-tenant"]);
+        JsonObject hostedToolJson = OpenAiSdkSerialization.ToJsonObject(hostedTool);
+        Assert.Equal("always", hostedToolJson["require_approval"]?.GetValue<string>());
+    }
+
+    /// <summary>Custom model-setting patches survive SDK transport serialization and reach the wire body.</summary>
+    /// <intent>Prove that the public model-settings dictionary is not just retained in-memory but actually serialized into the outgoing Responses request.</intent>
+    /// <scenario>LIB-OAI-MAP-002C</scenario>
+    /// <behavior>Custom model-setting keys are serialized into the OpenAI Responses request body while explicit top-level transport fields remain controlled by the mapper.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_SerializesCustomModelSettingsOntoTheWire()
+    {
+        Agent<TestContext> triage = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle mail",
+            ModelSettings = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["model"] = "wrong-model",
+                ["instructions"] = "wrong instructions",
+                ["previous_response_id"] = "wrong-response",
+                ["metadata"] = new JsonObject { ["spoof"] = "bad" },
+                ["stream"] = true,
+                ["custom_string"] = "value",
+                ["custom_bool"] = true,
+                ["custom_int"] = 42,
+                ["custom_long"] = 1234567890123L,
+                ["custom_double"] = 12.5d,
+                ["custom_null"] = null,
+                ["custom_object"] = new JsonObject
+                {
+                    ["nested_text"] = "inner",
+                    ["nested_flag"] = false,
+                    ["nested_count"] = 7,
+                    ["nested_fallback"] = 12345678901234567890m,
+                },
+                ["custom_array"] = new JsonArray("alpha", 2, null),
+            },
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            triage,
+            new TestContext("user-1", "tenant-1"),
+            "session-1",
+            5,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "Need mail help" },
+            ],
+            "Need mail help",
+            "resp-previous",
+            null));
+
+        RecordingHandler handler = new();
+        using HttpClient httpClient = new(handler)
+        {
+            BaseAddress = new Uri("https://example.test/"),
+        };
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "test-key");
+
+        OpenAiResponsesClient client = new(httpClient, "v1/responses");
+        await client.CreateResponseAsync(new OpenAiResponsesRequest(plan.Options), CancellationToken.None);
+
+        JsonObject body = JsonNode.Parse(handler.Body)?.AsObject()
+            ?? throw new InvalidOperationException("The captured request body was not valid JSON.");
+
+        Assert.Equal("gpt-5.4", body["model"]?.GetValue<string>());
+        Assert.Equal("Handle mail", body["instructions"]?.GetValue<string>());
+        Assert.Equal("resp-previous", body["previous_response_id"]?.GetValue<string>());
+        Assert.False(body["stream"]?.GetValue<bool>() ?? true);
+
+        JsonObject metadata = Assert.IsType<JsonObject>(body["metadata"]);
+        Assert.Equal("session-1", metadata["session_key"]?.GetValue<string>());
+        Assert.Equal("triage", metadata["agent_name"]?.GetValue<string>());
+        Assert.Equal("5", metadata["turn_number"]?.GetValue<string>());
+        Assert.DoesNotContain("spoof", metadata.ToJsonString());
+
+        Assert.Equal("value", body["custom_string"]?.GetValue<string>());
+        Assert.True(body["custom_bool"]?.GetValue<bool>() ?? false);
+        Assert.Equal(42, body["custom_int"]?.GetValue<int>());
+        Assert.Equal(1234567890123L, body["custom_long"]?.GetValue<long>());
+        Assert.Equal(12.5d, body["custom_double"]?.GetValue<double>());
+        Assert.True(body.ContainsKey("custom_null"));
+        Assert.Null(body["custom_null"]);
+
+        JsonObject customObject = Assert.IsType<JsonObject>(body["custom_object"]);
+        Assert.Equal("inner", customObject["nested_text"]?.GetValue<string>());
+        Assert.False(customObject["nested_flag"]?.GetValue<bool>() ?? true);
+        Assert.Equal(7, customObject["nested_count"]?.GetValue<int>());
+        Assert.NotNull(customObject["nested_fallback"]);
+
+        JsonArray customArray = Assert.IsType<JsonArray>(body["custom_array"]);
+        Assert.Equal("alpha", customArray[0]?.GetValue<string>());
+        Assert.Equal(2, customArray[1]?.GetValue<int>());
+        Assert.Null(customArray[2]);
+    }
+
+    /// <summary>Reasoning items preserve the joined summary text, status, encrypted content, and omission policy.</summary>
+    /// <intent>Protect reasoning-item fidelity when mapped into the OpenAI Responses SDK model.</intent>
+    /// <scenario>LIB-OAI-MAP-002B</scenario>
+    /// <behavior>Reasoning input preserves the readable summary text, keeps status and encrypted content, and omits the reasoning item ID when requested.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_PreservesReasoningSummaryStatusEncryptedContentAndIdPolicy()
+    {
+        Agent<TestContext> agent = new()
+        {
+            Name = "delegate",
+            Model = "gpt-5.4",
+            Instructions = "Handle the delegated task.",
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            agent,
+            new TestContext("user-1", "tenant-1"),
+            "session-reasoning",
+            2,
+            [
+                new AgentConversationItem(AgentItemTypes.Reasoning, "assistant", "delegate")
+                {
+                    Data = new JsonObject
+                    {
+                        ["type"] = "reasoning",
+                        ["id"] = "rs_123",
+                        ["status"] = "completed",
+                        ["encrypted_content"] = "enc-abc",
+                        ["summary"] = new JsonArray
+                        {
+                            "first line",
+                            new JsonObject { ["text"] = "second line" },
+                            new JsonObject { ["text"] = string.Empty },
+                            42,
+                        },
+                    },
+                },
+            ],
+            null,
+            null,
+            new AgentRunOptions<TestContext> { ReasoningItemIdPolicy = ReasoningItemIdPolicy.Omit }));
+
+        ReasoningResponseItem reasoning = Assert.IsType<ReasoningResponseItem>(Assert.Single(plan.Options.InputItems));
+        Assert.Null(reasoning.Id);
+        Assert.Equal(ReasoningStatus.Completed, reasoning.Status);
+        Assert.Equal("enc-abc", reasoning.EncryptedContent);
+        Assert.Equal(string.Join(Environment.NewLine, ["first line", "second line"]), ReadReasoningSummary(reasoning));
+    }
+
+    private static string? ReadReasoningSummary(ReasoningResponseItem reasoning)
+    {
+        JsonObject json = OpenAiSdkSerialization.ToJsonObject(reasoning);
+
+        if (json["summary"] is JsonValue summaryValue && summaryValue.TryGetValue<string>(out string? text))
+        {
+            return text;
+        }
+
+        if (json["summary"] is JsonArray summaryArray)
+        {
+            List<string> parts = [];
+            foreach (JsonNode? entry in summaryArray)
+            {
+                switch (entry)
+                {
+                    case JsonValue value when value.TryGetValue<string>(out string? textValue) && !string.IsNullOrWhiteSpace(textValue):
+                        parts.Add(textValue);
+                        break;
+                    case JsonObject obj when obj["text"] is JsonValue textNode && textNode.TryGetValue<string>(out string? itemText) && !string.IsNullOrWhiteSpace(itemText):
+                        parts.Add(itemText);
+                        break;
+                }
+            }
+
+            return string.Join(Environment.NewLine, parts);
+        }
+
+        return reasoning.GetType().GetProperty("SummaryText")?.GetValue(reasoning)?.ToString()
+            ?? reasoning.GetType().GetProperty("Summary")?.GetValue(reasoning)?.ToString();
+    }
+
+    private sealed class RecordingHandler : HttpMessageHandler
+    {
+        public string Body { get; private set; } = string.Empty;
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            Body = request.Content is null ? string.Empty : await request.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("""{"id":"resp-1","output":[]}""", Encoding.UTF8, "application/json"),
+            };
+        }
+    }
+
+    private sealed record TestContext(string UserId, string TenantId);
+}

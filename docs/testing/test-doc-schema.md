@@ -26,6 +26,8 @@ Recommended conventions:
 - use `Trait("Category", "Integration")` for Docker-backed tests that exercise real external services
 - use `Trait("Category", "KnownIssue")` only for visible non-blocking regressions
 - add `Trait("RequiresDocker", "true")` when a test needs Docker to run
+- use `CoverageTypeAttribute` to mark evidence as `Positive`, `Negative`, `Edge`, `Fuzz`, or `Benchmark`
+- prefer one-scenario requirement-home files under `tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/` for direct requirement traceability
 
 Example:
 

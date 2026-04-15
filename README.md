@@ -132,7 +132,7 @@ dotnet test
 - Publishing uses the GitHub workflow [``.github/workflows/publish-nuget-packages.yml``](.github/workflows/publish-nuget-packages.yml).
   - Tag with `vX.Y.Z` (for example `v1.0.12`) and push, or run workflow dispatch with `version` set to `X.Y.Z`.
   - The workflow validates policy using [``scripts/release/validate-public-api-versioning.ps1``](scripts/release/validate-public-api-versioning.ps1) before packing and pushing both packages to nuget.org.
-- Standard CI uses [``.github/workflows/ci.yml``](.github/workflows/ci.yml) for push and pull request validation without publishing.
+- Standard CI uses [``.github/workflows/ci.yml``](.github/workflows/ci.yml) for push and pull request validation, including the blocking tests and full quality evidence lane, without publishing.
 
 ### 2) Run samples
 
@@ -227,7 +227,9 @@ sealed class DemoAuthResolver : IUserScopedMcpAuthResolver
 ## Quality and operations
 
 - **Quality lanes**: `dotnet test`, plus scripted quality workflows in [``scripts/quality/``](scripts/quality/).
-- **Workbench sync evidence**: [``scripts/quality/run-quality-evidence.ps1``](scripts/quality/run-quality-evidence.ps1) and [``.github/workflows/workbench-quality.yml``](.github/workflows/workbench-quality.yml).
+- **Workbench sync evidence**: [``scripts/quality/run-quality-evidence.ps1``](scripts/quality/run-quality-evidence.ps1) and [``.github/workflows/workbench-quality.yml``](.github/workflows/workbench-quality.yml) for advisory tests, mutation evidence, and fuzz corpus checks.
+- **Benchmarks**: [``benchmarks/README.md``](benchmarks/README.md).
+- **Fuzz harnesses**: [``fuzz/README.md``](fuzz/README.md), [``fuzz/corpus/README.md``](fuzz/corpus/README.md), [``scripts/quality/run-fuzz-corpus.ps1``](scripts/quality/run-fuzz-corpus.ps1).
 - **Nightly issue sync**: [``.github/workflows/workbench-nightly-sync.yml``](.github/workflows/workbench-nightly-sync.yml) (dry-run validation + artifact output).
 - **Scope parity tracking**: [``docs/parity/manifest.md``](docs/parity/manifest.md).
 - **Maintenance checklist**: [``docs/parity/maintenance-checklist.md``](docs/parity/maintenance-checklist.md).

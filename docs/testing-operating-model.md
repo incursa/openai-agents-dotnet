@@ -14,8 +14,10 @@ The repo uses four quality lanes:
 - `smoke`: fast curated checks tagged with `Category=Smoke`
 - `blocking`: required non-Docker validation over the maintained solution
 - `observational`: visible `Category=KnownIssue` regressions that do not block the lane
-- `advisory`: blocking tests plus package coverage, then Workbench normalization
+- `advisory`: blocking tests plus package coverage, mutation evidence, fuzz corpus checks, then Workbench normalization
 - `integration`: Docker-backed checks tagged with `Category=Integration` and `RequiresDocker=true`
+
+Benchmark suites and fuzz harnesses live alongside these lanes under [``benchmarks/``](../benchmarks/README.md) and [``fuzz/``](../fuzz/README.md) for hot-path and parser-robustness evidence.
 
 Local commands:
 
@@ -24,6 +26,8 @@ pwsh -File scripts/quality/run-smoke-tests.ps1
 pwsh -File scripts/quality/run-blocking-tests.ps1
 pwsh -File scripts/quality/run-observational-tests.ps1
 pwsh -File scripts/quality/run-quality-evidence.ps1
+pwsh -File scripts/quality/run-library-mutation.ps1
+pwsh -File scripts/quality/run-fuzz-corpus.ps1
 dotnet test tests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests/Incursa.OpenAI.Agents.Storage.Azure.IntegrationTests.csproj
 dotnet test tests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests/Incursa.OpenAI.Agents.Storage.S3.IntegrationTests.csproj
 pwsh -File scripts/testing/prepull-test-images.ps1

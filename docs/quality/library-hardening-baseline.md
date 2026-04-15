@@ -15,7 +15,7 @@ This repo treats the following artifacts as the minimum hardening baseline for a
 - a conformance matrix mapping each scenario to tests or automation artifacts
 - committed public API analyzer baselines for each public package
 - required blocking and smoke test lanes
-- package-level coverage and advisory mutation automation
+- package-level coverage, advisory mutation automation, benchmark evidence, and fuzz harnesses for parser-facing code
 - generated test documentation inventory
 
 A new public API is not considered fully integrated until it is:
@@ -23,3 +23,4 @@ A new public API is not considered fully integrated until it is:
 1. intentionally added to `PublicAPI.Unshipped.txt`
 2. covered by an authored `LIB-*` scenario
 3. mapped to automated tests in the conformance matrix
+4. backed by benchmark or fuzz evidence where the public path is hot or wire-facing
