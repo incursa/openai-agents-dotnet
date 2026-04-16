@@ -163,6 +163,7 @@ _TeamCity*
 coverage*.json
 coverage*.xml
 coverage*.info
+!docs/30-contracts/coverage-summary.schema.json
 
 # Visual Studio code coverage results
 *.coverage
