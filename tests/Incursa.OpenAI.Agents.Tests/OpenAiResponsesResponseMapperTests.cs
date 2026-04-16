@@ -1108,6 +1108,50 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("function", toolCall.ToolType);
     }
 
+    /// <summary>Raw function-call fallbacks still map when optional metadata is absent.</summary>
+    /// <intent>Protect the raw function-call fallback defaults for missing names, arguments, approval metadata, and status.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-020</scenario>
+    /// <behavior>Raw `function_call` items without optional fields still map to function tool calls with generated ids, empty names, and null arguments.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task ResponseMapper_FallbackMapsRawFunctionCallsWithoutOptionalMetadata()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle sparse fallback tool calls.",
+        });
+
+        OpenAiResponsesResponse response = new("resp-raw-function-call-sparse", new JsonObject
+        {
+            ["id"] = "resp-raw-function-call-sparse",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "reasoning",
+                    ["id"] = "rs_bad",
+                    ["summary"] = new JsonArray("plain-text-summary"),
+                },
+                new JsonObject
+                {
+                    ["type"] = "function_call",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.False(string.IsNullOrWhiteSpace(toolCall.CallId));
+        Assert.Equal(string.Empty, toolCall.ToolName);
+        Assert.Null(toolCall.Arguments);
+        Assert.False(toolCall.RequiresApproval);
+        Assert.Null(toolCall.ApprovalReason);
+        Assert.Equal("function", toolCall.ToolType);
+    }
+
     /// <summary>Raw MCP tool-call aliases still map when ids are omitted.</summary>
     /// <intent>Protect the raw `mcp_tool_call` alias path and its fallback-id generation.</intent>
     /// <scenario>LIB-OAI-RESP-MAP-019</scenario>
@@ -1150,6 +1194,94 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.False(string.IsNullOrWhiteSpace(toolCall.CallId));
         Assert.Equal("search_mail", toolCall.ToolName);
         Assert.Equal("invoice", toolCall.Arguments?["query"]?.GetValue<string>());
+        Assert.False(toolCall.RequiresApproval);
+        Assert.Null(toolCall.ApprovalReason);
+        Assert.Equal("mcp", toolCall.ToolType);
+    }
+
+    /// <summary>Raw MCP approval fallbacks still map when names are absent.</summary>
+    /// <intent>Protect the raw MCP approval fallback defaults for missing tool names and arguments.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-021</scenario>
+    /// <behavior>Raw `mcp_approval_request` items without ids, names, or arguments still map to approval-required MCP tool calls with generated ids and empty names.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task ResponseMapper_FallbackMapsRawApprovalRequestsWithoutNames()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle sparse approval fallback items.",
+        });
+
+        OpenAiResponsesResponse response = new("resp-raw-approval-no-name", new JsonObject
+        {
+            ["id"] = "resp-raw-approval-no-name",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "reasoning",
+                    ["id"] = "rs_bad",
+                    ["summary"] = new JsonArray("plain-text-summary"),
+                },
+                new JsonObject
+                {
+                    ["type"] = "mcp_approval_request",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.False(string.IsNullOrWhiteSpace(toolCall.CallId));
+        Assert.Equal(string.Empty, toolCall.ToolName);
+        Assert.True(toolCall.RequiresApproval);
+        Assert.Null(toolCall.Arguments);
+        Assert.Null(toolCall.ApprovalReason);
+        Assert.Equal("mcp", toolCall.ToolType);
+    }
+
+    /// <summary>Raw MCP call fallbacks still map when optional metadata is absent.</summary>
+    /// <intent>Protect the raw MCP call fallback defaults for missing names, arguments, and statuses.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-022</scenario>
+    /// <behavior>Raw `mcp_call` items without optional fields still map to MCP tool calls with generated ids, empty names, and null arguments.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task ResponseMapper_FallbackMapsRawMcpCallsWithoutOptionalMetadata()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle sparse MCP fallback items.",
+        });
+
+        OpenAiResponsesResponse response = new("resp-raw-mcp-call-sparse", new JsonObject
+        {
+            ["id"] = "resp-raw-mcp-call-sparse",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "reasoning",
+                    ["id"] = "rs_bad",
+                    ["summary"] = new JsonArray("plain-text-summary"),
+                },
+                new JsonObject
+                {
+                    ["type"] = "mcp_call",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.False(string.IsNullOrWhiteSpace(toolCall.CallId));
+        Assert.Equal(string.Empty, toolCall.ToolName);
+        Assert.Null(toolCall.Arguments);
         Assert.False(toolCall.RequiresApproval);
         Assert.Null(toolCall.ApprovalReason);
         Assert.Equal("mcp", toolCall.ToolType);
@@ -1288,6 +1420,37 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("fc_call", runItem.ToolCallId);
         Assert.Equal("42", runItem.Data?["customer_id"]?.GetValue<string>());
         Assert.Equal("completed", runItem.Status);
+        Assert.NotNull(runItem.TimestampUtc);
+    }
+
+    /// <summary>The raw unknown streaming helper maps `tool_call` aliases the same way as function calls.</summary>
+    /// <intent>Protect the private raw streaming alias branch and keep the remaining timeout line observable.</intent>
+    /// <scenario>LIB-OAI-STREAM-NEG-010</scenario>
+    /// <behavior>The unknown streaming helper maps raw `tool_call` items into tool-call run items with the expected alias semantics.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public void TryMapUnknownStreamingOutputItem_MapsRawToolCallAliases()
+    {
+        JsonObject item = new()
+        {
+            ["type"] = "tool_call",
+            ["id"] = "tc_id",
+            ["name"] = "lookup_customer",
+            ["arguments"] = new JsonObject
+            {
+                ["customer_id"] = "42",
+            },
+            ["status"] = "queued",
+        };
+
+        AgentRunItem runItem = Assert.IsType<AgentRunItem>(InvokeUnknownStreamingOutputItem("triage", item));
+
+        Assert.Equal(AgentItemTypes.ToolCall, runItem.ItemType);
+        Assert.Equal("assistant", runItem.Role);
+        Assert.Equal("lookup_customer", runItem.Name);
+        Assert.Equal("tc_id", runItem.ToolCallId);
+        Assert.Equal("42", runItem.Data?["customer_id"]?.GetValue<string>());
+        Assert.Equal("queued", runItem.Status);
         Assert.NotNull(runItem.TimestampUtc);
     }
 
