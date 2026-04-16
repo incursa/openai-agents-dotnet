@@ -315,7 +315,7 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.False(string.IsNullOrWhiteSpace(toolCall.CallId));
         Assert.Equal("delete_message", toolCall.ToolName);
         Assert.True(toolCall.RequiresApproval);
-        Assert.Null(toolCall.ApprovalReason);
+        Assert.Equal("confirm destructive action", toolCall.ApprovalReason);
         Assert.Equal("mcp", toolCall.ToolType);
         Assert.Null(toolCall.Arguments);
     }
@@ -438,6 +438,44 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal(AgentItemTypes.McpListTools, runItem.ItemType);
         Assert.Equal("system", runItem.Role);
         Assert.Equal("mcp_list_tools", runItem.Data?["type"]?.GetValue<string>());
+        Assert.Null(turn.FinalOutput);
+    }
+
+    /// <summary>Unhandled typed hosted-tool items do not fabricate actionable runtime state.</summary>
+    /// <intent>Protect the typed response-item default branch from inventing tool calls, handoffs, or final output for hosted-tool items the mapper does not yet project.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-019</scenario>
+    /// <behavior>Typed `web_search_call` items are ignored by the mapper rather than being coerced into unrelated runtime items.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task ResponseMapper_IgnoresUnhandledTypedHostedToolItems()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle hosted tool results.",
+        });
+
+        OpenAiResponsesResponse response = CreateTypedResponse(new JsonObject
+        {
+            ["id"] = "resp-typed-web-search",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "web_search_call",
+                    ["id"] = "ws_1",
+                    ["status"] = "completed",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        Assert.Empty(turn.ToolCalls);
+        Assert.Empty(turn.Handoffs);
+        Assert.Empty(Assert.IsAssignableFrom<IReadOnlyList<AgentRunItem>>(turn.Items));
+        Assert.Null(turn.FinalOutput);
     }
 
     /// <summary>Typed reasoning items are emitted as reasoning run items when SDK parsing succeeds.</summary>
@@ -483,6 +521,7 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal(AgentItemTypes.Reasoning, runItem.ItemType);
         Assert.Equal("assistant", runItem.Role);
         Assert.Equal("reasoning", runItem.Data?["type"]?.GetValue<string>());
+        Assert.Null(turn.FinalOutput);
     }
 
     /// <summary>Typed function-call items preserve status and tool metadata through the top-level mapper.</summary>
@@ -525,6 +564,124 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("function", toolCall.ToolType);
         Assert.False(toolCall.RequiresApproval);
         Assert.Equal("42", toolCall.Arguments?["customer_id"]?.GetValue<string>());
+    }
+
+    /// <summary>Typed function-call items retain status when they route through handoff mapping without a raw round-trip.</summary>
+    /// <intent>Protect the typed function-call branch that now reads status directly from the SDK model instead of fallback serialization.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-017</scenario>
+    /// <behavior>Typed function-call handoffs without a raw round-trip preserve parsed arguments and completion status in the handoff request.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task ResponseMapper_MapsTypedFunctionCallItemsWithoutRoundTripIntoHandoffs()
+    {
+        Agent<TestContext> mailAgent = new()
+        {
+            Name = "mail specialist",
+            Model = "gpt-5.4",
+            Instructions = "Handle mail.",
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Route work.",
+            Handoffs =
+            [
+                new AgentHandoff<TestContext>
+                {
+                    Name = "mail",
+                    TargetAgent = mailAgent,
+                    ToolNameOverride = "route_to_mail",
+                    Description = "Transfer to mail.",
+                },
+            ],
+        });
+
+        OpenAiResponsesResponse response = CreateTypedResponseWithoutRoundTrip(new JsonObject
+        {
+            ["id"] = "resp-typed-function-handoff",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "function_call",
+                    ["name"] = "route_to_mail",
+                    ["arguments"] = """{"topic":"billing"}""",
+                    ["status"] = "completed",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentHandoffRequest<TestContext> handoff = Assert.Single(turn.Handoffs);
+        JsonObject arguments = Assert.IsType<JsonObject>(handoff.Arguments);
+        Assert.Equal("mail", handoff.HandoffName);
+        Assert.Same(mailAgent, handoff.TargetAgent);
+        Assert.Equal("billing", arguments["topic"]?.GetValue<string>());
+        Assert.Equal("completed", handoff.Reason);
+        Assert.Empty(turn.ToolCalls);
+        Assert.Null(turn.FinalOutput);
+    }
+
+    /// <summary>Typed MCP call items retain status when they route through handoff mapping without a raw round-trip.</summary>
+    /// <intent>Protect the typed MCP call branch that now reads status from the SDK patch instead of fallback serialization.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-018</scenario>
+    /// <behavior>Typed MCP handoffs without a raw round-trip preserve parsed arguments and completion status in the handoff request.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task ResponseMapper_MapsTypedMcpToolCallItemsWithoutRoundTripIntoHandoffs()
+    {
+        Agent<TestContext> mailAgent = new()
+        {
+            Name = "mail specialist",
+            Model = "gpt-5.4",
+            Instructions = "Handle mail.",
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Route work.",
+            Handoffs =
+            [
+                new AgentHandoff<TestContext>
+                {
+                    Name = "mail",
+                    TargetAgent = mailAgent,
+                    ToolNameOverride = "route_to_mail",
+                    Description = "Transfer to mail.",
+                },
+            ],
+        });
+
+        OpenAiResponsesResponse response = CreateTypedResponseWithoutRoundTrip(new JsonObject
+        {
+            ["id"] = "resp-typed-mcp-handoff",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "mcp_call",
+                    ["name"] = "route_to_mail",
+                    ["arguments"] = """{"query":"invoice"}""",
+                    ["status"] = "completed",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentHandoffRequest<TestContext> handoff = Assert.Single(turn.Handoffs);
+        JsonObject arguments = Assert.IsType<JsonObject>(handoff.Arguments);
+        Assert.Equal("mail", handoff.HandoffName);
+        Assert.Same(mailAgent, handoff.TargetAgent);
+        Assert.Equal("invoice", arguments["query"]?.GetValue<string>());
+        Assert.Equal("completed", handoff.Reason);
+        Assert.Empty(turn.ToolCalls);
+        Assert.Null(turn.FinalOutput);
     }
 
     /// <summary>Streaming tool-call items preserve malformed argument payloads instead of throwing.</summary>

@@ -1,6 +1,7 @@
 #pragma warning disable OPENAI001
 #pragma warning disable SCME0001
 
+using System.ClientModel.Primitives;
 using OpenAI.Responses;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -54,7 +55,7 @@ internal sealed class OpenAiResponsesResponseMapper
                         break;
 
                     case FunctionCallResponseItem functionCall:
-                        MapToolCall(plan, toolCalls, handoffs, functionCall.CallId, functionCall.FunctionName, functionCall.FunctionArguments?.ToString(), SerializeModelSafely(functionCall, "function_call")["status"]?.GetValue<string>(), false, null, "function");
+                        MapToolCall(plan, toolCalls, handoffs, functionCall.CallId, functionCall.FunctionName, functionCall.FunctionArguments?.ToString(), functionCall.Status?.ToString().ToLowerInvariant(), false, null, "function");
                         break;
 
                     case McpToolCallApprovalRequestItem approvalRequest:
@@ -63,12 +64,12 @@ internal sealed class OpenAiResponsesResponseMapper
                             approvalRequest.ToolName,
                             ParseJsonNode(approvalRequest.ToolArguments is null ? null : JsonValue.Create(approvalRequest.ToolArguments.ToString())),
                             true,
-                            SerializeModelSafely(approvalRequest, "mcp_approval_request")["approval_reason"]?.GetValue<string>(),
+                            TryGetPatchString(approvalRequest.Patch, "$.approval_reason"u8),
                             "mcp"));
                         break;
 
                     case McpToolCallItem mcpCall:
-                        MapToolCall(plan, toolCalls, handoffs, mcpCall.Id ?? Guid.NewGuid().ToString("n"), mcpCall.ToolName, mcpCall.ToolArguments?.ToString(), SerializeModelSafely(mcpCall, "mcp_call")["status"]?.GetValue<string>(), false, null, "mcp");
+                        MapToolCall(plan, toolCalls, handoffs, mcpCall.Id ?? Guid.NewGuid().ToString("n"), mcpCall.ToolName, mcpCall.ToolArguments?.ToString(), TryGetPatchString(mcpCall.Patch, "$.status"u8), false, null, "mcp");
                         break;
 
                     case McpToolDefinitionListItem mcpList:
@@ -94,7 +95,9 @@ internal sealed class OpenAiResponsesResponseMapper
         }
 
         AgentFinalOutput? finalOutput = null;
-        if (handoffs.Count == 0 && toolCalls.Count == 0)
+        if (handoffs.Count == 0
+            && toolCalls.Count == 0
+            && (finalText is not null || structured is not null))
         {
             if (finalText is null && structured is not null)
             {
@@ -280,6 +283,9 @@ internal sealed class OpenAiResponsesResponseMapper
             Data = SerializeModelSafely(item, "reasoning"),
             TimestampUtc = DateTimeOffset.UtcNow,
         };
+
+    private static string? TryGetPatchString(JsonPatch patch, ReadOnlySpan<byte> path)
+        => patch.Contains(path) ? patch.GetString(path) : null;
 
     private static JsonObject SerializeModelSafely<T>(T value, string fallbackType)
     {
