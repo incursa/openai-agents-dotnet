@@ -317,6 +317,298 @@ public sealed class REQ_LIB_OAI_MAP_002
         Assert.Equal(string.Join(Environment.NewLine, ["first line", "second line"]), ReadReasoningSummary(reasoning));
     }
 
+    /// <summary>Missing models fail fast before any request mapping work begins.</summary>
+    /// <intent>Protect the request-mapper guard that rejects OpenAI runs without a concrete model id.</intent>
+    /// <scenario>LIB-OAI-MAP-002D</scenario>
+    /// <behavior>Agents with blank model identifiers throw an informative `InvalidOperationException` during request mapping.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task RequestMapper_RejectsAgentsWithoutModels()
+    {
+        Agent<TestContext> agent = new()
+        {
+            Name = "triage",
+            Model = "   ",
+            Instructions = "Handle requests.",
+        };
+
+        InvalidOperationException error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+                agent,
+                new TestContext("user-1", "tenant-1"),
+                "session-missing-model",
+                1,
+                [
+                    new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "hello" },
+                ],
+                "hello",
+                null,
+                null)).AsTask());
+
+        Assert.Contains("must specify a model", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>Disabled handoffs are omitted, while enabled handoffs fall back to target-agent descriptions and default schemas.</summary>
+    /// <intent>Protect handoff enablement checks and fallback handoff metadata when explicit overrides are not supplied.</intent>
+    /// <scenario>LIB-OAI-MAP-002E</scenario>
+    /// <behavior>Disabled handoffs do not produce tools, and enabled handoffs without explicit descriptions or schemas use the target agent fallback description and default object schema.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_SkipsDisabledHandoffsAndUsesFallbackDescriptions()
+    {
+        Agent<TestContext> mailAgent = new()
+        {
+            Name = "mail specialist",
+            Model = "gpt-5.4",
+            Instructions = "Handle mail",
+            HandoffDescription = "Fallback mail handoff description.",
+        };
+
+        Agent<TestContext> calendarAgent = new()
+        {
+            Name = "calendar specialist",
+            Model = "gpt-5.4",
+            Instructions = "Handle calendars",
+            HandoffDescription = "Fallback calendar handoff description.",
+        };
+
+        Agent<TestContext> triage = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Route work",
+            Handoffs =
+            [
+                new AgentHandoff<TestContext>
+                {
+                    Name = "mail",
+                    TargetAgent = mailAgent,
+                },
+                new AgentHandoff<TestContext>
+                {
+                    Name = "calendar",
+                    TargetAgent = calendarAgent,
+                    ToolNameOverride = "route_to_calendar",
+                    IsEnabledAsync = static (_, _) => ValueTask.FromResult(false),
+                },
+            ],
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            triage,
+            new TestContext("user-1", "tenant-1"),
+            "session-handoffs",
+            1,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "hello" },
+            ],
+            "hello",
+            null,
+            null));
+
+        FunctionTool handoffTool = Assert.Single(plan.Options.Tools.OfType<FunctionTool>());
+        JsonObject handoffJson = OpenAiSdkSerialization.ToJsonObject(handoffTool);
+
+        Assert.Equal("transfer_to_mail_specialist", handoffTool.FunctionName);
+        Assert.Contains("transfer_to_mail_specialist", plan.HandoffMap.Keys);
+        Assert.DoesNotContain("route_to_calendar", plan.HandoffMap.Keys);
+        Assert.Contains("Fallback mail handoff description.", handoffJson.ToJsonString());
+        Assert.Contains("\"additionalProperties\":true", handoffJson.ToJsonString());
+    }
+
+    /// <summary>Custom handoff-history transformers receive the correct source, target, and argument context after a handoff.</summary>
+    /// <intent>Protect the request-mapper path that delegates post-handoff normalization to caller-provided transformers.</intent>
+    /// <scenario>LIB-OAI-MAP-002F</scenario>
+    /// <behavior>When post-handoff normalization is enabled, the transformer is invoked with the last handoff source agent and arguments for the current target agent.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_PassesCorrectContextToHandoffHistoryTransformer()
+    {
+        Agent<TestContext> delegateAgent = new()
+        {
+            Name = "delegate",
+            Model = "gpt-5.4",
+            Instructions = "Handle delegated work.",
+        };
+
+        AgentHandoffHistoryTransformContext<TestContext>? captured = null;
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            delegateAgent,
+            new TestContext("user-1", "tenant-1"),
+            "session-transform",
+            2,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "help" },
+                new AgentConversationItem(AgentItemTypes.ToolCall, "assistant", "triage") { Name = "lookup_customer", ToolCallId = "call-1", Data = new JsonObject { ["customer_id"] = "42" } },
+                new AgentConversationItem(AgentItemTypes.HandoffRequested, "assistant", "triage") { Name = "mail", Text = "delegate", Data = new JsonObject { ["topic"] = "mail" } },
+                new AgentConversationItem(AgentItemTypes.HandoffOccurred, "system", "delegate") { Name = "mail", Text = "delegate", Data = new JsonObject { ["topic"] = "mail" } },
+            ],
+            null,
+            "resp-1",
+            new AgentRunOptions<TestContext>
+            {
+                HandoffHistoryMode = AgentHandoffHistoryMode.NormalizeModelInputAfterHandoff,
+                HandoffHistoryTransformerAsync = (context, _) =>
+                {
+                    captured = context;
+                    return ValueTask.FromResult<IReadOnlyList<AgentConversationItem>>(context.Conversation);
+                },
+            }));
+
+        Assert.NotNull(captured);
+        Assert.Equal("triage", captured!.CurrentAgentName);
+        Assert.Equal("delegate", captured.TargetAgentName);
+        Assert.Equal("mail", captured.Arguments?["topic"]?.GetValue<string>());
+        Assert.Equal(4, plan.Options.InputItems.Count);
+    }
+
+    /// <summary>Conversation items preserve roles, fallback raw item fields, tool defaults, and reasoning normalization.</summary>
+    /// <intent>Protect the per-item mapping branches that feed the OpenAI Responses input array.</intent>
+    /// <scenario>LIB-OAI-MAP-002G</scenario>
+    /// <behavior>Mapped input preserves message roles, raw fallback item fields, generated tool-call ids, serialized tool outputs, and reasoning defaults for blank ids and non-array summaries.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_MapsConversationItemsAcrossRolesFallbacksAndStatuses()
+    {
+        Agent<TestContext> agent = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle requests.",
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            agent,
+            new TestContext("user-1", "tenant-1"),
+            "session-items",
+            1,
+            [
+                new AgentConversationItem(AgentItemTypes.MessageOutput, "assistant", "triage") { Text = "assistant reply" },
+                new AgentConversationItem(AgentItemTypes.FinalOutput, "system", "triage") { Text = "system note" },
+                new AgentConversationItem(AgentItemTypes.GuardrailTripwire, "developer", "triage") { Text = "developer note" },
+                new AgentConversationItem(AgentItemTypes.ApprovalRejected, "user", "triage") { Text = "user note" },
+                new AgentConversationItem(AgentItemTypes.ToolCall, "assistant", "triage") { Status = "completed" },
+                new AgentConversationItem(AgentItemTypes.ToolOutput, "tool", "triage") { Data = new JsonObject { ["result"] = "ok" }, Status = "completed" },
+                new AgentConversationItem(AgentItemTypes.Reasoning, "assistant", "triage")
+                {
+                    Data = new JsonObject
+                    {
+                        ["id"] = " ",
+                        ["status"] = "completed",
+                        ["encrypted_content"] = "enc-value",
+                        ["summary"] = "not-an-array",
+                    },
+                },
+                new AgentConversationItem("custom_item", "tool", "triage")
+                {
+                    Name = "raw_item",
+                    Text = "payload",
+                    ToolCallId = "call-raw",
+                    Data = new JsonObject { ["value"] = 1 },
+                },
+            ],
+            null,
+            null,
+            null));
+
+        JsonObject assistantMessage = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[0]);
+        JsonObject systemMessage = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[1]);
+        JsonObject developerMessage = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[2]);
+        JsonObject userMessage = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[3]);
+        JsonObject toolCall = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[4]);
+        JsonObject toolOutput = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[5]);
+        ReasoningResponseItem reasoning = Assert.IsType<ReasoningResponseItem>(plan.Options.InputItems[6]);
+        JsonObject rawItem = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[7]);
+
+        Assert.Equal("assistant", assistantMessage["role"]?.GetValue<string>());
+        Assert.Equal("output_text", assistantMessage["content"]?[0]?["type"]?.GetValue<string>());
+        Assert.Equal("system", systemMessage["role"]?.GetValue<string>());
+        Assert.Equal("input_text", systemMessage["content"]?[0]?["type"]?.GetValue<string>());
+        Assert.Equal("developer", developerMessage["role"]?.GetValue<string>());
+        Assert.Equal("user", userMessage["role"]?.GetValue<string>());
+
+        Assert.False(string.IsNullOrWhiteSpace(toolCall["call_id"]?.GetValue<string>()));
+        Assert.Equal(string.Empty, toolCall["name"]?.GetValue<string>());
+        Assert.Equal("{}", toolCall["arguments"]?.GetValue<string>());
+        Assert.Equal("completed", toolCall["status"]?.GetValue<string>());
+
+        Assert.False(string.IsNullOrWhiteSpace(toolOutput["call_id"]?.GetValue<string>()));
+        Assert.Equal("""{"result":"ok"}""", toolOutput["output"]?.GetValue<string>());
+        Assert.Equal("completed", toolOutput["status"]?.GetValue<string>());
+
+        Assert.Null(reasoning.Id);
+        Assert.Equal(ReasoningStatus.Completed, reasoning.Status);
+        Assert.Equal("enc-value", reasoning.EncryptedContent);
+        Assert.Equal(string.Empty, ReadReasoningSummary(reasoning));
+
+        Assert.Equal("custom_item", rawItem["type"]?.GetValue<string>());
+        Assert.Equal("tool", rawItem["role"]?.GetValue<string>());
+        Assert.Equal("raw_item", rawItem["name"]?.GetValue<string>());
+        Assert.Equal("payload", rawItem["content"]?.GetValue<string>());
+        Assert.Equal("call-raw", rawItem["tool_call_id"]?.GetValue<string>());
+        Assert.Equal(1, rawItem["data"]?["value"]?.GetValue<int>());
+    }
+
+    /// <summary>Hosted MCP factory resolution uses caller auth context and preserves approval policy details on the resolved tool.</summary>
+    /// <intent>Protect hosted MCP resolution when connector-only tools are expanded through the factory path.</intent>
+    /// <scenario>LIB-OAI-MAP-002H</scenario>
+    /// <behavior>Hosted MCP factory resolution receives the mapped auth context, supports connector-only tools, and preserves approval policy and patch metadata from the resolved definition.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_UsesHostedMcpFactoryAuthContextAndConnectorFallbacks()
+    {
+        McpAuthContext? capturedContext = null;
+        HostedMcpToolFactory factory = new(new DelegateMcpAuthResolver(context =>
+        {
+            capturedContext = context;
+            return new McpAuthResult("factory-token", null);
+        }));
+
+        Agent<TestContext> agent = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle hosted MCP tools.",
+            HostedMcpTools =
+            [
+                new HostedMcpToolDefinition("mail", null, "connector-1", null, true, null, "approval required", "Hosted mail connector"),
+                new HostedMcpToolDefinition("calendar", null, "connector-2", null, false, null, null, "Hosted calendar connector"),
+            ],
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper(
+            factory,
+            _ => new McpAuthContext { UserId = "user-1", TenantId = "tenant-1", SessionKey = "session-hosted" }).CreateAsync(new AgentTurnRequest<TestContext>(
+                agent,
+                new TestContext("user-1", "tenant-1"),
+                "session-hosted",
+                1,
+                [
+                    new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "hello" },
+                ],
+                "hello",
+                null,
+                null));
+
+        Assert.NotNull(capturedContext);
+        Assert.Equal("user-1", capturedContext!.UserId);
+        Assert.Equal("tenant-1", capturedContext.TenantId);
+        Assert.Equal("session-hosted", capturedContext.SessionKey);
+
+        McpTool approvalTool = Assert.Single(plan.Options.Tools.OfType<McpTool>(), tool => tool.ConnectorId == "connector-1");
+        McpTool connectorTool = Assert.Single(plan.Options.Tools.OfType<McpTool>(), tool => tool.ConnectorId == "connector-2");
+        JsonObject approvalToolJson = OpenAiSdkSerialization.ToJsonObject(approvalTool);
+        JsonObject connectorToolJson = OpenAiSdkSerialization.ToJsonObject(connectorTool);
+
+        Assert.Equal("always", approvalToolJson["require_approval"]?.GetValue<string>());
+        Assert.Equal("approval required", approvalToolJson["approval_reason"]?.GetValue<string>());
+        Assert.Equal("Bearer factory-token", approvalTool.AuthorizationToken);
+
+        Assert.Equal("never", connectorToolJson["require_approval"]?.GetValue<string>());
+        Assert.Equal("connector-2", connectorTool.ConnectorId);
+        Assert.Null(connectorToolJson["approval_reason"]);
+    }
+
     private static string? ReadReasoningSummary(ReasoningResponseItem reasoning)
     {
         JsonObject json = OpenAiSdkSerialization.ToJsonObject(reasoning);
@@ -361,6 +653,19 @@ public sealed class REQ_LIB_OAI_MAP_002
                 Content = new StringContent("""{"id":"resp-1","output":[]}""", Encoding.UTF8, "application/json"),
             };
         }
+    }
+
+    private sealed class DelegateMcpAuthResolver : IUserScopedMcpAuthResolver
+    {
+        private readonly Func<McpAuthContext, McpAuthResult> handler;
+
+        public DelegateMcpAuthResolver(Func<McpAuthContext, McpAuthResult> handler)
+        {
+            this.handler = handler;
+        }
+
+        public ValueTask<McpAuthResult> ResolveAsync(McpAuthContext context, CancellationToken cancellationToken)
+            => ValueTask.FromResult(handler(context));
     }
 
     private sealed record TestContext(string UserId, string TenantId);

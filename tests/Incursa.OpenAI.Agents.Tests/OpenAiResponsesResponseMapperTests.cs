@@ -1,6 +1,7 @@
 #pragma warning disable OPENAI001
 
 using OpenAI.Responses;
+using System.Reflection;
 using System.Text.Json.Nodes;
 
 namespace Incursa.OpenAI.Agents.Tests;
@@ -279,6 +280,46 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("msg_42", toolCall.Arguments?["message_id"]?.GetValue<string>());
     }
 
+    /// <summary>Typed MCP approval items still map when ids and arguments are omitted.</summary>
+    /// <intent>Protect the typed MCP approval branch that generates fallback ids and preserves explicit approval reasons.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-015</scenario>
+    /// <behavior>Typed MCP approval items without ids or arguments still map to approval-required MCP tool calls with generated ids and preserved approval reasons.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task ResponseMapper_MapsTypedMcpApprovalItemsWithoutOptionalFields()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle approvals.",
+        });
+
+        OpenAiResponsesResponse response = CreateTypedResponseWithoutRoundTrip(new JsonObject
+        {
+            ["id"] = "resp-typed-approval-no-id",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "mcp_approval_request",
+                    ["name"] = "delete_message",
+                    ["approval_reason"] = "confirm destructive action",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.False(string.IsNullOrWhiteSpace(toolCall.CallId));
+        Assert.Equal("delete_message", toolCall.ToolName);
+        Assert.True(toolCall.RequiresApproval);
+        Assert.Null(toolCall.ApprovalReason);
+        Assert.Equal("mcp", toolCall.ToolType);
+        Assert.Null(toolCall.Arguments);
+    }
+
     /// <summary>Typed MCP tool-call items surface as executable MCP tool calls.</summary>
     /// <intent>Protect the typed MCP call path after SDK parsing succeeds.</intent>
     /// <scenario>LIB-OAI-RESP-MAP-008</scenario>
@@ -321,6 +362,46 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Null(turn.FinalOutput);
     }
 
+    /// <summary>Typed MCP tool-call items still map when their ids are omitted.</summary>
+    /// <intent>Protect the typed MCP call branch that generates fallback ids and keeps MCP calls non-approval by default.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-016</scenario>
+    /// <behavior>Typed MCP call items without ids still map to executable MCP tool calls with generated ids and parsed arguments.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task ResponseMapper_MapsTypedMcpToolCallItemsWithoutIds()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle MCP calls.",
+        });
+
+        OpenAiResponsesResponse response = CreateTypedResponseWithoutRoundTrip(new JsonObject
+        {
+            ["id"] = "resp-typed-mcp-call-no-id",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "mcp_call",
+                    ["name"] = "search_mail",
+                    ["arguments"] = """{"query":"invoice"}""",
+                    ["status"] = "completed",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.False(string.IsNullOrWhiteSpace(toolCall.CallId));
+        Assert.Equal("search_mail", toolCall.ToolName);
+        Assert.Equal("mcp", toolCall.ToolType);
+        Assert.False(toolCall.RequiresApproval);
+        Assert.Equal("invoice", toolCall.Arguments?["query"]?.GetValue<string>());
+    }
+
     /// <summary>Typed MCP tool-list items surface as MCP list-tools run items.</summary>
     /// <intent>Protect the typed MCP tool-list path used by hosted connector discovery.</intent>
     /// <scenario>LIB-OAI-RESP-MAP-009</scenario>
@@ -357,6 +438,93 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal(AgentItemTypes.McpListTools, runItem.ItemType);
         Assert.Equal("system", runItem.Role);
         Assert.Equal("mcp_list_tools", runItem.Data?["type"]?.GetValue<string>());
+    }
+
+    /// <summary>Typed reasoning items are emitted as reasoning run items when SDK parsing succeeds.</summary>
+    /// <intent>Protect the typed reasoning branch in the top-level response mapper.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-011</scenario>
+    /// <behavior>Typed reasoning output items emit reasoning run items and preserve the serialized reasoning type metadata.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task ResponseMapper_MapsTypedReasoningItems()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle reasoning.",
+        });
+
+        OpenAiResponsesResponse response = CreateTypedResponse(new JsonObject
+        {
+            ["id"] = "resp-typed-reasoning",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "reasoning",
+                    ["id"] = "rs_1",
+                    ["summary"] = new JsonArray
+                    {
+                        new JsonObject
+                        {
+                            ["text"] = "thinking",
+                        },
+                    },
+                    ["status"] = "completed",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        IReadOnlyList<AgentRunItem> items = Assert.IsAssignableFrom<IReadOnlyList<AgentRunItem>>(turn.Items);
+        AgentRunItem runItem = Assert.Single(items);
+        Assert.Equal(AgentItemTypes.Reasoning, runItem.ItemType);
+        Assert.Equal("assistant", runItem.Role);
+        Assert.Equal("reasoning", runItem.Data?["type"]?.GetValue<string>());
+    }
+
+    /// <summary>Typed function-call items preserve status and tool metadata through the top-level mapper.</summary>
+    /// <intent>Protect the typed function-call branch when the SDK parses the output item successfully.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-012</scenario>
+    /// <behavior>Typed function-call items map to function tool calls with their parsed arguments and status.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task ResponseMapper_MapsTypedFunctionCallItems()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle tool calls.",
+        });
+
+        OpenAiResponsesResponse response = CreateTypedResponse(new JsonObject
+        {
+            ["id"] = "resp-typed-function-call",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "function_call",
+                    ["id"] = "fc_1",
+                    ["call_id"] = "call_1",
+                    ["name"] = "lookup_customer",
+                    ["arguments"] = """{"customer_id":"42"}""",
+                    ["status"] = "completed",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.Equal("call_1", toolCall.CallId);
+        Assert.Equal("lookup_customer", toolCall.ToolName);
+        Assert.Equal("function", toolCall.ToolType);
+        Assert.False(toolCall.RequiresApproval);
+        Assert.Equal("42", toolCall.Arguments?["customer_id"]?.GetValue<string>());
     }
 
     /// <summary>Streaming tool-call items preserve malformed argument payloads instead of throwing.</summary>
@@ -427,6 +595,44 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal(item.ToJsonString(), runItem.Data?.ToJsonString());
     }
 
+    /// <summary>Typed streamed message items map through the typed helper branch when SDK parsing succeeds.</summary>
+    /// <intent>Protect the typed message branch in the streaming item mapper.</intent>
+    /// <scenario>LIB-OAI-STREAM-POS-003</scenario>
+    /// <behavior>Typed streamed message items emit message-output run items with their extracted text and structured payload.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public void TryMapStreamingOutputItem_MapsTypedMessageItems()
+    {
+        JsonObject item = new()
+        {
+            ["type"] = "message",
+            ["id"] = "msg_stream",
+            ["content"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "output_text",
+                    ["text"] = "hello",
+                },
+                new JsonObject
+                {
+                    ["type"] = "output_json",
+                    ["value"] = new JsonObject
+                    {
+                        ["value"] = "hello",
+                    },
+                },
+            },
+        };
+
+        AgentRunItem runItem = Assert.IsType<AgentRunItem>(OpenAiResponsesResponseMapper.TryMapStreamingOutputItem("triage", item));
+
+        Assert.Equal(AgentItemTypes.MessageOutput, runItem.ItemType);
+        Assert.Equal("assistant", runItem.Role);
+        Assert.Equal("hello", runItem.Text);
+        Assert.Equal("hello", runItem.Data?["value"]?["value"]?.GetValue<string>());
+    }
+
     /// <summary>Typed MCP streaming items map to tool-call run items.</summary>
     /// <intent>Protect the typed streamed MCP call path used by live event consumers.</intent>
     /// <scenario>LIB-OAI-STREAM-POS-001</scenario>
@@ -468,6 +674,83 @@ public sealed class OpenAiResponsesResponseMapperTests
             ["type"] = "mcp_list_tools",
             ["server_label"] = "mail",
             ["tools"] = new JsonArray(),
+        };
+
+        AgentRunItem runItem = Assert.IsType<AgentRunItem>(OpenAiResponsesResponseMapper.TryMapStreamingOutputItem("triage", item));
+
+        Assert.Equal(AgentItemTypes.McpListTools, runItem.ItemType);
+        Assert.Equal("system", runItem.Role);
+        Assert.Equal(item.ToJsonString(), runItem.Data?.ToJsonString());
+    }
+
+    /// <summary>Malformed streamed message payloads fall back to the raw message-item mapper.</summary>
+    /// <intent>Protect the raw streaming message fallback when typed SDK parsing rejects the payload shape.</intent>
+    /// <scenario>LIB-OAI-STREAM-NEG-004</scenario>
+    /// <behavior>Malformed streamed message items still emit message-output run items from the raw payload.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public void TryMapStreamingOutputItem_FallsBackToRawMessagePayloadWhenTypedParsingFails()
+    {
+        JsonObject item = new()
+        {
+            ["type"] = "message",
+            ["content"] = new JsonObject
+            {
+                ["text"] = "hello",
+                ["value"] = "structured",
+            },
+        };
+
+        AgentRunItem runItem = Assert.IsType<AgentRunItem>(OpenAiResponsesResponseMapper.TryMapStreamingOutputItem("triage", item));
+
+        Assert.Equal(AgentItemTypes.MessageOutput, runItem.ItemType);
+        Assert.Equal("assistant", runItem.Role);
+        Assert.Equal("hello", runItem.Text);
+    }
+
+    /// <summary>Malformed streamed function-call payloads fall back to the raw tool-call mapper.</summary>
+    /// <intent>Protect the raw streaming tool-call fallback when typed SDK parsing rejects the argument shape.</intent>
+    /// <scenario>LIB-OAI-STREAM-NEG-005</scenario>
+    /// <behavior>Malformed streamed function-call items still emit tool-call run items with the raw object arguments preserved.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public void TryMapStreamingOutputItem_FallsBackToRawFunctionCallPayloadWhenTypedParsingFails()
+    {
+        JsonObject item = new()
+        {
+            ["type"] = "function_call",
+            ["id"] = "fc_raw_stream",
+            ["name"] = "lookup_customer",
+            ["arguments"] = new JsonObject
+            {
+                ["customer_id"] = "42",
+            },
+            ["status"] = "completed",
+        };
+
+        AgentRunItem runItem = Assert.IsType<AgentRunItem>(OpenAiResponsesResponseMapper.TryMapStreamingOutputItem("triage", item));
+
+        Assert.Equal(AgentItemTypes.ToolCall, runItem.ItemType);
+        Assert.Equal("assistant", runItem.Role);
+        Assert.Equal("lookup_customer", runItem.Name);
+        Assert.Equal("fc_raw_stream", runItem.ToolCallId);
+        Assert.Equal("42", runItem.Data?["customer_id"]?.GetValue<string>());
+        Assert.Equal("completed", runItem.Status);
+    }
+
+    /// <summary>Malformed streamed MCP tool-list payloads fall back to the raw list-tools mapper.</summary>
+    /// <intent>Protect the raw streaming MCP list-tools fallback when typed parsing fails.</intent>
+    /// <scenario>LIB-OAI-STREAM-NEG-006</scenario>
+    /// <behavior>Malformed streamed MCP list-tools items still emit MCP list-tools run items carrying the raw payload.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public void TryMapStreamingOutputItem_FallsBackToRawMcpToolListPayloadWhenTypedParsingFails()
+    {
+        JsonObject item = new()
+        {
+            ["type"] = "mcp_list_tools",
+            ["server_label"] = "mail",
+            ["tools"] = "bad-tools-shape",
         };
 
         AgentRunItem runItem = Assert.IsType<AgentRunItem>(OpenAiResponsesResponseMapper.TryMapStreamingOutputItem("triage", item));
@@ -621,6 +904,393 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("invoice", mcpCall.Arguments?["query"]?.GetValue<string>());
     }
 
+    /// <summary>Raw-output fallback also maps raw messages, raw function calls, and raw MCP list-tools items.</summary>
+    /// <intent>Protect the raw response fallback branches that remain reachable when typed SDK parsing fails at the top level.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-013</scenario>
+    /// <behavior>When typed response parsing fails, raw message, function-call, and MCP list-tools items still map with correct first-message coalescing and raw metadata.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task ResponseMapper_FallbackMapsRawMessagesFunctionCallsAndMcpListTools()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle fallback items.",
+        });
+
+        OpenAiResponsesResponse response = new("resp-raw-mixed", new JsonObject
+        {
+            ["id"] = "resp-raw-mixed",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "reasoning",
+                    ["id"] = "rs_bad",
+                    ["summary"] = new JsonArray("plain-text-summary"),
+                },
+                new JsonObject
+                {
+                    ["type"] = "message",
+                    ["content"] = new JsonArray
+                    {
+                        new JsonObject
+                        {
+                            ["type"] = "output_text",
+                            ["text"] = "first",
+                        },
+                        new JsonObject
+                        {
+                            ["type"] = "output_json",
+                            ["value"] = new JsonObject
+                            {
+                                ["value"] = "first-structured",
+                            },
+                        },
+                    },
+                },
+                new JsonObject
+                {
+                    ["type"] = "message",
+                    ["content"] = new JsonArray
+                    {
+                        new JsonObject
+                        {
+                            ["type"] = "output_text",
+                            ["text"] = "second",
+                        },
+                    },
+                },
+                new JsonObject
+                {
+                    ["type"] = "function_call",
+                    ["id"] = "fc_raw",
+                    ["name"] = "lookup_customer",
+                    ["arguments"] = """{"customer_id":"42"}""",
+                    ["status"] = "completed",
+                    ["approval_required"] = false,
+                },
+                new JsonObject
+                {
+                    ["type"] = "mcp_list_tools",
+                    ["server_label"] = "mail",
+                    ["tools"] = new JsonArray(),
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        Assert.Null(turn.FinalOutput);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.Equal("fc_raw", toolCall.CallId);
+        Assert.Equal("lookup_customer", toolCall.ToolName);
+        Assert.Equal("function", toolCall.ToolType);
+        Assert.Equal("42", toolCall.Arguments?["customer_id"]?.GetValue<string>());
+
+        IReadOnlyList<AgentRunItem> items = Assert.IsAssignableFrom<IReadOnlyList<AgentRunItem>>(turn.Items);
+        Assert.Equal(4, items.Count);
+
+        AgentRunItem firstMessage = Assert.IsType<AgentRunItem>(items[1]);
+        AgentRunItem secondMessage = Assert.IsType<AgentRunItem>(items[2]);
+        AgentRunItem listTools = Assert.IsType<AgentRunItem>(items[3]);
+
+        Assert.Equal(AgentItemTypes.MessageOutput, firstMessage.ItemType);
+        Assert.Equal("first", firstMessage.Text);
+        Assert.Equal("first-structured", firstMessage.Data?["value"]?["value"]?.GetValue<string>());
+
+        Assert.Equal(AgentItemTypes.MessageOutput, secondMessage.ItemType);
+        Assert.Equal("first", secondMessage.Text);
+        Assert.Equal("first-structured", secondMessage.Data?["value"]?["value"]?.GetValue<string>());
+
+        Assert.Equal(AgentItemTypes.McpListTools, listTools.ItemType);
+        Assert.Equal("mcp_list_tools", listTools.Data?["type"]?.GetValue<string>());
+    }
+
+    /// <summary>Raw function-call fallback preserves call-id precedence and explicit approval metadata.</summary>
+    /// <intent>Protect the raw function-call fallback path when malformed sibling items force top-level raw mapping.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-017</scenario>
+    /// <behavior>Raw function-call items prefer `call_id` over `id`, preserve explicit approval flags and reasons, and keep custom tool types.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task ResponseMapper_FallbackPreservesRawFunctionCallMetadata()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle fallback tool calls.",
+        });
+
+        OpenAiResponsesResponse response = new("resp-raw-function-call", new JsonObject
+        {
+            ["id"] = "resp-raw-function-call",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "reasoning",
+                    ["id"] = "rs_bad",
+                    ["summary"] = new JsonArray("plain-text-summary"),
+                },
+                new JsonObject
+                {
+                    ["type"] = "function_call",
+                    ["id"] = "fc_raw_id",
+                    ["call_id"] = "fc_raw_call",
+                    ["name"] = "lookup_customer",
+                    ["arguments"] = """{"customer_id":"42"}""",
+                    ["status"] = "in_progress",
+                    ["approval_required"] = true,
+                    ["approval_reason"] = "manager review required",
+                    ["tool_type"] = "custom_function",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.Equal("fc_raw_call", toolCall.CallId);
+        Assert.Equal("lookup_customer", toolCall.ToolName);
+        Assert.Equal("42", toolCall.Arguments?["customer_id"]?.GetValue<string>());
+        Assert.True(toolCall.RequiresApproval);
+        Assert.Equal("manager review required", toolCall.ApprovalReason);
+        Assert.Equal("custom_function", toolCall.ToolType);
+    }
+
+    /// <summary>Raw tool-call aliases still map when ids are omitted.</summary>
+    /// <intent>Protect the raw `tool_call` alias path and the helper branch that generates fallback call ids.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-018</scenario>
+    /// <behavior>Raw `tool_call` items without ids still map to function tool calls with generated ids, parsed arguments, and default non-approval metadata.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task ResponseMapper_FallbackMapsRawToolCallAliasWithoutIds()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle fallback tool-call aliases.",
+        });
+
+        OpenAiResponsesResponse response = new("resp-raw-tool-call-alias", new JsonObject
+        {
+            ["id"] = "resp-raw-tool-call-alias",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "reasoning",
+                    ["id"] = "rs_bad",
+                    ["summary"] = new JsonArray("plain-text-summary"),
+                },
+                new JsonObject
+                {
+                    ["type"] = "tool_call",
+                    ["name"] = "lookup_customer",
+                    ["arguments"] = """{"customer_id":"42"}""",
+                    ["status"] = "completed",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.False(string.IsNullOrWhiteSpace(toolCall.CallId));
+        Assert.Equal("lookup_customer", toolCall.ToolName);
+        Assert.Equal("42", toolCall.Arguments?["customer_id"]?.GetValue<string>());
+        Assert.False(toolCall.RequiresApproval);
+        Assert.Null(toolCall.ApprovalReason);
+        Assert.Equal("function", toolCall.ToolType);
+    }
+
+    /// <summary>Raw MCP tool-call aliases still map when ids are omitted.</summary>
+    /// <intent>Protect the raw `mcp_tool_call` alias path and its fallback-id generation.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-019</scenario>
+    /// <behavior>Raw `mcp_tool_call` items without ids still map to MCP tool calls with generated ids and parsed arguments.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task ResponseMapper_FallbackMapsRawMcpToolCallAliasWithoutIds()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle fallback MCP aliases.",
+        });
+
+        OpenAiResponsesResponse response = new("resp-raw-mcp-tool-call-alias", new JsonObject
+        {
+            ["id"] = "resp-raw-mcp-tool-call-alias",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "reasoning",
+                    ["id"] = "rs_bad",
+                    ["summary"] = new JsonArray("plain-text-summary"),
+                },
+                new JsonObject
+                {
+                    ["type"] = "mcp_tool_call",
+                    ["name"] = "search_mail",
+                    ["arguments"] = """{"query":"invoice"}""",
+                    ["status"] = "completed",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.False(string.IsNullOrWhiteSpace(toolCall.CallId));
+        Assert.Equal("search_mail", toolCall.ToolName);
+        Assert.Equal("invoice", toolCall.Arguments?["query"]?.GetValue<string>());
+        Assert.False(toolCall.RequiresApproval);
+        Assert.Null(toolCall.ApprovalReason);
+        Assert.Equal("mcp", toolCall.ToolType);
+    }
+
+    /// <summary>Raw-output fallback maps raw MCP approval items even when optional fields are absent.</summary>
+    /// <intent>Protect the raw approval fallback path for approval items that omit ids or reasons.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-014</scenario>
+    /// <behavior>Raw MCP approval items without ids still map to approval-required MCP tool calls with generated call ids and null arguments.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task ResponseMapper_FallbackMapsRawApprovalRequestsWithoutOptionalFields()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle approval fallback items.",
+        });
+
+        OpenAiResponsesResponse response = new("resp-raw-approval", new JsonObject
+        {
+            ["id"] = "resp-raw-approval",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "reasoning",
+                    ["id"] = "rs_bad",
+                    ["summary"] = new JsonArray("plain-text-summary"),
+                },
+                new JsonObject
+                {
+                    ["type"] = "mcp_approval_request",
+                    ["name"] = "delete_message",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.False(string.IsNullOrWhiteSpace(toolCall.CallId));
+        Assert.Equal("delete_message", toolCall.ToolName);
+        Assert.True(toolCall.RequiresApproval);
+        Assert.Equal("mcp", toolCall.ToolType);
+        Assert.Null(toolCall.Arguments);
+        Assert.Null(toolCall.ApprovalReason);
+    }
+
+    /// <summary>The raw unknown streaming helper preserves message text and structured payloads.</summary>
+    /// <intent>Protect the private raw streaming message fallback branch that public parsing does not reach deterministically.</intent>
+    /// <scenario>LIB-OAI-STREAM-NEG-007</scenario>
+    /// <behavior>The unknown streaming helper maps raw message items into message-output run items with extracted text, structured data, and timestamps.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public void TryMapUnknownStreamingOutputItem_MapsRawMessageItems()
+    {
+        JsonObject item = new()
+        {
+            ["type"] = "message",
+            ["content"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "output_text",
+                    ["text"] = "hello",
+                },
+                new JsonObject
+                {
+                    ["type"] = "output_json",
+                    ["value"] = new JsonObject
+                    {
+                        ["value"] = "structured",
+                    },
+                },
+            },
+        };
+
+        AgentRunItem runItem = Assert.IsType<AgentRunItem>(InvokeUnknownStreamingOutputItem("triage", item));
+
+        Assert.Equal(AgentItemTypes.MessageOutput, runItem.ItemType);
+        Assert.Equal("assistant", runItem.Role);
+        Assert.Equal("hello", runItem.Text);
+        Assert.Equal("structured", runItem.Data?["value"]?["value"]?.GetValue<string>());
+        Assert.NotNull(runItem.TimestampUtc);
+    }
+
+    /// <summary>The raw unknown streaming helper preserves reasoning payloads.</summary>
+    /// <intent>Protect the private raw streaming reasoning fallback branch.</intent>
+    /// <scenario>LIB-OAI-STREAM-NEG-008</scenario>
+    /// <behavior>The unknown streaming helper maps raw reasoning items into reasoning run items carrying the original payload.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public void TryMapUnknownStreamingOutputItem_MapsRawReasoningItems()
+    {
+        JsonObject item = new()
+        {
+            ["type"] = "reasoning",
+            ["summary"] = new JsonArray("thinking"),
+        };
+
+        AgentRunItem runItem = Assert.IsType<AgentRunItem>(InvokeUnknownStreamingOutputItem("triage", item));
+
+        Assert.Equal(AgentItemTypes.Reasoning, runItem.ItemType);
+        Assert.Equal(item.ToJsonString(), runItem.Data?.ToJsonString());
+        Assert.NotNull(runItem.TimestampUtc);
+    }
+
+    /// <summary>The raw unknown streaming helper prefers `call_id` over `id` for raw tool calls.</summary>
+    /// <intent>Protect the private raw streaming tool-call fallback branch from regressing call-id precedence.</intent>
+    /// <scenario>LIB-OAI-STREAM-NEG-009</scenario>
+    /// <behavior>The unknown streaming helper maps raw function-call items with `call_id` precedence, parsed arguments, and preserved status.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public void TryMapUnknownStreamingOutputItem_PrefersCallIdForRawFunctionCalls()
+    {
+        JsonObject item = new()
+        {
+            ["type"] = "function_call",
+            ["id"] = "fc_id",
+            ["call_id"] = "fc_call",
+            ["name"] = "lookup_customer",
+            ["arguments"] = new JsonObject
+            {
+                ["customer_id"] = "42",
+            },
+            ["status"] = "completed",
+        };
+
+        AgentRunItem runItem = Assert.IsType<AgentRunItem>(InvokeUnknownStreamingOutputItem("triage", item));
+
+        Assert.Equal(AgentItemTypes.ToolCall, runItem.ItemType);
+        Assert.Equal("assistant", runItem.Role);
+        Assert.Equal("lookup_customer", runItem.Name);
+        Assert.Equal("fc_call", runItem.ToolCallId);
+        Assert.Equal("42", runItem.Data?["customer_id"]?.GetValue<string>());
+        Assert.Equal("completed", runItem.Status);
+        Assert.NotNull(runItem.TimestampUtc);
+    }
+
     private static ValueTask<OpenAiResponsesTurnPlan<TestContext>> CreatePlanAsync(Agent<TestContext> agent)
         => new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
             agent,
@@ -636,6 +1306,24 @@ public sealed class OpenAiResponsesResponseMapperTests
 
     private static OpenAiResponsesResponse CreateTypedResponse(JsonObject raw)
         => new(OpenAiSdkSerialization.ReadModel<ResponseResult>(raw));
+
+    private static OpenAiResponsesResponse CreateTypedResponseWithoutRoundTrip(JsonObject raw)
+    {
+        OpenAiResponsesResponse response = new(raw["id"]?.GetValue<string>() ?? string.Empty, raw.DeepClone() as JsonObject ?? new JsonObject());
+        PropertyInfo resultProperty = typeof(OpenAiResponsesResponse).GetProperty("Result", BindingFlags.Instance | BindingFlags.NonPublic)
+            ?? throw new InvalidOperationException("OpenAiResponsesResponse.Result was not found.");
+
+        resultProperty.SetValue(response, OpenAiSdkSerialization.ReadModel<ResponseResult>(raw));
+        return response;
+    }
+
+    private static AgentRunItem? InvokeUnknownStreamingOutputItem(string agentName, JsonObject item)
+    {
+        MethodInfo method = typeof(OpenAiResponsesResponseMapper).GetMethod("TryMapUnknownStreamingOutputItem", BindingFlags.Static | BindingFlags.NonPublic)
+            ?? throw new InvalidOperationException("OpenAiResponsesResponseMapper.TryMapUnknownStreamingOutputItem was not found.");
+
+        return method.Invoke(null, [agentName, item]) as AgentRunItem;
+    }
 
     private sealed record TestContext(string UserId, string TenantId);
 }
