@@ -150,7 +150,7 @@ public sealed class OpenAiResponsesClient : IOpenAiResponsesClient
         {
         }
 
-        string message = body is null
+        string message = string.IsNullOrWhiteSpace(body)
             ? $"OpenAI Responses API failed to {operation}: {exception.Message}"
             : $"OpenAI Responses API failed to {operation}: {exception.Message}{Environment.NewLine}Response body: {body}";
 

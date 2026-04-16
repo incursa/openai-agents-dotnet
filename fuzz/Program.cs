@@ -40,7 +40,7 @@ public static class Program
     private static void FuzzOpenAiResponses(byte[] input)
     {
         string text = input.Length > 1 ? Encoding.UTF8.GetString(input, 1, input.Length - 1) : string.Empty;
-        JsonObject item = BuildStreamingItem(text, input[0]);
+        JsonObject item = BuildStreamingItem(text);
 
         OpenAiResponsesResponseMapper.TryMapStreamingOutputItem("fuzz-agent", item);
         OpenAiResponsesStreaming.TryGetOutputItem(new OpenAiResponsesStreamEvent("response.output_item.added", new JsonObject
@@ -136,9 +136,45 @@ public static class Program
         return RequestMapper.CreateAsync(request).AsTask().GetAwaiter().GetResult();
     }
 
-    private static JsonObject BuildStreamingItem(string text, byte selector)
-        => (selector & 1) == 0
-            ? new JsonObject
+    private static JsonObject BuildStreamingItem(string text)
+    {
+        char? discriminator = text.Length > 0 ? text[0] : null;
+        string payload = text.Length > 1 ? text[1..] : string.Empty;
+
+        return discriminator switch
+        {
+            'F' => CreateFunctionCallItem(payload, malformedArguments: false),
+            'B' => CreateFunctionCallItem(payload, malformedArguments: true),
+            'R' => new JsonObject
+            {
+                ["type"] = "reasoning",
+                ["id"] = "rs_fuzz",
+                ["summary"] = new JsonArray
+                {
+                    payload,
+                },
+            },
+            'A' => new JsonObject
+            {
+                ["type"] = "mcp_approval_request",
+                ["id"] = "apr_fuzz",
+                ["server_label"] = "mail",
+                ["name"] = SanitizeToolName(payload),
+                ["arguments"] = JsonValue.Create(payload),
+            },
+            'L' => new JsonObject
+            {
+                ["type"] = "mcp_list_tools",
+                ["server_label"] = "mail",
+                ["tools"] = new JsonArray
+                {
+                    new JsonObject
+                    {
+                        ["name"] = SanitizeToolName(payload),
+                    },
+                },
+            },
+            _ => new JsonObject
             {
                 ["type"] = "message",
                 ["content"] = new JsonArray
@@ -149,18 +185,24 @@ public static class Program
                         ["text"] = text,
                     },
                 },
-            }
-            : new JsonObject
-            {
-                ["type"] = "function_call",
-                ["id"] = "fc_fuzz",
-                ["call_id"] = "call_fuzz",
-                ["name"] = SanitizeToolName(text),
-                ["arguments"] = new JsonObject
+            },
+        };
+    }
+
+    private static JsonObject CreateFunctionCallItem(string text, bool malformedArguments)
+        => new()
+        {
+            ["type"] = "function_call",
+            ["id"] = "fc_fuzz",
+            ["call_id"] = "call_fuzz",
+            ["name"] = SanitizeToolName(text),
+            ["arguments"] = malformedArguments
+                ? JsonValue.Create(text)
+                : JsonValue.Create(new JsonObject
                 {
                     ["value"] = text,
-                }.ToJsonString(),
-            };
+                }.ToJsonString()),
+        };
 
     private static string SanitizeToolName(string text)
     {

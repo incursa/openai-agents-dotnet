@@ -9,6 +9,7 @@
     "mutate": [
       "**/OpenAiResponsesClient.cs",
       "**/OpenAiResponsesMapping.cs",
+      "**/OpenAiResponsesResponseMapper.cs",
       "**/OpenAiResponsesRunner.cs",
       "**/OpenAiResponsesStreaming.cs"
     ],

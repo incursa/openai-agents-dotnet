@@ -76,6 +76,102 @@ public sealed class REQ_LIB_OAI_CLIENT_002
         Assert.Contains("forced failure", error.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>The default constructor still targets the documented `v1/responses` endpoint.</summary>
+    /// <intent>Protect the default transport path so the convenience constructor cannot silently drift to a different API route.</intent>
+    /// <scenario>LIB-OAI-CLIENT-005</scenario>
+    /// <behavior>Constructing the client without an explicit path sends requests to the `v1/responses` route under the configured base address.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task OpenAiResponsesClient_DefaultConstructorTargetsV1ResponsesRoute()
+    {
+        RecordingHandler handler = new();
+        HttpClient httpClient = new(handler)
+        {
+            BaseAddress = new Uri("https://example.test/api/"),
+        };
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "test-api-key");
+
+        OpenAiResponsesClient client = new(httpClient);
+
+        OpenAiResponsesResponse response = await client.CreateResponseAsync(new OpenAiResponsesRequest(new CreateResponseOptions
+        {
+            Model = "gpt-5.4",
+        }), CancellationToken.None);
+
+        Assert.Equal("resp-1", response.Id);
+        Assert.Equal(new Uri("https://example.test/api/v1/responses"), handler.LastRequestUri);
+    }
+
+    /// <summary>Null `HttpClient` inputs fail before any SDK setup occurs.</summary>
+    /// <intent>Protect the public constructor null guard so consumers get an immediate argument exception.</intent>
+    /// <scenario>LIB-OAI-CLIENT-006</scenario>
+    /// <behavior>Constructing the client with a null `HttpClient` throws `ArgumentNullException` for `httpClient`.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public void OpenAiResponsesClient_RejectsNullHttpClient()
+    {
+        ArgumentNullException error = Assert.Throws<ArgumentNullException>(() => new OpenAiResponsesClient((HttpClient)null!));
+
+        Assert.Equal("httpClient", error.ParamName);
+    }
+
+    /// <summary>Public client entrypoints reject null requests before touching the network.</summary>
+    /// <intent>Protect the public request guard for both create and stream APIs.</intent>
+    /// <scenario>LIB-OAI-CLIENT-007</scenario>
+    /// <behavior>Passing a null request to the create or stream methods throws `ArgumentNullException` for `request`.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task OpenAiResponsesClient_RejectsNullRequestsOnCreateAndStreamApis()
+    {
+        HttpClient httpClient = new(new PassThroughHandler())
+        {
+            BaseAddress = new Uri("https://example.test/"),
+        };
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "test-api-key");
+
+        OpenAiResponsesClient client = new(httpClient);
+
+        ArgumentNullException createError = await Assert.ThrowsAsync<ArgumentNullException>(() => client.CreateResponseAsync(null!, CancellationToken.None));
+        Assert.Equal("request", createError.ParamName);
+
+        IAsyncEnumerator<OpenAiResponsesStreamEvent> enumerator = client.StreamResponseAsync(null!, CancellationToken.None).GetAsyncEnumerator();
+        try
+        {
+            ArgumentNullException streamError = await Assert.ThrowsAsync<ArgumentNullException>(() => enumerator.MoveNextAsync().AsTask());
+            Assert.Equal("request", streamError.ParamName);
+        }
+        finally
+        {
+            await enumerator.DisposeAsync();
+        }
+    }
+
+    /// <summary>Missing upstream response bodies do not force an empty `Response body:` suffix into the wrapped exception.</summary>
+    /// <intent>Protect the exception surface when the upstream transport fails without a readable body payload.</intent>
+    /// <scenario>LIB-OAI-CLIENT-008</scenario>
+    /// <behavior>Client failures with no response body still include the operation detail but omit the response-body suffix.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task OpenAiResponsesClient_OmitsResponseBodySuffixWhenUpstreamBodyIsMissing()
+    {
+        HttpClient httpClient = new(new EmptyResponseHandler(HttpStatusCode.InternalServerError))
+        {
+            BaseAddress = new Uri("https://example.test/"),
+        };
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "test-api-key");
+
+        OpenAiResponsesClient client = new(httpClient, "v1/responses");
+
+        InvalidOperationException error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            client.CreateResponseAsync(new OpenAiResponsesRequest(new CreateResponseOptions
+            {
+                Model = "gpt-5.4",
+            }), CancellationToken.None));
+
+        Assert.Contains("OpenAI Responses API failed to create response", error.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Response body:", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static Uri ResolveEndpoint(Uri? baseAddress, string responsesPath)
     {
         MethodInfo method = typeof(OpenAiResponsesClient).GetMethod("ResolveEndpoint", BindingFlags.NonPublic | BindingFlags.Static)
@@ -116,5 +212,32 @@ public sealed class REQ_LIB_OAI_CLIENT_002
             {
                 Content = new StringContent(body, Encoding.UTF8, "application/json"),
             });
+    }
+
+    private sealed class EmptyResponseHandler : HttpMessageHandler
+    {
+        private readonly HttpStatusCode statusCode;
+
+        public EmptyResponseHandler(HttpStatusCode statusCode)
+        {
+            this.statusCode = statusCode;
+        }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            => Task.FromResult(new HttpResponseMessage(statusCode));
+    }
+
+    private sealed class RecordingHandler : HttpMessageHandler
+    {
+        public Uri? LastRequestUri { get; private set; }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            LastRequestUri = request.RequestUri;
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("""{"id":"resp-1","output":[]}""", Encoding.UTF8, "application/json"),
+            });
+        }
     }
 }

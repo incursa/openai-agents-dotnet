@@ -43,10 +43,22 @@ public static class OpenAiResponsesStreaming
     {
         item = streamEvent.Update switch
         {
-            StreamingResponseOutputItemAddedUpdate added => OpenAiSdkSerialization.ToJsonObject(added.Item),
-            StreamingResponseOutputItemDoneUpdate done => OpenAiSdkSerialization.ToJsonObject(done.Item),
+            StreamingResponseOutputItemAddedUpdate added => TrySerializeItem(added.Item),
+            StreamingResponseOutputItemDoneUpdate done => TrySerializeItem(done.Item),
             _ => streamEvent.Data["item"] as JsonObject,
         };
         return item is not null;
+    }
+
+    private static JsonObject? TrySerializeItem(ResponseItem item)
+    {
+        try
+        {
+            return OpenAiSdkSerialization.ToJsonObject(item);
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

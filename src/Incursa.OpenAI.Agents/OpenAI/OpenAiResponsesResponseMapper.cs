@@ -13,62 +13,83 @@ internal sealed class OpenAiResponsesResponseMapper
 
     internal AgentTurnResponse<TContext> Map<TContext>(OpenAiResponsesResponse response, OpenAiResponsesTurnPlan<TContext> plan)
     {
-        ResponseResult result = response.Result ?? OpenAiSdkSerialization.ReadModel<ResponseResult>(response.Raw);
         List<AgentToolCall<TContext>> toolCalls = [];
         List<AgentHandoffRequest<TContext>> handoffs = [];
         List<AgentRunItem> items = [];
         string? finalText = null;
         JsonNode? structured = null;
 
-        foreach (ResponseItem outputItem in result.OutputItems)
+        ResponseResult? result = response.Result;
+        if (result is null)
         {
-            switch (outputItem)
+            try
             {
-                case MessageResponseItem message:
-                    JsonObject rawMessage = OpenAiSdkSerialization.ToJsonObject(message);
-                    finalText ??= ExtractText(rawMessage["content"]);
-                    structured ??= ExtractStructured(rawMessage["content"]);
-                    items.Add(new AgentRunItem(AgentItemTypes.MessageOutput, "assistant", plan.EffectiveAgent.Name)
-                    {
-                        Text = finalText,
-                        Data = structured,
-                        TimestampUtc = DateTimeOffset.UtcNow,
-                    });
-                    break;
+                result = OpenAiSdkSerialization.ReadModel<ResponseResult>(response.Raw);
+            }
+            catch
+            {
+            }
+        }
 
-                case ReasoningResponseItem reasoning:
-                    items.Add(MapReasoningItem(plan.EffectiveAgent.Name, reasoning));
-                    break;
+        if (result is not null)
+        {
+            foreach (ResponseItem outputItem in result.OutputItems)
+            {
+                switch (outputItem)
+                {
+                    case MessageResponseItem message:
+                        JsonObject rawMessage = SerializeModelSafely(message, "message");
+                        finalText ??= ExtractText(rawMessage["content"]);
+                        structured ??= ExtractStructured(rawMessage["content"]);
+                        items.Add(new AgentRunItem(AgentItemTypes.MessageOutput, "assistant", plan.EffectiveAgent.Name)
+                        {
+                            Text = finalText,
+                            Data = structured,
+                            TimestampUtc = DateTimeOffset.UtcNow,
+                        });
+                        break;
 
-                case FunctionCallResponseItem functionCall:
-                    MapToolCall(plan, toolCalls, handoffs, functionCall.CallId, functionCall.FunctionName, functionCall.FunctionArguments?.ToString(), OpenAiSdkSerialization.ToJsonObject(functionCall)["status"]?.GetValue<string>(), false, null, "function");
-                    break;
+                    case ReasoningResponseItem reasoning:
+                        items.Add(MapReasoningItem(plan.EffectiveAgent.Name, reasoning));
+                        break;
 
-                case McpToolCallApprovalRequestItem approvalRequest:
-                    toolCalls.Add(new AgentToolCall<TContext>(
-                        approvalRequest.Id ?? Guid.NewGuid().ToString("n"),
-                        approvalRequest.ToolName,
-                        ParseJsonNode(approvalRequest.ToolArguments is null ? null : JsonValue.Create(approvalRequest.ToolArguments.ToString())),
-                        true,
-                        OpenAiSdkSerialization.ToJsonObject(approvalRequest)["approval_reason"]?.GetValue<string>(),
-                        "mcp"));
-                    break;
+                    case FunctionCallResponseItem functionCall:
+                        MapToolCall(plan, toolCalls, handoffs, functionCall.CallId, functionCall.FunctionName, functionCall.FunctionArguments?.ToString(), SerializeModelSafely(functionCall, "function_call")["status"]?.GetValue<string>(), false, null, "function");
+                        break;
 
-                case McpToolCallItem mcpCall:
-                    MapToolCall(plan, toolCalls, handoffs, mcpCall.Id ?? Guid.NewGuid().ToString("n"), mcpCall.ToolName, mcpCall.ToolArguments?.ToString(), OpenAiSdkSerialization.ToJsonObject(mcpCall)["status"]?.GetValue<string>(), false, null, "mcp");
-                    break;
+                    case McpToolCallApprovalRequestItem approvalRequest:
+                        toolCalls.Add(new AgentToolCall<TContext>(
+                            approvalRequest.Id ?? Guid.NewGuid().ToString("n"),
+                            approvalRequest.ToolName,
+                            ParseJsonNode(approvalRequest.ToolArguments is null ? null : JsonValue.Create(approvalRequest.ToolArguments.ToString())),
+                            true,
+                            SerializeModelSafely(approvalRequest, "mcp_approval_request")["approval_reason"]?.GetValue<string>(),
+                            "mcp"));
+                        break;
 
-                case McpToolDefinitionListItem mcpList:
-                    items.Add(new AgentRunItem(AgentItemTypes.McpListTools, "system", plan.EffectiveAgent.Name)
-                    {
-                        Data = OpenAiSdkSerialization.ToJsonObject(mcpList),
-                        TimestampUtc = DateTimeOffset.UtcNow,
-                    });
-                    break;
+                    case McpToolCallItem mcpCall:
+                        MapToolCall(plan, toolCalls, handoffs, mcpCall.Id ?? Guid.NewGuid().ToString("n"), mcpCall.ToolName, mcpCall.ToolArguments?.ToString(), SerializeModelSafely(mcpCall, "mcp_call")["status"]?.GetValue<string>(), false, null, "mcp");
+                        break;
 
-                default:
-                    TryMapUnknownItem(plan, outputItem, toolCalls, handoffs, items, ref finalText, ref structured);
-                    break;
+                    case McpToolDefinitionListItem mcpList:
+                        items.Add(new AgentRunItem(AgentItemTypes.McpListTools, "system", plan.EffectiveAgent.Name)
+                        {
+                            Data = SerializeModelSafely(mcpList, "mcp_list_tools"),
+                            TimestampUtc = DateTimeOffset.UtcNow,
+                        });
+                        break;
+
+                    default:
+                        MapRawOutputItem(plan, SerializeModelSafely(outputItem, "unknown"), toolCalls, handoffs, items, ref finalText, ref structured);
+                        break;
+                }
+            }
+        }
+        else if (response.Raw["output"] is JsonArray rawOutput)
+        {
+            foreach (JsonObject rawItem in rawOutput.OfType<JsonObject>())
+            {
+                MapRawOutputItem(plan, rawItem, toolCalls, handoffs, items, ref finalText, ref structured);
             }
         }
 
@@ -88,7 +109,15 @@ internal sealed class OpenAiResponsesResponseMapper
 
     internal static AgentRunItem? TryMapStreamingOutputItem(string agentName, JsonObject item)
     {
-        ResponseItem typedItem = OpenAiSdkSerialization.ReadModel<ResponseItem>(item);
+        ResponseItem typedItem;
+        try
+        {
+            typedItem = OpenAiSdkSerialization.ReadModel<ResponseItem>(item);
+        }
+        catch
+        {
+            return TryMapUnknownStreamingOutputItem(agentName, item);
+        }
 
         return typedItem switch
         {
@@ -152,16 +181,15 @@ internal sealed class OpenAiResponsesResponseMapper
             toolType));
     }
 
-    private static void TryMapUnknownItem<TContext>(
+    private static void MapRawOutputItem<TContext>(
         OpenAiResponsesTurnPlan<TContext> plan,
-        ResponseItem outputItem,
+        JsonObject rawItem,
         List<AgentToolCall<TContext>> toolCalls,
         List<AgentHandoffRequest<TContext>> handoffs,
         List<AgentRunItem> items,
         ref string? finalText,
         ref JsonNode? structured)
     {
-        JsonObject rawItem = OpenAiSdkSerialization.ToJsonObject(outputItem);
         string? type = rawItem["type"]?.GetValue<string>();
 
         switch (type)
@@ -180,7 +208,7 @@ internal sealed class OpenAiResponsesResponseMapper
             case "reasoning":
                 items.Add(new AgentRunItem(AgentItemTypes.Reasoning, "assistant", plan.EffectiveAgent.Name)
                 {
-                    Data = rawItem,
+                    Data = rawItem.DeepClone(),
                     TimestampUtc = DateTimeOffset.UtcNow,
                 });
                 break;
@@ -189,10 +217,24 @@ internal sealed class OpenAiResponsesResponseMapper
                 MapToolCall(plan, toolCalls, handoffs, rawItem["call_id"]?.GetValue<string>() ?? rawItem["id"]?.GetValue<string>(), rawItem["name"]?.GetValue<string>() ?? string.Empty, rawItem["arguments"]?.GetValue<string>(), rawItem["status"]?.GetValue<string>(), rawItem["approval_required"]?.GetValue<bool>() ?? false, rawItem["approval_reason"]?.GetValue<string>(), rawItem["tool_type"]?.GetValue<string>() ?? "function");
                 break;
 
+            case "mcp_approval_request":
+                toolCalls.Add(new AgentToolCall<TContext>(
+                    rawItem["id"]?.GetValue<string>() ?? Guid.NewGuid().ToString("n"),
+                    rawItem["name"]?.GetValue<string>() ?? string.Empty,
+                    ParseJsonNode(rawItem["arguments"]),
+                    true,
+                    rawItem["approval_reason"]?.GetValue<string>(),
+                    "mcp"));
+                break;
+
+            case "mcp_call" or "mcp_tool_call":
+                MapToolCall(plan, toolCalls, handoffs, rawItem["id"]?.GetValue<string>() ?? Guid.NewGuid().ToString("n"), rawItem["name"]?.GetValue<string>() ?? string.Empty, rawItem["arguments"]?.GetValue<string>(), rawItem["status"]?.GetValue<string>(), false, null, "mcp");
+                break;
+
             case "mcp_list_tools":
                 items.Add(new AgentRunItem(AgentItemTypes.McpListTools, "system", plan.EffectiveAgent.Name)
                 {
-                    Data = rawItem,
+                    Data = rawItem.DeepClone(),
                     TimestampUtc = DateTimeOffset.UtcNow,
                 });
                 break;
@@ -235,9 +277,24 @@ internal sealed class OpenAiResponsesResponseMapper
     private static AgentRunItem MapReasoningItem(string agentName, ReasoningResponseItem item)
         => new(AgentItemTypes.Reasoning, "assistant", agentName)
         {
-            Data = OpenAiSdkSerialization.ToJsonObject(item),
+            Data = SerializeModelSafely(item, "reasoning"),
             TimestampUtc = DateTimeOffset.UtcNow,
         };
+
+    private static JsonObject SerializeModelSafely<T>(T value, string fallbackType)
+    {
+        try
+        {
+            return OpenAiSdkSerialization.ToJsonObject(value);
+        }
+        catch
+        {
+            return new JsonObject
+            {
+                ["type"] = fallbackType,
+            };
+        }
+    }
 
     private static string? ExtractText(JsonNode? content)
     {

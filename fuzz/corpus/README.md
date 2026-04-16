@@ -15,6 +15,15 @@ Each seed is a UTF-8 text file.
 - Even first-byte values exercise the OpenAI Responses path.
 - Odd first-byte values exercise the MCP path.
 
+For OpenAI seeds, an optional second character can force the response-item shape:
+
+- `M` -> message output
+- `F` -> function call with valid JSON arguments
+- `B` -> function call with malformed arguments
+- `R` -> reasoning item
+- `A` -> MCP approval request
+- `L` -> MCP tool-list item
+
 For the MCP seeds, the first character also selects the mock HTTP status:
 
 - `1` -> `200 OK`
