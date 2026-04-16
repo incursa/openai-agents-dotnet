@@ -1,9 +1,14 @@
+#pragma warning disable SCME0001
+
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Reflection;
 using Incursa.OpenAI.Agents;
 using Incursa.OpenAI.Agents.Mcp;
+using System.ClientModel.Primitives;
 using SharpFuzz;
 
 namespace Incursa.OpenAI.Agents.Fuzz;
@@ -13,6 +18,8 @@ public static class Program
     private static readonly OpenAiResponsesRequestMapper RequestMapper = new();
     private static readonly OpenAiResponsesResponseMapper ResponseMapper = new();
     private static readonly OpenAiResponsesTurnPlan<TestContext> Plan = CreatePlan();
+    private static readonly MethodInfo ApplyJsonPatchValueMethod = typeof(OpenAiResponsesRequestMapper).GetMethod("ApplyJsonPatchValue", BindingFlags.NonPublic | BindingFlags.Static)
+        ?? throw new InvalidOperationException("OpenAiResponsesRequestMapper.ApplyJsonPatchValue was not found.");
 
     public static void Main(string[] args)
     {
@@ -27,13 +34,67 @@ public static class Program
             return;
         }
 
-        if ((input[0] & 1) == 0)
+        if (input[0] == (byte)'Q')
+        {
+            FuzzRequestMapping(input);
+        }
+        else if ((input[0] & 1) == 0)
         {
             FuzzOpenAiResponses(input);
         }
         else
         {
             FuzzMcpClient(input);
+        }
+    }
+
+    private static void FuzzRequestMapping(byte[] input)
+    {
+        string text = input.Length > 1 ? Encoding.UTF8.GetString(input, 1, input.Length - 1) : string.Empty;
+        char? discriminator = text.Length > 0 ? text[0] : null;
+        string payload = text.Length > 1 ? text[1..] : string.Empty;
+
+        switch (discriminator)
+        {
+            case 'D':
+                SerializeRequest(CreatePlan(new Agent<TestContext>
+                {
+                    Name = "fuzz",
+                    Model = "gpt-5.4",
+                    Instructions = "Exercise request mapping.",
+                    ModelSettings = new Dictionary<string, object?>(StringComparer.Ordinal)
+                    {
+                        ["custom_large_double"] = 1e100d,
+                    },
+                }));
+                break;
+            case 'H':
+                SerializeRequest(CreatePlan(new Agent<TestContext>
+                {
+                    Name = "fuzz",
+                    Model = "gpt-5.4",
+                    Instructions = "Exercise request mapping.",
+                    HostedMcpTools =
+                    [
+                        new HostedMcpToolDefinition(SanitizeToolName(payload)),
+                    ],
+                }));
+                break;
+            case 'U':
+                JsonPatch patch = new(Array.Empty<byte>());
+                object?[] parameters =
+                [
+                    patch,
+                    "$.custom_uri",
+                    JsonValue.Create(new Uri($"https://example.test/{SanitizeToolName(payload).ToLowerInvariant()}")),
+                ];
+
+                ApplyJsonPatchValueMethod.Invoke(null, parameters);
+                _ = parameters[0]?.ToString();
+                break;
+            default:
+                SerializeRequest(CreatePlan());
+                break;
         }
     }
 
@@ -115,9 +176,9 @@ public static class Program
         }
     }
 
-    private static OpenAiResponsesTurnPlan<TestContext> CreatePlan()
+    private static OpenAiResponsesTurnPlan<TestContext> CreatePlan(Agent<TestContext>? agent = null)
     {
-        Agent<TestContext> agent = new()
+        agent ??= new Agent<TestContext>
         {
             Name = "fuzz",
             Model = "gpt-5.4",
@@ -134,6 +195,18 @@ public static class Program
             ]);
 
         return RequestMapper.CreateAsync(request).AsTask().GetAwaiter().GetResult();
+    }
+
+    private static void SerializeRequest(OpenAiResponsesTurnPlan<TestContext> plan)
+    {
+        using HttpClient httpClient = new(new ResponsesHandler())
+        {
+            BaseAddress = new Uri("https://example.test/"),
+        };
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "fuzz-key");
+
+        OpenAiResponsesClient client = new(httpClient, "v1/responses");
+        client.CreateResponseAsync(new OpenAiResponsesRequest(plan.Options)).GetAwaiter().GetResult();
     }
 
     private static JsonObject BuildStreamingItem(string text)
@@ -237,6 +310,17 @@ public static class Program
             return Task.FromResult(new HttpResponseMessage(status)
             {
                 Content = new StringContent(payload, Encoding.UTF8, "application/json"),
+            });
+        }
+    }
+
+    private sealed class ResponsesHandler : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("""{"id":"resp-fuzz","output":[]}""", Encoding.UTF8, "application/json"),
             });
         }
     }

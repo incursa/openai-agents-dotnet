@@ -6,6 +6,7 @@ This project contains the SharpFuzz harnesses for parser-facing and wire-facing 
 
 - Feed arbitrary byte sequences into the OpenAI Responses item mapping helpers.
 - Exercise streamed-response helper methods against malformed and unusual payloads.
+- Exercise request-mapper model-setting and hosted-MCP serialization paths against unusual inputs.
 - Exercise streamable MCP discovery and tool-call handling against arbitrary response bodies.
 - Fail fast on unexpected exceptions while allowing ordinary rejection paths.
 

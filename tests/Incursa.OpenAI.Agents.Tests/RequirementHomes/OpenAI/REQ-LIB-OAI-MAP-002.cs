@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Reflection;
 using Incursa.OpenAI.Agents;
 using Incursa.OpenAI.Agents.Mcp;
 using System.ClientModel.Primitives;
@@ -907,6 +908,118 @@ public sealed class REQ_LIB_OAI_MAP_002
         Assert.Equal("connector-1", hostedTool.ConnectorId);
         Assert.Equal("Bearer token", hostedTool.AuthorizationToken);
         Assert.Equal("Hosted mail connector", hostedTool.ServerDescription);
+    }
+
+    /// <summary>Very large finite doubles survive model-setting patch serialization.</summary>
+    /// <intent>Protect the request-mapper numeric branch that uses the JsonPatch double overload for values outside decimal precision.</intent>
+    /// <scenario>LIB-OAI-MAP-002N</scenario>
+    /// <behavior>Finite doubles that cannot round-trip through decimal still reach the wire body as doubles instead of being dropped.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_SerializesLargeFiniteDoubleModelSettingsOntoTheWire()
+    {
+        Agent<TestContext> triage = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle mail",
+            ModelSettings = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["custom_large_double"] = 1e100d,
+            },
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            triage,
+            new TestContext("user-1", "tenant-1"),
+            "session-large-double",
+            6,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "Need mail help" },
+            ],
+            "Need mail help",
+            null,
+            null));
+
+        RecordingHandler handler = new();
+        using HttpClient httpClient = new(handler)
+        {
+            BaseAddress = new Uri("https://example.test/"),
+        };
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "test-key");
+
+        OpenAiResponsesClient client = new(httpClient, "v1/responses");
+        await client.CreateResponseAsync(new OpenAiResponsesRequest(plan.Options), CancellationToken.None);
+
+        JsonObject body = JsonNode.Parse(handler.Body)?.AsObject()
+            ?? throw new InvalidOperationException("The captured request body was not valid JSON.");
+
+        Assert.Equal(1e100d, body["custom_large_double"]?.GetValue<double>());
+    }
+
+    /// <summary>Connectorless hosted MCP definitions still map through the empty-connector fallback path.</summary>
+    /// <intent>Protect the hosted-MCP constructor fallback used when a definition only supplies a server label.</intent>
+    /// <scenario>LIB-OAI-MAP-002O</scenario>
+    /// <behavior>Hosted MCP definitions without a server URL or connector id produce a tool with an empty relative server URI and no connector id.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task RequestMapper_UsesEmptyHostedMcpFallbackWhenNoServerConfigurationIsProvided()
+    {
+        Agent<TestContext> agent = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle hosted MCP tools.",
+            HostedMcpTools =
+            [
+                new HostedMcpToolDefinition("mail"),
+            ],
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            agent,
+            new TestContext("user-1", "tenant-1"),
+            "session-empty-hosted",
+            1,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "hello" },
+            ],
+            "hello",
+            null,
+            null));
+
+        McpTool hostedTool = Assert.Single(plan.Options.Tools.OfType<McpTool>());
+
+        Assert.True(hostedTool.ConnectorId.HasValue);
+        Assert.Equal(string.Empty, hostedTool.ConnectorId.ToString());
+        Assert.Null(hostedTool.ServerUri);
+    }
+
+    /// <summary>Unrecognized JsonValue primitives are written as raw JSON patch payloads.</summary>
+    /// <intent>Protect the private raw-json fallback so uncommon JsonValue primitive types are not silently dropped.</intent>
+    /// <scenario>LIB-OAI-MAP-002P</scenario>
+    /// <behavior>When ApplyJsonPatchValue receives a JsonValue primitive that does not map to string, bool, or known numeric overloads, it writes the node's raw JSON payload into the patch.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public void RequestMapper_ApplyJsonPatchValue_WritesRawJsonForUnrecognizedJsonValuePrimitives()
+    {
+        JsonPatch patch = new(Array.Empty<byte>());
+        MethodInfo method = typeof(OpenAiResponsesRequestMapper).GetMethod("ApplyJsonPatchValue", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new InvalidOperationException("OpenAiResponsesRequestMapper.ApplyJsonPatchValue was not found.");
+
+        object?[] parameters =
+        [
+            patch,
+            "$.custom_uri",
+            JsonValue.Create(new Uri("https://example.test/a")),
+        ];
+
+        method.Invoke(null, parameters);
+
+        JsonPatch updatedPatch = Assert.IsType<JsonPatch>(parameters[0]);
+        string patchText = updatedPatch.ToString();
+        Assert.Contains("/custom_uri", patchText, StringComparison.Ordinal);
+        Assert.Contains("https://example.test/a", patchText, StringComparison.Ordinal);
     }
 
     private static string? ReadReasoningSummary(ReasoningResponseItem reasoning)
