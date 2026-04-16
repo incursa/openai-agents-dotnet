@@ -15,6 +15,17 @@ namespace Incursa.OpenAI.Agents.Tests;
 /// <summary>Request mapping preserves the OpenAI Responses turn shape for public consumption.</summary>
 public sealed class REQ_LIB_OAI_MAP_002
 {
+    private static readonly JsonObject ExampleOutputSchema = new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["value"] = new JsonObject { ["type"] = "string" },
+        },
+        ["required"] = new JsonArray("value"),
+        ["additionalProperties"] = false,
+    };
+
     /// <summary>Request mapping preserves request metadata, tool schemas, handoff translation, hosted MCP translation, and model-setting patches.</summary>
     /// <intent>Protect the public request shape that is sent to the OpenAI Responses API.</intent>
     /// <scenario>LIB-OAI-MAP-002</scenario>
@@ -259,7 +270,7 @@ public sealed class REQ_LIB_OAI_MAP_002
         Assert.Equal("inner", customObject["nested_text"]?.GetValue<string>());
         Assert.False(customObject["nested_flag"]?.GetValue<bool>() ?? true);
         Assert.Equal(7, customObject["nested_count"]?.GetValue<int>());
-        Assert.NotNull(customObject["nested_fallback"]);
+        Assert.Equal(12345678901234567000m, customObject["nested_fallback"]?.GetValue<decimal>());
 
         JsonArray customArray = Assert.IsType<JsonArray>(body["custom_array"]);
         Assert.Equal("alpha", customArray[0]?.GetValue<string>());
@@ -413,6 +424,8 @@ public sealed class REQ_LIB_OAI_MAP_002
         Assert.Contains("transfer_to_mail_specialist", plan.HandoffMap.Keys);
         Assert.DoesNotContain("route_to_calendar", plan.HandoffMap.Keys);
         Assert.Contains("Fallback mail handoff description.", handoffJson.ToJsonString());
+        Assert.Contains("\"type\":\"object\"", handoffJson.ToJsonString());
+        Assert.Contains("\"properties\":{}", handoffJson.ToJsonString());
         Assert.Contains("\"additionalProperties\":true", handoffJson.ToJsonString());
     }
 
@@ -442,6 +455,7 @@ public sealed class REQ_LIB_OAI_MAP_002
                 new AgentConversationItem(AgentItemTypes.ToolCall, "assistant", "triage") { Name = "lookup_customer", ToolCallId = "call-1", Data = new JsonObject { ["customer_id"] = "42" } },
                 new AgentConversationItem(AgentItemTypes.HandoffRequested, "assistant", "triage") { Name = "mail", Text = "delegate", Data = new JsonObject { ["topic"] = "mail" } },
                 new AgentConversationItem(AgentItemTypes.HandoffOccurred, "system", "delegate") { Name = "mail", Text = "delegate", Data = new JsonObject { ["topic"] = "mail" } },
+                new AgentConversationItem(AgentItemTypes.MessageOutput, "assistant", "delegate") { Text = "later message", Data = new JsonObject { ["topic"] = "wrong" } },
             ],
             null,
             "resp-1",
@@ -459,7 +473,7 @@ public sealed class REQ_LIB_OAI_MAP_002
         Assert.Equal("triage", captured!.CurrentAgentName);
         Assert.Equal("delegate", captured.TargetAgentName);
         Assert.Equal("mail", captured.Arguments?["topic"]?.GetValue<string>());
-        Assert.Equal(4, plan.Options.InputItems.Count);
+        Assert.Equal(5, plan.Options.InputItems.Count);
     }
 
     /// <summary>Conversation items preserve roles, fallback raw item fields, tool defaults, and reasoning normalization.</summary>
@@ -522,17 +536,19 @@ public sealed class REQ_LIB_OAI_MAP_002
 
         Assert.Equal("assistant", assistantMessage["role"]?.GetValue<string>());
         Assert.Equal("output_text", assistantMessage["content"]?[0]?["type"]?.GetValue<string>());
+        Assert.Equal("assistant reply", assistantMessage["content"]?[0]?["text"]?.GetValue<string>());
         Assert.Equal("system", systemMessage["role"]?.GetValue<string>());
         Assert.Equal("input_text", systemMessage["content"]?[0]?["type"]?.GetValue<string>());
+        Assert.Equal("system note", systemMessage["content"]?[0]?["text"]?.GetValue<string>());
         Assert.Equal("developer", developerMessage["role"]?.GetValue<string>());
         Assert.Equal("user", userMessage["role"]?.GetValue<string>());
 
-        Assert.False(string.IsNullOrWhiteSpace(toolCall["call_id"]?.GetValue<string>()));
+        Assert.Matches("^[0-9a-f]{32}$", toolCall["call_id"]?.GetValue<string>() ?? string.Empty);
         Assert.Equal(string.Empty, toolCall["name"]?.GetValue<string>());
         Assert.Equal("{}", toolCall["arguments"]?.GetValue<string>());
         Assert.Equal("completed", toolCall["status"]?.GetValue<string>());
 
-        Assert.False(string.IsNullOrWhiteSpace(toolOutput["call_id"]?.GetValue<string>()));
+        Assert.Matches("^[0-9a-f]{32}$", toolOutput["call_id"]?.GetValue<string>() ?? string.Empty);
         Assert.Equal("""{"result":"ok"}""", toolOutput["output"]?.GetValue<string>());
         Assert.Equal("completed", toolOutput["status"]?.GetValue<string>());
 
@@ -540,6 +556,7 @@ public sealed class REQ_LIB_OAI_MAP_002
         Assert.Equal(ReasoningStatus.Completed, reasoning.Status);
         Assert.Equal("enc-value", reasoning.EncryptedContent);
         Assert.Equal(string.Empty, ReadReasoningSummary(reasoning));
+        Assert.Equal("reasoning", OpenAiSdkSerialization.ToJsonObject(reasoning)["type"]?.GetValue<string>());
 
         Assert.Equal("custom_item", rawItem["type"]?.GetValue<string>());
         Assert.Equal("tool", rawItem["role"]?.GetValue<string>());
@@ -607,6 +624,289 @@ public sealed class REQ_LIB_OAI_MAP_002
         Assert.Equal("never", connectorToolJson["require_approval"]?.GetValue<string>());
         Assert.Equal("connector-2", connectorTool.ConnectorId);
         Assert.Null(connectorToolJson["approval_reason"]);
+    }
+
+    /// <summary>Explicit handoff schemas and fallback output-contract details survive request mapping.</summary>
+    /// <intent>Protect the fallback branches that synthesize transfer descriptions and structured-output names while preserving caller-supplied handoff schemas.</intent>
+    /// <scenario>LIB-OAI-MAP-002I</scenario>
+    /// <behavior>Handoffs without descriptions fall back to a transfer message, explicit handoff schemas are preserved, and unnamed structured outputs use the default OpenAI schema name in strict mode.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_UsesTransferFallbackDescriptionAndStructuredOutputDefaults()
+    {
+        JsonObject handoffSchema = new()
+        {
+            ["type"] = "object",
+            ["properties"] = new JsonObject
+            {
+                ["ticket_id"] = new JsonObject { ["type"] = "string" },
+            },
+            ["required"] = new JsonArray("ticket_id"),
+            ["additionalProperties"] = false,
+        };
+
+        Agent<TestContext> mailAgent = new()
+        {
+            Name = "mail specialist",
+            Model = "gpt-5.4",
+            Instructions = "Handle mail",
+        };
+
+        Agent<TestContext> triage = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Route work",
+            Handoffs =
+            [
+                new AgentHandoff<TestContext>
+                {
+                    Name = "mail",
+                    TargetAgent = mailAgent,
+                    InputSchema = handoffSchema,
+                },
+            ],
+            OutputContract = new AgentOutputContract(ExampleOutputSchema, null, null),
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            triage,
+            new TestContext("user-1", "tenant-1"),
+            "session-structured-output",
+            1,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "help" },
+            ],
+            "help",
+            null,
+            null));
+
+        FunctionTool handoffTool = Assert.Single(plan.Options.Tools.OfType<FunctionTool>());
+        JsonObject handoffJson = OpenAiSdkSerialization.ToJsonObject(handoffTool);
+        JsonObject textFormatJson = OpenAiSdkSerialization.ToJsonObject(plan.Options.TextOptions!.TextFormat);
+        string handoffToolText = handoffJson.ToJsonString();
+
+        Assert.Contains("\"ticket_id\"", handoffToolText);
+        Assert.Contains("\"additionalProperties\":false", handoffToolText);
+        Assert.Contains("Transfer to mail specialist.", handoffToolText);
+        Assert.Equal(ResponseTextFormatKind.JsonSchema, plan.Options.TextOptions.TextFormat.Kind);
+        Assert.Equal("structured_output", textFormatJson["name"]?.GetValue<string>());
+        Assert.Equal(ExampleOutputSchema.ToJsonString(), textFormatJson["schema"]?.ToJsonString());
+        Assert.True(textFormatJson["strict"]?.GetValue<bool>() ?? false);
+    }
+
+    /// <summary>Conversation item mapping preserves explicit tool-call fields, empty message text fallbacks, and reasoning normalization details.</summary>
+    /// <intent>Protect item-level fallback branches so generated defaults only apply when callers omit values.</intent>
+    /// <scenario>LIB-OAI-MAP-002J</scenario>
+    /// <behavior>Message items map null text to empty strings, tool calls and outputs preserve explicit identifiers and payloads, and reasoning items keep non-blank ids while ignoring whitespace-only summary entries.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_PreservesExplicitConversationItemFieldsAndWhitespaceReasoningRules()
+    {
+        Agent<TestContext> agent = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle requests.",
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            agent,
+            new TestContext("user-1", "tenant-1"),
+            "session-explicit-items",
+            1,
+            [
+                new AgentConversationItem(AgentItemTypes.MessageOutput, "assistant", "triage"),
+                new AgentConversationItem(AgentItemTypes.FinalOutput, "system", "triage"),
+                new AgentConversationItem(AgentItemTypes.ToolCall, "assistant", "triage")
+                {
+                    ToolCallId = "call-123",
+                    Name = "lookup_customer",
+                    Data = new JsonObject { ["customer_id"] = "42" },
+                    Status = "completed",
+                },
+                new AgentConversationItem(AgentItemTypes.ToolOutput, "tool", "triage")
+                {
+                    ToolCallId = "call-123",
+                    Text = "customer-42",
+                    Data = new JsonObject { ["result"] = "ignored" },
+                    Status = "completed",
+                },
+                new AgentConversationItem(AgentItemTypes.Reasoning, "assistant", "triage"),
+                new AgentConversationItem(AgentItemTypes.Reasoning, "assistant", "triage")
+                {
+                    Data = new JsonObject
+                    {
+                        ["id"] = "rs_123",
+                        ["status"] = "completed",
+                        ["summary"] = new JsonArray(
+                            "first line",
+                            "   ",
+                            new JsonObject { ["text"] = "second line" },
+                            new JsonObject { ["text"] = "   " }),
+                    },
+                },
+            ],
+            null,
+            null,
+            null));
+
+        JsonObject assistantMessage = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[0]);
+        JsonObject systemMessage = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[1]);
+        JsonObject toolCall = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[2]);
+        JsonObject toolOutput = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[3]);
+        ReasoningResponseItem defaultReasoning = Assert.IsType<ReasoningResponseItem>(plan.Options.InputItems[4]);
+        ReasoningResponseItem explicitReasoning = Assert.IsType<ReasoningResponseItem>(plan.Options.InputItems[5]);
+
+        Assert.Equal(string.Empty, assistantMessage["content"]?[0]?["text"]?.GetValue<string>());
+        Assert.Equal(string.Empty, systemMessage["content"]?[0]?["text"]?.GetValue<string>());
+
+        Assert.Equal("call-123", toolCall["call_id"]?.GetValue<string>());
+        Assert.Equal("lookup_customer", toolCall["name"]?.GetValue<string>());
+        Assert.Equal("""{"customer_id":"42"}""", toolCall["arguments"]?.GetValue<string>());
+        Assert.Equal("completed", toolCall["status"]?.GetValue<string>());
+
+        Assert.Equal("call-123", toolOutput["call_id"]?.GetValue<string>());
+        Assert.Equal("customer-42", toolOutput["output"]?.GetValue<string>());
+        Assert.Equal("completed", toolOutput["status"]?.GetValue<string>());
+
+        Assert.Null(defaultReasoning.Id);
+        Assert.Equal(string.Empty, ReadReasoningSummary(defaultReasoning));
+        Assert.Equal("rs_123", explicitReasoning.Id);
+        Assert.Equal(ReasoningStatus.Completed, explicitReasoning.Status);
+        Assert.Equal(string.Join(Environment.NewLine, ["first line", "second line"]), ReadReasoningSummary(explicitReasoning));
+        Assert.Equal("reasoning", OpenAiSdkSerialization.ToJsonObject(defaultReasoning)["type"]?.GetValue<string>());
+    }
+
+    /// <summary>Missing tool-call values generate compact OpenAI identifiers and empty tool-output text.</summary>
+    /// <intent>Protect the fallback branches that synthesize OpenAI-compatible call ids and blank tool output when no payload is present.</intent>
+    /// <scenario>LIB-OAI-MAP-002M</scenario>
+    /// <behavior>Missing tool-call ids use 32-character lowercase hex values, and tool-output items with no text or data map to an empty string.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_GeneratesCompactIdsAndEmptyToolOutputsForMissingValues()
+    {
+        Agent<TestContext> agent = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle requests.",
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            agent,
+            new TestContext("user-1", "tenant-1"),
+            "session-generated-ids",
+            1,
+            [
+                new AgentConversationItem(AgentItemTypes.ToolCall, "assistant", "triage"),
+                new AgentConversationItem(AgentItemTypes.ToolOutput, "tool", "triage"),
+            ],
+            null,
+            null,
+            null));
+
+        JsonObject generatedToolCall = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[0]);
+        JsonObject generatedToolOutput = OpenAiSdkSerialization.ToJsonObject(plan.Options.InputItems[1]);
+
+        Assert.Matches("^[0-9a-f]{32}$", generatedToolCall["call_id"]?.GetValue<string>() ?? string.Empty);
+        Assert.Equal(string.Empty, generatedToolCall["name"]?.GetValue<string>());
+        Assert.Equal("{}", generatedToolCall["arguments"]?.GetValue<string>());
+        Assert.Matches("^[0-9a-f]{32}$", generatedToolOutput["call_id"]?.GetValue<string>() ?? string.Empty);
+        Assert.Equal(string.Empty, generatedToolOutput["output"]?.GetValue<string>());
+    }
+
+    /// <summary>Handoff normalization stays disabled unless the current agent actually received a handoff occurrence.</summary>
+    /// <intent>Protect the negative normalization path so unrelated handoff events do not rewrite the model-visible conversation.</intent>
+    /// <scenario>LIB-OAI-MAP-002K</scenario>
+    /// <behavior>When the current agent does not appear on a handoff-occurred item, normalization does not run and the original conversation remains intact.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task RequestMapper_DoesNotNormalizeWithoutMatchingTargetHandoff()
+    {
+        bool transformerInvoked = false;
+
+        Agent<TestContext> delegateAgent = new()
+        {
+            Name = "delegate",
+            Model = "gpt-5.4",
+            Instructions = "Handle delegated work.",
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            delegateAgent,
+            new TestContext("user-1", "tenant-1"),
+            "session-no-handoff",
+            2,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "delegate") { Text = "help" },
+                new AgentConversationItem(AgentItemTypes.ToolCall, "assistant", "delegate")
+                {
+                    ToolCallId = "call-keep",
+                    Name = "lookup_customer",
+                    Data = new JsonObject { ["customer_id"] = "42" },
+                },
+                new AgentConversationItem(AgentItemTypes.HandoffOccurred, "system", "other-agent")
+                {
+                    Name = "mail",
+                    Text = "delegate",
+                    Data = new JsonObject { ["topic"] = "mail" },
+                },
+            ],
+            null,
+            "resp-1",
+            new AgentRunOptions<TestContext>
+            {
+                HandoffHistoryMode = AgentHandoffHistoryMode.NormalizeModelInputAfterHandoff,
+                HandoffHistoryTransformerAsync = (_, _) =>
+                {
+                    transformerInvoked = true;
+                    return ValueTask.FromResult<IReadOnlyList<AgentConversationItem>>([]);
+                },
+            }));
+
+        Assert.False(transformerInvoked);
+        FunctionCallResponseItem preservedToolCall = Assert.IsType<FunctionCallResponseItem>(Assert.Single(plan.Options.InputItems, item => item is FunctionCallResponseItem));
+        Assert.Equal("call-keep", OpenAiSdkSerialization.ToJsonObject(preservedToolCall)["call_id"]?.GetValue<string>());
+    }
+
+    /// <summary>Hosted MCP mapping prefers server URLs when they are present and still keeps connector metadata.</summary>
+    /// <intent>Protect the hosted-MCP branch that selects URL-backed tools instead of connector-only fallbacks.</intent>
+    /// <scenario>LIB-OAI-MAP-002L</scenario>
+    /// <behavior>When a hosted MCP definition supplies a server URL, the mapped tool keeps the URL path while also preserving connector metadata and description.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RequestMapper_PrefersHostedServerUrlsWhenAvailable()
+    {
+        Agent<TestContext> agent = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle hosted MCP tools.",
+            HostedMcpTools =
+            [
+                new HostedMcpToolDefinition("mail", new Uri("https://mail.example.test/mcp"), "connector-1", "Bearer token", false, null, null, "Hosted mail connector"),
+            ],
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            agent,
+            new TestContext("user-1", "tenant-1"),
+            "session-server-url",
+            1,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "hello" },
+            ],
+            "hello",
+            null,
+            null));
+
+        McpTool hostedTool = Assert.Single(plan.Options.Tools.OfType<McpTool>());
+
+        Assert.Equal(new Uri("https://mail.example.test/mcp"), hostedTool.ServerUri);
+        Assert.Equal("connector-1", hostedTool.ConnectorId);
+        Assert.Equal("Bearer token", hostedTool.AuthorizationToken);
+        Assert.Equal("Hosted mail connector", hostedTool.ServerDescription);
     }
 
     private static string? ReadReasoningSummary(ReasoningResponseItem reasoning)
