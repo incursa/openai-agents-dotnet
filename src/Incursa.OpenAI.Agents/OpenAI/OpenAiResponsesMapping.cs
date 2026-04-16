@@ -322,6 +322,9 @@ internal sealed class OpenAiResponsesRequestMapper
             case JsonValue value when value.TryGetValue<long>(out long int64):
                 patch.Set(jsonPath, int64);
                 return;
+            case JsonValue value when value.TryGetValue<decimal>(out decimal preciseNumber):
+                patch.Set(jsonPath, preciseNumber);
+                return;
             case JsonValue value when value.TryGetValue<double>(out double number):
                 patch.Set(jsonPath, number);
                 return;
@@ -332,7 +335,7 @@ internal sealed class OpenAiResponsesRequestMapper
                 }
                 return;
             default:
-                patch.Set(jsonPath, node.ToJsonString(SerializerOptions));
+                patch.Set(jsonPath, BinaryData.FromString(node.ToJsonString(SerializerOptions)));
                 return;
         }
     }

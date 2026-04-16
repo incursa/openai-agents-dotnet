@@ -270,7 +270,7 @@ public sealed class REQ_LIB_OAI_MAP_002
         Assert.Equal("inner", customObject["nested_text"]?.GetValue<string>());
         Assert.False(customObject["nested_flag"]?.GetValue<bool>() ?? true);
         Assert.Equal(7, customObject["nested_count"]?.GetValue<int>());
-        Assert.Equal(12345678901234567000m, customObject["nested_fallback"]?.GetValue<decimal>());
+        Assert.Equal(12345678901234567890m, customObject["nested_fallback"]?.GetValue<decimal>());
 
         JsonArray customArray = Assert.IsType<JsonArray>(body["custom_array"]);
         Assert.Equal("alpha", customArray[0]?.GetValue<string>());
