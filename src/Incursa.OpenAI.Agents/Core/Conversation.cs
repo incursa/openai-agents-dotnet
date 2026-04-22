@@ -95,6 +95,76 @@ public static class AgentItemTypes
 }
 
 /// <summary>
+/// Describes where a function-tool-backed item originated.
+/// </summary>
+public enum ToolOriginType
+{
+    /// <summary>Function tool defined on the agent.</summary>
+    [JsonStringEnumMemberName("function")]
+    Function,
+
+    /// <summary>Tool invoked through MCP.</summary>
+    [JsonStringEnumMemberName("mcp")]
+    Mcp,
+
+    /// <summary>Tool representing another agent wrapped as a tool.</summary>
+    [JsonStringEnumMemberName("agent_as_tool")]
+    AgentAsTool,
+}
+
+/// <summary>
+/// Carries origin metadata for tool-backed items and approvals.
+/// </summary>
+public sealed record ToolOrigin
+{
+    /// <summary>Creates an origin with only the origin type.</summary>
+    [JsonConstructor]
+    public ToolOrigin(ToolOriginType type)
+        : this(type, null, null, null)
+    {
+    }
+
+    /// <summary>Creates an origin with explicit metadata.</summary>
+    public ToolOrigin(ToolOriginType type, string? mcpServerName, string? agentName, string? agentToolName)
+    {
+        Type = type;
+        McpServerName = mcpServerName;
+        AgentName = agentName;
+        AgentToolName = agentToolName;
+    }
+
+    /// <summary>Gets the origin type.</summary>
+    [JsonPropertyName("type")]
+    public ToolOriginType Type { get; init; }
+
+    /// <summary>Gets the MCP server name, if any.</summary>
+    [JsonPropertyName("mcp_server_name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? McpServerName { get; init; }
+
+    /// <summary>Gets the originating agent name, if any.</summary>
+    [JsonPropertyName("agent_name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? AgentName { get; init; }
+
+    /// <summary>Gets the originating agent tool name, if any.</summary>
+    [JsonPropertyName("agent_tool_name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? AgentToolName { get; init; }
+}
+
+internal static class ToolOriginMetadata
+{
+    public static ToolOrigin FromToolType(string? toolType)
+        => toolType switch
+        {
+            string value when string.Equals(value, "mcp", StringComparison.OrdinalIgnoreCase) => new ToolOrigin(ToolOriginType.Mcp),
+            string value when string.Equals(value, "agent_as_tool", StringComparison.OrdinalIgnoreCase) => new ToolOrigin(ToolOriginType.AgentAsTool),
+            _ => new ToolOrigin(ToolOriginType.Function),
+        };
+}
+
+/// <summary>
 /// Defines canonical stream event type names used by the runtime.
 /// </summary>
 
@@ -119,7 +189,7 @@ public sealed record AgentConversationItem
     /// <summary>Creates a run item from explicit type, role, and agent name.</summary>
     [JsonConstructor]
     public AgentConversationItem(string itemType, string role, string agentName)
-        : this(itemType, role, agentName, null, null, null, null, null, null)
+        : this(itemType, role, agentName, null, null, null, null, null, null, null)
     {
     }
 
@@ -134,6 +204,22 @@ public sealed record AgentConversationItem
         JsonNode? data,
         string? status,
         DateTimeOffset? timestampUtc)
+        : this(itemType, role, agentName, name, text, toolCallId, data, status, timestampUtc, null)
+    {
+    }
+
+    /// <summary>Creates a conversation item with full metadata.</summary>
+    public AgentConversationItem(
+        string itemType,
+        string role,
+        string agentName,
+        string? name,
+        string? text,
+        string? toolCallId,
+        JsonNode? data,
+        string? status,
+        DateTimeOffset? timestampUtc,
+        ToolOrigin? toolOrigin = null)
     {
         ItemType = itemType;
         Role = role;
@@ -143,6 +229,9 @@ public sealed record AgentConversationItem
         ToolCallId = toolCallId;
         Data = data;
         Status = status;
+        ToolOrigin = toolOrigin ?? (itemType is AgentItemTypes.ToolCall or AgentItemTypes.ToolOutput or AgentItemTypes.ApprovalRequired or AgentItemTypes.ApprovalRejected
+            ? new ToolOrigin(ToolOriginType.Function)
+            : null);
         TimestampUtc = timestampUtc;
     }
 
@@ -170,12 +259,17 @@ public sealed record AgentConversationItem
     /// <summary>Gets optional status for item-specific result.</summary>
     public string? Status { get; init; }
 
+    /// <summary>Gets optional origin metadata for tool-backed items.</summary>
+    [JsonPropertyName("tool_origin")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ToolOrigin? ToolOrigin { get; init; }
+
     /// <summary>Gets optional UTC timestamp.</summary>
     public DateTimeOffset? TimestampUtc { get; init; }
 
     /// <summary>Converts to a run item equivalent.</summary>
     public AgentRunItem ToRunItem()
-        => new(ItemType, Role, AgentName, Name, Text, ToolCallId, Data, Status, TimestampUtc);
+        => new(ItemType, Role, AgentName, Name, Text, ToolCallId, Data, Status, TimestampUtc, ToolOrigin);
 }
 
 /// <summary>
@@ -187,7 +281,7 @@ public sealed record AgentRunItem
     /// <summary>Creates a run item from explicit type, role, and agent name.</summary>
     [JsonConstructor]
     public AgentRunItem(string itemType, string role, string agentName)
-        : this(itemType, role, agentName, null, null, null, null, null, null)
+        : this(itemType, role, agentName, null, null, null, null, null, null, null)
     {
     }
 
@@ -202,6 +296,22 @@ public sealed record AgentRunItem
         JsonNode? data,
         string? status,
         DateTimeOffset? timestampUtc)
+        : this(itemType, role, agentName, name, text, toolCallId, data, status, timestampUtc, null)
+    {
+    }
+
+    /// <summary>Creates a run item with full metadata.</summary>
+    public AgentRunItem(
+        string itemType,
+        string role,
+        string agentName,
+        string? name,
+        string? text,
+        string? toolCallId,
+        JsonNode? data,
+        string? status,
+        DateTimeOffset? timestampUtc,
+        ToolOrigin? toolOrigin = null)
     {
         ItemType = itemType;
         Role = role;
@@ -211,6 +321,9 @@ public sealed record AgentRunItem
         ToolCallId = toolCallId;
         Data = data;
         Status = status;
+        ToolOrigin = toolOrigin ?? (itemType is AgentItemTypes.ToolCall or AgentItemTypes.ToolOutput or AgentItemTypes.ApprovalRequired or AgentItemTypes.ApprovalRejected
+            ? new ToolOrigin(ToolOriginType.Function)
+            : null);
         TimestampUtc = timestampUtc;
     }
 
@@ -238,12 +351,17 @@ public sealed record AgentRunItem
     /// <summary>Gets optional status value.</summary>
     public string? Status { get; init; }
 
+    /// <summary>Gets optional origin metadata for tool-backed items.</summary>
+    [JsonPropertyName("tool_origin")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ToolOrigin? ToolOrigin { get; init; }
+
     /// <summary>Gets optional UTC event timestamp.</summary>
     public DateTimeOffset? TimestampUtc { get; init; }
 
     /// <summary>Converts this run item to a conversation item.</summary>
     public AgentConversationItem ToConversationItem()
-        => new(ItemType, Role, AgentName, Name, Text, ToolCallId, Data, Status, TimestampUtc);
+        => new(ItemType, Role, AgentName, Name, Text, ToolCallId, Data, Status, TimestampUtc, ToolOrigin);
 }
 
 /// <summary>
@@ -436,12 +554,19 @@ public sealed record AgentToolErrorContext
 {
     /// <summary>Creates a tool error context.</summary>
     public AgentToolErrorContext(string kind, string toolType, string toolName, string callId, string defaultMessage)
+        : this(kind, toolType, toolName, callId, defaultMessage, ToolOriginMetadata.FromToolType(toolType))
+    {
+    }
+
+    /// <summary>Creates a tool error context with explicit origin metadata.</summary>
+    public AgentToolErrorContext(string kind, string toolType, string toolName, string callId, string defaultMessage, ToolOrigin? toolOrigin)
     {
         Kind = kind;
         ToolType = toolType;
         ToolName = toolName;
         CallId = callId;
         DefaultMessage = defaultMessage;
+        ToolOrigin = toolOrigin ?? ToolOriginMetadata.FromToolType(toolType);
     }
 
     /// <summary>Gets kind of tool error.</summary>
@@ -458,6 +583,11 @@ public sealed record AgentToolErrorContext
 
     /// <summary>Gets default formatter fallback message.</summary>
     public string DefaultMessage { get; init; }
+
+    /// <summary>Gets optional origin metadata for the erroring tool.</summary>
+    [JsonPropertyName("tool_origin")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ToolOrigin? ToolOrigin { get; init; }
 }
 
 /// <summary>
@@ -499,19 +629,31 @@ public sealed record AgentPendingApproval<TContext>
 {
     /// <summary>Creates a pending approval request for a default function tool call.</summary>
     public AgentPendingApproval(Agent<TContext> agent, string toolName, string toolCallId)
-        : this(agent, toolName, toolCallId, null, null, "function")
+        : this(agent, toolName, toolCallId, null, null, "function", new ToolOrigin(ToolOriginType.Function))
     {
     }
 
     /// <summary>Creates a pending approval request with arguments.</summary>
     public AgentPendingApproval(Agent<TContext> agent, string toolName, string toolCallId, JsonNode? arguments)
-        : this(agent, toolName, toolCallId, arguments, null, "function")
+        : this(agent, toolName, toolCallId, arguments, null, "function", new ToolOrigin(ToolOriginType.Function))
     {
     }
 
     /// <summary>Creates a pending approval request with arguments and reason.</summary>
     public AgentPendingApproval(Agent<TContext> agent, string toolName, string toolCallId, JsonNode? arguments, string? reason)
-        : this(agent, toolName, toolCallId, arguments, reason, "function")
+        : this(agent, toolName, toolCallId, arguments, reason, "function", new ToolOrigin(ToolOriginType.Function))
+    {
+    }
+
+    /// <summary>Creates a pending approval request with explicit tool type metadata.</summary>
+    public AgentPendingApproval(
+        Agent<TContext> agent,
+        string toolName,
+        string toolCallId,
+        JsonNode? arguments,
+        string? reason,
+        string toolType)
+        : this(agent, toolName, toolCallId, arguments, reason, toolType, ToolOriginMetadata.FromToolType(toolType))
     {
     }
 
@@ -522,7 +664,8 @@ public sealed record AgentPendingApproval<TContext>
         string toolCallId,
         JsonNode? arguments,
         string? reason,
-        string toolType)
+        string toolType,
+        ToolOrigin? toolOrigin = null)
     {
         Agent = agent;
         ToolName = toolName;
@@ -530,6 +673,7 @@ public sealed record AgentPendingApproval<TContext>
         Arguments = arguments;
         Reason = reason;
         ToolType = toolType;
+        ToolOrigin = toolOrigin ?? ToolOriginMetadata.FromToolType(toolType);
     }
 
     /// <summary>Gets the agent executing this call.</summary>
@@ -549,6 +693,11 @@ public sealed record AgentPendingApproval<TContext>
 
     /// <summary>Gets the tool type string.</summary>
     public string ToolType { get; init; }
+
+    /// <summary>Gets the origin metadata for the approved tool.</summary>
+    [JsonPropertyName("tool_origin")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ToolOrigin? ToolOrigin { get; init; }
 }
 
 /// <summary>
@@ -613,12 +762,19 @@ public sealed record AgentApprovalRequest
 {
     /// <summary>Creates an approval request record.</summary>
     public AgentApprovalRequest(string agentName, string toolName, string toolCallId, string? reason, JsonNode? arguments)
+        : this(agentName, toolName, toolCallId, reason, arguments, new ToolOrigin(ToolOriginType.Function))
+    {
+    }
+
+    /// <summary>Creates an approval request record with explicit origin metadata.</summary>
+    public AgentApprovalRequest(string agentName, string toolName, string toolCallId, string? reason, JsonNode? arguments, ToolOrigin? toolOrigin)
     {
         AgentName = agentName;
         ToolName = toolName;
         ToolCallId = toolCallId;
         Reason = reason;
         Arguments = arguments;
+        ToolOrigin = toolOrigin ?? new ToolOrigin(ToolOriginType.Function);
     }
 
     /// <summary>Gets the agent name associated with the approval request.</summary>
@@ -635,6 +791,11 @@ public sealed record AgentApprovalRequest
 
     /// <summary>Gets the arguments for the requested tool call.</summary>
     public JsonNode? Arguments { get; init; }
+
+    /// <summary>Gets the origin metadata for the requested tool.</summary>
+    [JsonPropertyName("tool_origin")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ToolOrigin? ToolOrigin { get; init; }
 }
 
 /// <summary>
@@ -854,25 +1015,37 @@ public sealed record AgentToolCall<TContext>
 {
     /// <summary>Creates a tool call for a default function.</summary>
     public AgentToolCall(string callId, string toolName)
-        : this(callId, toolName, null, false, null, "function")
+        : this(callId, toolName, null, false, null, "function", new ToolOrigin(ToolOriginType.Function))
     {
     }
 
     /// <summary>Creates a tool call with arguments.</summary>
     public AgentToolCall(string callId, string toolName, JsonNode? arguments)
-        : this(callId, toolName, arguments, false, null, "function")
+        : this(callId, toolName, arguments, false, null, "function", new ToolOrigin(ToolOriginType.Function))
     {
     }
 
     /// <summary>Creates a tool call with an approval requirement.</summary>
     public AgentToolCall(string callId, string toolName, JsonNode? arguments, bool requiresApproval)
-        : this(callId, toolName, arguments, requiresApproval, null, "function")
+        : this(callId, toolName, arguments, requiresApproval, null, "function", new ToolOrigin(ToolOriginType.Function))
     {
     }
 
     /// <summary>Creates a tool call with approval reason.</summary>
     public AgentToolCall(string callId, string toolName, JsonNode? arguments, bool requiresApproval, string? approvalReason)
-        : this(callId, toolName, arguments, requiresApproval, approvalReason, "function")
+        : this(callId, toolName, arguments, requiresApproval, approvalReason, "function", new ToolOrigin(ToolOriginType.Function))
+    {
+    }
+
+    /// <summary>Creates a tool call with explicit tool type metadata.</summary>
+    public AgentToolCall(
+        string callId,
+        string toolName,
+        JsonNode? arguments,
+        bool requiresApproval,
+        string? approvalReason,
+        string toolType)
+        : this(callId, toolName, arguments, requiresApproval, approvalReason, toolType, ToolOriginMetadata.FromToolType(toolType))
     {
     }
 
@@ -883,7 +1056,8 @@ public sealed record AgentToolCall<TContext>
         JsonNode? arguments,
         bool requiresApproval,
         string? approvalReason,
-        string toolType)
+        string toolType,
+        ToolOrigin? toolOrigin = null)
     {
         CallId = callId;
         ToolName = toolName;
@@ -891,6 +1065,7 @@ public sealed record AgentToolCall<TContext>
         RequiresApproval = requiresApproval;
         ApprovalReason = approvalReason;
         ToolType = toolType;
+        ToolOrigin = toolOrigin ?? ToolOriginMetadata.FromToolType(toolType);
     }
 
     /// <summary>Gets the call identifier.</summary>
@@ -910,6 +1085,11 @@ public sealed record AgentToolCall<TContext>
 
     /// <summary>Gets the tool type.</summary>
     public string ToolType { get; init; }
+
+    /// <summary>Gets the origin metadata for the tool call.</summary>
+    [JsonPropertyName("tool_origin")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ToolOrigin? ToolOrigin { get; init; }
 }
 
 /// <summary>

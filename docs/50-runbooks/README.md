@@ -10,3 +10,5 @@ workbench:
 # Runbooks
 
 Operational procedures, troubleshooting, and release playbooks.
+
+- [``upstream-sync.md``](upstream-sync.md): Python-first workflow for reviewing and translating upstream Agents SDK changes into this repository.

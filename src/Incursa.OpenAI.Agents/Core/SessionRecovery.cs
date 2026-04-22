@@ -29,7 +29,8 @@ public static class AgentSessionRecovery
                 item.ToolCallId,
                 item.Arguments?.DeepClone(),
                 item.Reason,
-                item.ToolType)).ToArray());
+                item.ToolType,
+                item.ToolOrigin)).ToArray());
 
     /// <summary>
     /// Creates a resume request that indicates a previously blocked tool call was approved.

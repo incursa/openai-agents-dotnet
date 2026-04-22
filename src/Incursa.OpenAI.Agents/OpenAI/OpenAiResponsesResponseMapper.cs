@@ -55,21 +55,23 @@ internal sealed class OpenAiResponsesResponseMapper
                         break;
 
                     case FunctionCallResponseItem functionCall:
-                        MapToolCall(plan, toolCalls, handoffs, functionCall.CallId, functionCall.FunctionName, functionCall.FunctionArguments?.ToString(), functionCall.Status?.ToString().ToLowerInvariant(), false, null, "function");
+                        MapToolCall(plan, toolCalls, handoffs, functionCall.CallId, functionCall.FunctionName, functionCall.FunctionArguments?.ToString(), functionCall.Status?.ToString().ToLowerInvariant(), false, null, "function", CreateToolOrigin("function"));
                         break;
 
                     case McpToolCallApprovalRequestItem approvalRequest:
+                        JsonObject approvalRequestJson = SerializeModelSafely(approvalRequest, "mcp_approval_request");
                         toolCalls.Add(new AgentToolCall<TContext>(
                             approvalRequest.Id ?? Guid.NewGuid().ToString("n"),
                             approvalRequest.ToolName,
                             ParseJsonNode(approvalRequest.ToolArguments is null ? null : JsonValue.Create(approvalRequest.ToolArguments.ToString())),
                             true,
                             TryGetPatchString(approvalRequest.Patch, "$.approval_reason"u8),
-                            "mcp"));
+                            "mcp",
+                            CreateToolOrigin("mcp", approvalRequestJson)));
                         break;
 
                     case McpToolCallItem mcpCall:
-                        MapToolCall(plan, toolCalls, handoffs, mcpCall.Id ?? Guid.NewGuid().ToString("n"), mcpCall.ToolName, mcpCall.ToolArguments?.ToString(), TryGetPatchString(mcpCall.Patch, "$.status"u8), false, null, "mcp");
+                        MapToolCall(plan, toolCalls, handoffs, mcpCall.Id ?? Guid.NewGuid().ToString("n"), mcpCall.ToolName, mcpCall.ToolArguments?.ToString(), TryGetPatchString(mcpCall.Patch, "$.status"u8), false, null, "mcp", CreateToolOrigin("mcp", SerializeModelSafely(mcpCall, "mcp_call")));
                         break;
 
                     case McpToolDefinitionListItem mcpList:
@@ -137,6 +139,7 @@ internal sealed class OpenAiResponsesResponseMapper
                 ToolCallId = functionCall.CallId ?? functionCall.Id,
                 Data = ParseJsonNode(JsonValue.Create(functionCall.FunctionArguments?.ToString())),
                 Status = item["status"]?.GetValue<string>(),
+                ToolOrigin = CreateToolOrigin("function"),
                 TimestampUtc = DateTimeOffset.UtcNow,
             },
             McpToolCallItem mcpCall => new AgentRunItem(AgentItemTypes.ToolCall, "assistant", agentName)
@@ -145,6 +148,7 @@ internal sealed class OpenAiResponsesResponseMapper
                 ToolCallId = mcpCall.Id,
                 Data = ParseJsonNode(JsonValue.Create(mcpCall.ToolArguments?.ToString())),
                 Status = item["status"]?.GetValue<string>(),
+                ToolOrigin = CreateToolOrigin("mcp", item),
                 TimestampUtc = DateTimeOffset.UtcNow,
             },
             McpToolDefinitionListItem => new AgentRunItem(AgentItemTypes.McpListTools, "system", agentName)
@@ -166,7 +170,8 @@ internal sealed class OpenAiResponsesResponseMapper
         string? status,
         bool requiresApproval,
         string? approvalReason,
-        string toolType)
+        string toolType,
+        ToolOrigin toolOrigin)
     {
         JsonNode? arguments = ParseJsonNode(argumentsJson is null ? null : JsonValue.Create(argumentsJson));
         if (plan.HandoffMap.TryGetValue(toolName, out AgentHandoff<TContext>? handoff))
@@ -181,7 +186,8 @@ internal sealed class OpenAiResponsesResponseMapper
             arguments,
             requiresApproval,
             approvalReason,
-            toolType));
+            toolType,
+            toolOrigin));
     }
 
     private static void MapRawOutputItem<TContext>(
@@ -217,21 +223,24 @@ internal sealed class OpenAiResponsesResponseMapper
                 break;
 
             case "function_call" or "tool_call":
-                MapToolCall(plan, toolCalls, handoffs, rawItem["call_id"]?.GetValue<string>() ?? rawItem["id"]?.GetValue<string>(), rawItem["name"]?.GetValue<string>() ?? string.Empty, rawItem["arguments"]?.GetValue<string>(), rawItem["status"]?.GetValue<string>(), rawItem["approval_required"]?.GetValue<bool>() ?? false, rawItem["approval_reason"]?.GetValue<string>(), rawItem["tool_type"]?.GetValue<string>() ?? "function");
+                string functionToolType = rawItem["tool_type"]?.GetValue<string>() ?? "function";
+                MapToolCall(plan, toolCalls, handoffs, rawItem["call_id"]?.GetValue<string>() ?? rawItem["id"]?.GetValue<string>(), rawItem["name"]?.GetValue<string>() ?? string.Empty, rawItem["arguments"]?.GetValue<string>(), rawItem["status"]?.GetValue<string>(), rawItem["approval_required"]?.GetValue<bool>() ?? false, rawItem["approval_reason"]?.GetValue<string>(), functionToolType, CreateToolOrigin(functionToolType, rawItem));
                 break;
 
             case "mcp_approval_request":
+                JsonObject mcpApprovalJson = rawItem;
                 toolCalls.Add(new AgentToolCall<TContext>(
                     rawItem["id"]?.GetValue<string>() ?? Guid.NewGuid().ToString("n"),
                     rawItem["name"]?.GetValue<string>() ?? string.Empty,
                     ParseJsonNode(rawItem["arguments"]),
                     true,
                     rawItem["approval_reason"]?.GetValue<string>(),
-                    "mcp"));
+                    "mcp",
+                    CreateToolOrigin("mcp", mcpApprovalJson)));
                 break;
 
             case "mcp_call" or "mcp_tool_call":
-                MapToolCall(plan, toolCalls, handoffs, rawItem["id"]?.GetValue<string>() ?? Guid.NewGuid().ToString("n"), rawItem["name"]?.GetValue<string>() ?? string.Empty, rawItem["arguments"]?.GetValue<string>(), rawItem["status"]?.GetValue<string>(), false, null, "mcp");
+                MapToolCall(plan, toolCalls, handoffs, rawItem["id"]?.GetValue<string>() ?? Guid.NewGuid().ToString("n"), rawItem["name"]?.GetValue<string>() ?? string.Empty, rawItem["arguments"]?.GetValue<string>(), rawItem["status"]?.GetValue<string>(), false, null, "mcp", CreateToolOrigin("mcp", rawItem));
                 break;
 
             case "mcp_list_tools":
@@ -266,6 +275,7 @@ internal sealed class OpenAiResponsesResponseMapper
                 ToolCallId = item["call_id"]?.GetValue<string>() ?? item["id"]?.GetValue<string>(),
                 Data = ParseJsonNode(item["arguments"]),
                 Status = item["status"]?.GetValue<string>(),
+                ToolOrigin = CreateToolOrigin(item["tool_type"]?.GetValue<string>() ?? "function", item),
                 TimestampUtc = DateTimeOffset.UtcNow,
             },
             "mcp_list_tools" => new AgentRunItem(AgentItemTypes.McpListTools, "system", agentName)
@@ -283,6 +293,25 @@ internal sealed class OpenAiResponsesResponseMapper
             Data = SerializeModelSafely(item, "reasoning"),
             TimestampUtc = DateTimeOffset.UtcNow,
         };
+
+    private static ToolOrigin CreateToolOrigin(string? toolType, JsonObject? item = null)
+    {
+        if (string.Equals(toolType, "mcp", StringComparison.OrdinalIgnoreCase))
+        {
+            return new ToolOrigin(ToolOriginType.Mcp, item?["server_label"]?.GetValue<string>(), null, null);
+        }
+
+        if (string.Equals(toolType, "agent_as_tool", StringComparison.OrdinalIgnoreCase))
+        {
+            return new ToolOrigin(
+                ToolOriginType.AgentAsTool,
+                null,
+                item?["agent_name"]?.GetValue<string>(),
+                item?["agent_tool_name"]?.GetValue<string>());
+        }
+
+        return new ToolOrigin(ToolOriginType.Function);
+    }
 
     private static string? TryGetPatchString(JsonPatch patch, ReadOnlySpan<byte> path)
         => patch.Contains(path) ? patch.GetString(path) : null;

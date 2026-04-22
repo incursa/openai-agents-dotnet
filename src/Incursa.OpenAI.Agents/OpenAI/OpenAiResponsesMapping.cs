@@ -354,6 +354,7 @@ internal sealed class OpenAiResponsesRequestMapper
 
     private static bool ShouldNormalizeHandoffInput<TContext>(AgentTurnRequest<TContext> request, AgentRunOptions<TContext> options)
         => options.HandoffHistoryMode == AgentHandoffHistoryMode.NormalizeModelInputAfterHandoff
+            && string.IsNullOrWhiteSpace(request.PreviousResponseId)
             && request.Conversation.Any(item => item.ItemType == AgentItemTypes.HandoffOccurred && string.Equals(item.AgentName, request.Agent.Name, StringComparison.Ordinal));
 
     private static IReadOnlyList<AgentConversationItem> NormalizeConversationForHandoff(IReadOnlyList<AgentConversationItem> conversation)

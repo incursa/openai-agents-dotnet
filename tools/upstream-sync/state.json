@@ -1,7 +1,26 @@
 {
-  "upstreamRepoUrl": "https://github.com/openai/openai-agents-python.git",
-  "upstreamLocalPath": "C:\\src\\openai\\openai-agents-python",
-  "upstreamBranch": "main",
-  "lastTranslatedSha": null,
-  "lastSuccessUtc": null
+  "schemaVersion": 2,
+  "lastSuccessUtc": null,
+  "sources": [
+    {
+      "key": "python",
+      "displayName": "openai-agents-python",
+      "repoUrl": "https://github.com/openai/openai-agents-python.git",
+      "localPath": "C:\\src\\openai\\openai-agents-python",
+      "branch": "main",
+      "role": "behavioral-source-of-truth",
+      "lastAppliedSha": null,
+      "lastAppliedUtc": null
+    },
+    {
+      "key": "js",
+      "displayName": "openai-agents-js",
+      "repoUrl": "https://github.com/openai/openai-agents-js.git",
+      "localPath": "C:\\src\\openai\\openai-agents-js",
+      "branch": "main",
+      "role": "supporting-signal",
+      "lastAppliedSha": null,
+      "lastAppliedUtc": null
+    }
+  ]
 }

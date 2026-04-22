@@ -233,6 +233,7 @@ sealed class DemoAuthResolver : IUserScopedMcpAuthResolver
 - **Nightly issue sync**: [``.github/workflows/workbench-nightly-sync.yml``](.github/workflows/workbench-nightly-sync.yml) (dry-run validation + artifact output).
 - **Scope parity tracking**: [``docs/parity/manifest.md``](docs/parity/manifest.md).
 - **Maintenance checklist**: [``docs/parity/maintenance-checklist.md``](docs/parity/maintenance-checklist.md).
+- **Upstream sync workflow**: [``tools/upstream-sync/README.md``](tools/upstream-sync/README.md).
 - **Repository boundaries and quality contracts**: [``docs/quality/repo-scope-boundary.md``](docs/quality/repo-scope-boundary.md), [``docs/30-contracts/test-gate.contract.yaml``](docs/30-contracts/test-gate.contract.yaml).
 
 ### Direct verification commands

@@ -17,7 +17,7 @@ This specification covers runtime execution behavior in `Incursa.OpenAI.Agents`:
 - `LIB-EXEC-HANDOFF-001`: Handoffs switch the active agent and emit handoff occurrence items.
 - `LIB-EXEC-MAXTURNS-001`: The runner stops with `MaxTurnsExceeded` when configured turn limits are exhausted.
 - `LIB-EXEC-STREAM-001`: Streaming runs emit user input, generated run items, and final output items as they become available.
-- `LIB-EXEC-APPROVAL-001`: Approval-required tool calls pause execution without invoking the tool until an approval response is supplied.
+- `LIB-EXEC-APPROVAL-001`: Approval-required tool calls pause execution without invoking the tool until an approval response is supplied, and pending approvals preserve tool-origin metadata across persistence and resumption.
 - `LIB-EXEC-APPROVAL-002`: Rejected approvals use the configured tool error formatter when producing rejection items.
 - `LIB-EXEC-GUARDRAIL-001`: Guardrail tripwires stop execution and surface the guardrail message on the result.
 - `LIB-EXEC-OBS-001`: Runtime execution emits lifecycle observations for run start, turn start, turn completion, and successful completion events.

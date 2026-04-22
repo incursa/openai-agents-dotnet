@@ -9,6 +9,7 @@ _None._
 | [TASK-0001 - Audio APIs v1 roadmap and release framing](items/TASK-0001-audio-apis-v1-roadmap-and-release-framing.md) | 🟠 high | 🧩 task | 🟢 ready | - | - | [audio-apis-v1-roadmap](../10-product/audio-apis-v1-roadmap.md), [audio-delivery-roadmap](../60-tracking/audio-delivery-roadmap.md) |
 | [TASK-0002 - Audio APIs v1 architecture and ADRs](items/TASK-0002-audio-apis-v1-architecture-and-adrs.md) | 🟠 high | 🧩 task | 🟢 ready | - | - | [adr-standalone-audio-api-surface](../40-decisions/adr-standalone-audio-api-surface.md), [adr-realtime-voice-separate-subsystem](../40-decisions/adr-realtime-voice-separate-subsystem.md), [audio-apis-v1](../20-architecture/audio-apis-v1.md) |
 | [TASK-0003 - OpenAI audio client foundation and contracts](items/TASK-0003-openai-audio-client-foundation-and-contracts.md) | 🟠 high | 🧩 task | 🟢 ready | - | - | [audio-apis-v1](../20-architecture/audio-apis-v1.md), src/Incursa.OpenAI.Agents/OpenAI/ |
+| [TASK-0009 - Upstream sync workflow](items/TASK-0009-upstream-sync-workflow.md) | 🟡 medium | 🧩 task | 🟢 ready | - | - | [upstream-sync](../50-runbooks/upstream-sync.md), [manifest](../parity/manifest.md), [maintenance-checklist](../parity/maintenance-checklist.md) |
 
 ## Blocked
 

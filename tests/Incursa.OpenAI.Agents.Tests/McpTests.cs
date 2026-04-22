@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json.Nodes;
 using Incursa.OpenAI.Agents.Mcp;
+using ModelContextProtocol.Protocol;
 
 namespace Incursa.OpenAI.Agents.Tests;
 
@@ -95,6 +96,58 @@ public sealed class McpTests
         await client.ListToolsAsync();
 
         Assert.Equal(1, calls);
+    }
+
+    /// <summary>Resource APIs round-trip cursor parameters and return typed protocol payloads.</summary>
+    /// <intent>Protect the streamable MCP resource surface added alongside tool discovery.</intent>
+    /// <scenario>LIB-MCP-RESOURCES-001</scenario>
+    /// <behavior>Resource list, resource template list, and resource read calls send the expected JSON-RPC methods and deserialize the typed protocol responses.</behavior>
+    [Fact]
+    public async Task StreamableMcpClient_ListsAndReadsResourcesWithCursors()
+    {
+        List<JsonObject> requests = new();
+        int callCount = 0;
+        RecordingHandler handler = new(async (request, _) =>
+        {
+            requests.Add(JsonNode.Parse(await request.Content!.ReadAsStringAsync())!.AsObject());
+            callCount++;
+
+            string payload = callCount switch
+            {
+                1 => """{"jsonrpc":"2.0","id":"1","result":{"resources":[{"name":"doc","uri":"file:///docs/doc.txt","mimeType":"text/plain","description":"Doc","title":"Document"}],"nextCursor":"cursor-2"}}""",
+                2 => """{"jsonrpc":"2.0","id":"1","result":{"resourceTemplates":[{"name":"template","uriTemplate":"file:///docs/{name}.txt","mimeType":"text/plain","description":"Template","title":"Template","isTemplated":true}],"nextCursor":"cursor-3"}}""",
+                _ => """{"jsonrpc":"2.0","id":"1","result":{"contents":[{"uri":"file:///docs/doc.txt","mimeType":"text/plain","text":"hello world"}]}}""",
+            };
+
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(payload, Encoding.UTF8, "application/json"),
+            };
+        });
+
+        StreamableHttpMcpClient client = new(
+            new HttpClient(handler),
+            "docs",
+            new Uri("https://example.test/mcp"));
+
+        ListResourcesResult resources = await client.ListResourcesAsync("cursor-1");
+        ListResourceTemplatesResult templates = await client.ListResourceTemplatesAsync("cursor-2");
+        ReadResourceResult resource = await client.ReadResourceAsync("file:///docs/doc.txt");
+
+        Assert.Equal(3, requests.Count);
+        Assert.Equal("resources/list", requests[0]["method"]?.GetValue<string>());
+        Assert.Equal("cursor-1", requests[0]["params"]?["cursor"]?.GetValue<string>());
+        Assert.Equal("resources/templates/list", requests[1]["method"]?.GetValue<string>());
+        Assert.Equal("cursor-2", requests[1]["params"]?["cursor"]?.GetValue<string>());
+        Assert.Equal("resources/read", requests[2]["method"]?.GetValue<string>());
+        Assert.Equal("file:///docs/doc.txt", requests[2]["params"]?["uri"]?.GetValue<string>());
+
+        Assert.Single(resources.Resources);
+        Assert.Equal("cursor-2", resources.NextCursor);
+        Assert.Single(templates.ResourceTemplates);
+        Assert.Equal("cursor-3", templates.NextCursor);
+        TextResourceContents content = Assert.IsType<TextResourceContents>(Assert.Single(resource.Contents));
+        Assert.Equal("hello world", content.Text);
     }
 
     /// <summary>Transient MCP failures retry and emit observations when retry settings allow it.</summary>

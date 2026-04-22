@@ -459,7 +459,7 @@ public sealed class REQ_LIB_OAI_MAP_002
                 new AgentConversationItem(AgentItemTypes.MessageOutput, "assistant", "delegate") { Text = "later message", Data = new JsonObject { ["topic"] = "wrong" } },
             ],
             null,
-            "resp-1",
+            null,
             new AgentRunOptions<TestContext>
             {
                 HandoffHistoryMode = AgentHandoffHistoryMode.NormalizeModelInputAfterHandoff,
@@ -475,6 +475,55 @@ public sealed class REQ_LIB_OAI_MAP_002
         Assert.Equal("delegate", captured.TargetAgentName);
         Assert.Equal("mail", captured.Arguments?["topic"]?.GetValue<string>());
         Assert.Equal(5, plan.Options.InputItems.Count);
+    }
+
+    /// <summary>Normalization stays disabled when a previous response id is already pinned for the turn.</summary>
+    /// <intent>Protect the server-managed handoff guard that keeps previously completed turns from being reshaped again.</intent>
+    /// <scenario>LIB-OAI-MAP-002F2</scenario>
+    /// <behavior>When the turn already has a previous response id, the handoff history transformer is not invoked and tool-call items remain in the mapped input.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task RequestMapper_DoesNotNormalizeWhenPreviousResponseIdIsSet()
+    {
+        bool transformerInvoked = false;
+
+        Agent<TestContext> delegateAgent = new()
+        {
+            Name = "delegate",
+            Model = "gpt-5.4",
+            Instructions = "Handle delegated work.",
+        };
+
+        OpenAiResponsesTurnPlan<TestContext> plan = await new OpenAiResponsesRequestMapper().CreateAsync(new AgentTurnRequest<TestContext>(
+            delegateAgent,
+            new TestContext("user-1", "tenant-1"),
+            "session-transform-previous-response",
+            2,
+            [
+                new AgentConversationItem(AgentItemTypes.UserInput, "user", "triage") { Text = "help" },
+                new AgentConversationItem(AgentItemTypes.ToolCall, "assistant", "triage")
+                {
+                    ToolCallId = "call-1",
+                    Name = "lookup_customer",
+                    Data = new JsonObject { ["customer_id"] = "42" },
+                },
+                new AgentConversationItem(AgentItemTypes.HandoffRequested, "assistant", "triage") { Name = "mail", Text = "delegate", Data = new JsonObject { ["topic"] = "mail" } },
+                new AgentConversationItem(AgentItemTypes.HandoffOccurred, "system", "delegate") { Name = "mail", Text = "delegate", Data = new JsonObject { ["topic"] = "mail" } },
+            ],
+            null,
+            "resp-1",
+            new AgentRunOptions<TestContext>
+            {
+                HandoffHistoryMode = AgentHandoffHistoryMode.NormalizeModelInputAfterHandoff,
+                HandoffHistoryTransformerAsync = (_, _) =>
+                {
+                    transformerInvoked = true;
+                    return ValueTask.FromResult<IReadOnlyList<AgentConversationItem>>([]);
+                },
+            }));
+
+        Assert.False(transformerInvoked);
+        Assert.Contains(plan.Options.InputItems, item => item is FunctionCallResponseItem);
     }
 
     /// <summary>Conversation items preserve roles, fallback raw item fields, tool defaults, and reasoning normalization.</summary>

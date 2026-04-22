@@ -12,7 +12,7 @@ This specification covers the OpenAI Responses surface in `Incursa.OpenAI.Agents
 ## Requirements
 - `LIB-OAI-API-001`: Public OpenAI Responses types are tracked by the public API baselines for `Incursa.OpenAI.Agents`.
 - `LIB-OAI-MAP-001`: Request mapping includes model selection, previous-response continuation, tools, handoffs, hosted MCP tools, and structured-output contracts.
-- `LIB-OAI-MAP-002`: Request mapping applies custom model-setting patches to the outgoing Responses payload while preserving explicit top-level transport fields.
+- `LIB-OAI-MAP-002`: Request mapping applies custom model-setting patches to the outgoing Responses payload while preserving explicit top-level transport fields, and handoff normalization stays disabled when a previous response id is already pinned for the turn.
 - `LIB-OAI-MCP-001`: Local streamable MCP servers are resolved into OpenAI tool payloads before turn execution.
 - `LIB-OAI-HANDOFF-001`: Handoff normalization options remove pre-handoff tool-call items from model input when configured.
 - `LIB-OAI-FILTER-001`: Run-level model input filters are applied during request mapping.

@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+using ModelContextProtocol.Protocol;
 
 namespace Incursa.OpenAI.Agents.Mcp;
 
@@ -22,6 +23,21 @@ public interface IStreamableMcpClient
     /// Lists the tools exposed by the MCP server.
     /// </summary>
     Task<IReadOnlyList<McpToolDescriptor>> ListToolsAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Lists resources exposed by the MCP server.
+    /// </summary>
+    Task<ListResourcesResult> ListResourcesAsync(string? cursor, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Lists resource templates exposed by the MCP server.
+    /// </summary>
+    Task<ListResourceTemplatesResult> ListResourceTemplatesAsync(string? cursor, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Reads a resource from the MCP server.
+    /// </summary>
+    Task<ReadResourceResult> ReadResourceAsync(string uri, CancellationToken cancellationToken);
 
     /// <summary>
     /// Calls a tool exposed by the MCP server.

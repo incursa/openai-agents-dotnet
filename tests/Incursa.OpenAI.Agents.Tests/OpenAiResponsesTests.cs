@@ -138,7 +138,7 @@ public sealed class OpenAiResponsesTests
                 new AgentConversationItem(AgentItemTypes.HandoffOccurred, "system", "delegate") { Name = "mail", Text = "delegate", Data = new JsonObject { ["topic"] = "mail" } },
             ],
             null,
-            "resp-1",
+            null,
             new AgentRunOptions<TestContext> { HandoffHistoryMode = AgentHandoffHistoryMode.NormalizeModelInputAfterHandoff }));
 
         Assert.DoesNotContain(plan.Options.InputItems, item => item is FunctionCallResponseItem);

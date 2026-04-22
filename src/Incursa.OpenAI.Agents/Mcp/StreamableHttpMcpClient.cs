@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using ModelContextProtocol.Protocol;
 
 namespace Incursa.OpenAI.Agents.Mcp;
 
@@ -130,6 +131,94 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
         }
 
         return tools;
+    }
+
+    /// <summary>
+    /// Lists resources without requiring an explicit cancellation token.
+    /// </summary>
+
+    public Task<ListResourcesResult> ListResourcesAsync()
+        => ListResourcesAsync(null, CancellationToken.None);
+
+    /// <summary>
+    /// Lists resources with an optional cursor and without requiring an explicit cancellation token.
+    /// </summary>
+
+    public Task<ListResourcesResult> ListResourcesAsync(string? cursor)
+        => ListResourcesAsync(cursor, CancellationToken.None);
+
+    /// <summary>
+    /// Lists resources using the supplied cancellation token.
+    /// </summary>
+
+    public async Task<ListResourcesResult> ListResourcesAsync(string? cursor, CancellationToken cancellationToken)
+    {
+        JsonObject parameters = new();
+        if (!string.IsNullOrWhiteSpace(cursor))
+        {
+            parameters["cursor"] = cursor;
+        }
+
+        JsonObject? response = await SendAsync("resources/list", null, new StreamableHttpMcpRequest("resources/list", parameters), cancellationToken).ConfigureAwait(false);
+        ListResourcesResult result = response?.Deserialize<ListResourcesResult>(SerializerOptions) ?? new ListResourcesResult();
+        result.Resources ??= new List<Resource>();
+        return result;
+    }
+
+    /// <summary>
+    /// Lists resource templates without requiring an explicit cancellation token.
+    /// </summary>
+
+    public Task<ListResourceTemplatesResult> ListResourceTemplatesAsync()
+        => ListResourceTemplatesAsync(null, CancellationToken.None);
+
+    /// <summary>
+    /// Lists resource templates with an optional cursor and without requiring an explicit cancellation token.
+    /// </summary>
+
+    public Task<ListResourceTemplatesResult> ListResourceTemplatesAsync(string? cursor)
+        => ListResourceTemplatesAsync(cursor, CancellationToken.None);
+
+    /// <summary>
+    /// Lists resource templates using the supplied cancellation token.
+    /// </summary>
+
+    public async Task<ListResourceTemplatesResult> ListResourceTemplatesAsync(string? cursor, CancellationToken cancellationToken)
+    {
+        JsonObject parameters = new();
+        if (!string.IsNullOrWhiteSpace(cursor))
+        {
+            parameters["cursor"] = cursor;
+        }
+
+        JsonObject? response = await SendAsync("resources/templates/list", null, new StreamableHttpMcpRequest("resources/templates/list", parameters), cancellationToken).ConfigureAwait(false);
+        ListResourceTemplatesResult result = response?.Deserialize<ListResourceTemplatesResult>(SerializerOptions) ?? new ListResourceTemplatesResult();
+        result.ResourceTemplates ??= new List<ResourceTemplate>();
+        return result;
+    }
+
+    /// <summary>
+    /// Reads a resource without requiring an explicit cancellation token.
+    /// </summary>
+
+    public Task<ReadResourceResult> ReadResourceAsync(string uri)
+        => ReadResourceAsync(uri, CancellationToken.None);
+
+    /// <summary>
+    /// Reads a resource using the supplied cancellation token.
+    /// </summary>
+
+    public async Task<ReadResourceResult> ReadResourceAsync(string uri, CancellationToken cancellationToken)
+    {
+        JsonObject parameters = new()
+        {
+            ["uri"] = uri,
+        };
+
+        JsonObject? response = await SendAsync("resources/read", null, new StreamableHttpMcpRequest("resources/read", parameters), cancellationToken).ConfigureAwait(false);
+        ReadResourceResult result = response?.Deserialize<ReadResourceResult>(SerializerOptions) ?? new ReadResourceResult();
+        result.Contents ??= new List<ResourceContents>();
+        return result;
     }
 
     /// <summary>

@@ -128,6 +128,7 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
                     {
                         ["mcp_server"] = server.ServerLabel,
                         ["mcp_tool_name"] = descriptor.Name,
+                        ["tool_origin"] = new ToolOrigin(ToolOriginType.Mcp, server.ServerLabel, null, null),
                     },
                     ExecuteAsync = async (invocation, ct) =>
                     {

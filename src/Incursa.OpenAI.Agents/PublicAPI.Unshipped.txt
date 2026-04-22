@@ -87,3 +87,62 @@ Incursa.OpenAI.Agents.OpenAiTranscribedWord.StartTime.get -> System.TimeSpan
 Incursa.OpenAI.Agents.OpenAiTranscribedWord.StartTime.init -> void
 static Incursa.OpenAI.Agents.OpenAiAudioClientExtensions.GenerateSpeechAsync(this Incursa.OpenAI.Agents.IOpenAiAudioClient! client, Incursa.OpenAI.Agents.OpenAiSpeechGenerationRequest! request) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiSpeechGenerationResponse!>!
 static Incursa.OpenAI.Agents.OpenAiAudioClientExtensions.TranscribeAsync(this Incursa.OpenAI.Agents.IOpenAiAudioClient! client, System.IO.Stream! audio, string! audioFileName, Incursa.OpenAI.Agents.OpenAiAudioTranscriptionRequest! request) -> System.Threading.Tasks.Task<Incursa.OpenAI.Agents.OpenAiAudioTranscriptionResponse!>!
+Incursa.OpenAI.Agents.ToolOriginType
+Incursa.OpenAI.Agents.ToolOriginType.Function = 0 -> Incursa.OpenAI.Agents.ToolOriginType
+Incursa.OpenAI.Agents.ToolOriginType.Mcp = 1 -> Incursa.OpenAI.Agents.ToolOriginType
+Incursa.OpenAI.Agents.ToolOriginType.AgentAsTool = 2 -> Incursa.OpenAI.Agents.ToolOriginType
+Incursa.OpenAI.Agents.ToolOrigin
+Incursa.OpenAI.Agents.ToolOrigin.<Clone>$() -> Incursa.OpenAI.Agents.ToolOrigin!
+Incursa.OpenAI.Agents.ToolOrigin.ToolOrigin(Incursa.OpenAI.Agents.ToolOriginType type) -> void
+Incursa.OpenAI.Agents.ToolOrigin.ToolOrigin(Incursa.OpenAI.Agents.ToolOriginType type, string? mcpServerName, string? agentName, string? agentToolName) -> void
+Incursa.OpenAI.Agents.ToolOrigin.AgentName.get -> string?
+Incursa.OpenAI.Agents.ToolOrigin.AgentName.init -> void
+Incursa.OpenAI.Agents.ToolOrigin.AgentToolName.get -> string?
+Incursa.OpenAI.Agents.ToolOrigin.AgentToolName.init -> void
+Incursa.OpenAI.Agents.ToolOrigin.Equals(Incursa.OpenAI.Agents.ToolOrigin? other) -> bool
+Incursa.OpenAI.Agents.ToolOrigin.McpServerName.get -> string?
+Incursa.OpenAI.Agents.ToolOrigin.McpServerName.init -> void
+Incursa.OpenAI.Agents.ToolOrigin.Type.get -> Incursa.OpenAI.Agents.ToolOriginType
+Incursa.OpenAI.Agents.ToolOrigin.Type.init -> void
+override Incursa.OpenAI.Agents.ToolOrigin.Equals(object? obj) -> bool
+override Incursa.OpenAI.Agents.ToolOrigin.GetHashCode() -> int
+override Incursa.OpenAI.Agents.ToolOrigin.ToString() -> string!
+static Incursa.OpenAI.Agents.ToolOrigin.operator !=(Incursa.OpenAI.Agents.ToolOrigin? left, Incursa.OpenAI.Agents.ToolOrigin? right) -> bool
+static Incursa.OpenAI.Agents.ToolOrigin.operator ==(Incursa.OpenAI.Agents.ToolOrigin? left, Incursa.OpenAI.Agents.ToolOrigin? right) -> bool
+Incursa.OpenAI.Agents.AgentApprovalRequest.ToolOrigin.get -> Incursa.OpenAI.Agents.ToolOrigin?
+Incursa.OpenAI.Agents.AgentApprovalRequest.ToolOrigin.init -> void
+Incursa.OpenAI.Agents.AgentApprovalRequest.AgentApprovalRequest(string! agentName, string! toolName, string! toolCallId, string? reason, System.Text.Json.Nodes.JsonNode? arguments, Incursa.OpenAI.Agents.ToolOrigin? toolOrigin) -> void
+Incursa.OpenAI.Agents.AgentConversationItem.ToolOrigin.get -> Incursa.OpenAI.Agents.ToolOrigin?
+Incursa.OpenAI.Agents.AgentConversationItem.ToolOrigin.init -> void
+Incursa.OpenAI.Agents.AgentConversationItem.AgentConversationItem(string! itemType, string! role, string! agentName, string? name, string? text, string? toolCallId, System.Text.Json.Nodes.JsonNode? data, string? status, System.DateTimeOffset? timestampUtc, Incursa.OpenAI.Agents.ToolOrigin? toolOrigin = null) -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.ToolOrigin.get -> Incursa.OpenAI.Agents.ToolOrigin?
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.ToolOrigin.init -> void
+Incursa.OpenAI.Agents.AgentPendingApproval<TContext>.AgentPendingApproval(Incursa.OpenAI.Agents.Agent<TContext>! agent, string! toolName, string! toolCallId, System.Text.Json.Nodes.JsonNode? arguments, string? reason, string! toolType, Incursa.OpenAI.Agents.ToolOrigin? toolOrigin = null) -> void
+Incursa.OpenAI.Agents.AgentRunItem.ToolOrigin.get -> Incursa.OpenAI.Agents.ToolOrigin?
+Incursa.OpenAI.Agents.AgentRunItem.ToolOrigin.init -> void
+Incursa.OpenAI.Agents.AgentRunItem.AgentRunItem(string! itemType, string! role, string! agentName, string? name, string? text, string? toolCallId, System.Text.Json.Nodes.JsonNode? data, string? status, System.DateTimeOffset? timestampUtc, Incursa.OpenAI.Agents.ToolOrigin? toolOrigin = null) -> void
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.ToolOrigin.get -> Incursa.OpenAI.Agents.ToolOrigin?
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.ToolOrigin.init -> void
+Incursa.OpenAI.Agents.AgentSessionPendingApproval.AgentSessionPendingApproval(string! toolName, string! toolCallId, System.Text.Json.Nodes.JsonNode? arguments, string? reason, string! toolType, Incursa.OpenAI.Agents.ToolOrigin? toolOrigin = null) -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.ToolOrigin.get -> Incursa.OpenAI.Agents.ToolOrigin?
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.ToolOrigin.init -> void
+Incursa.OpenAI.Agents.AgentToolCall<TContext>.AgentToolCall(string! callId, string! toolName, System.Text.Json.Nodes.JsonNode? arguments, bool requiresApproval, string? approvalReason, string! toolType, Incursa.OpenAI.Agents.ToolOrigin? toolOrigin = null) -> void
+Incursa.OpenAI.Agents.AgentToolErrorContext.ToolOrigin.get -> Incursa.OpenAI.Agents.ToolOrigin?
+Incursa.OpenAI.Agents.AgentToolErrorContext.ToolOrigin.init -> void
+Incursa.OpenAI.Agents.AgentToolErrorContext.AgentToolErrorContext(string! kind, string! toolType, string! toolName, string! callId, string! defaultMessage, Incursa.OpenAI.Agents.ToolOrigin? toolOrigin) -> void
+Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient.ListResourcesAsync(string? cursor, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourcesResult!>!
+Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient.ListResourceTemplatesAsync(string? cursor, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourceTemplatesResult!>!
+Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient.ReadResourceAsync(string! uri, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ReadResourceResult!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ListResourcesAsync() -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourcesResult!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ListResourcesAsync(string? cursor) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourcesResult!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ListResourcesAsync(string? cursor, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourcesResult!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ListResourceTemplatesAsync() -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourceTemplatesResult!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ListResourceTemplatesAsync(string? cursor) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourceTemplatesResult!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ListResourceTemplatesAsync(string? cursor, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourceTemplatesResult!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ReadResourceAsync(string! uri) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ReadResourceResult!>!
+Incursa.OpenAI.Agents.Mcp.StreamableHttpMcpClient.ReadResourceAsync(string! uri, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ReadResourceResult!>!
+static Incursa.OpenAI.Agents.Mcp.StreamableMcpClientExtensions.ListResourcesAsync(this Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient! client) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourcesResult!>!
+static Incursa.OpenAI.Agents.Mcp.StreamableMcpClientExtensions.ListResourcesAsync(this Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient! client, string? cursor) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourcesResult!>!
+static Incursa.OpenAI.Agents.Mcp.StreamableMcpClientExtensions.ListResourceTemplatesAsync(this Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient! client) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourceTemplatesResult!>!
+static Incursa.OpenAI.Agents.Mcp.StreamableMcpClientExtensions.ListResourceTemplatesAsync(this Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient! client, string? cursor) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ListResourceTemplatesResult!>!
+static Incursa.OpenAI.Agents.Mcp.StreamableMcpClientExtensions.ReadResourceAsync(this Incursa.OpenAI.Agents.Mcp.IStreamableMcpClient! client, string! uri) -> System.Threading.Tasks.Task<ModelContextProtocol.Protocol.ReadResourceResult!>!

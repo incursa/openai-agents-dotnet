@@ -116,5 +116,6 @@ This repo does not aim for full Python SDK parity. It tracks the included server
 For the included surface, prefer:
 
 - behavioral parity with the upstream tests and docs
+- `openai-agents-python` as the primary source of truth, with `openai-agents-js` used only as a supporting signal
 - idiomatic .NET public APIs over Python-shaped APIs
 - preserving persisted session history and applying normalization at model-input time when possible

@@ -136,7 +136,8 @@ public sealed partial class AgentRunner
                 item.ToolCallId,
                 item.Arguments?.DeepClone(),
                 item.Reason,
-                item.ToolType)).ToList();
+                item.ToolType,
+                item.ToolOrigin)).ToList();
 
         await ObserveAsync(new AgentRuntimeObservation(
             AgentRuntimeEventNames.RunStarted,
@@ -417,7 +418,7 @@ public sealed partial class AgentRunner
         session.LastResponseId = responseId;
         session.TurnsExecuted = turns;
         session.PendingApprovals = pendingApprovals
-            .Select(item => new AgentSessionPendingApproval(item.ToolName, item.ToolCallId, item.Arguments?.DeepClone(), item.Reason, item.ToolType))
+            .Select(item => new AgentSessionPendingApproval(item.ToolName, item.ToolCallId, item.Arguments?.DeepClone(), item.Reason, item.ToolType, item.ToolOrigin))
             .ToList();
         session.UpdatedUtc = DateTimeOffset.UtcNow;
     }
@@ -443,7 +444,7 @@ public sealed partial class AgentRunner
             responseId,
             approvalRequest is null
                 ? []
-                : [new AgentPendingApproval<TContext>(agent, approvalRequest.ToolName, approvalRequest.ToolCallId, approvalRequest.Arguments, approvalRequest.Reason)]);
+                : [new AgentPendingApproval<TContext>(agent, approvalRequest.ToolName, approvalRequest.ToolCallId, approvalRequest.Arguments, approvalRequest.Reason, GetToolTypeFromOrigin(approvalRequest.ToolOrigin), approvalRequest.ToolOrigin)]);
 
         return new AgentRunResult<TContext>(
             status,
@@ -458,4 +459,12 @@ public sealed partial class AgentRunner
             responseId,
             state);
     }
+
+    private static string GetToolTypeFromOrigin(ToolOrigin? toolOrigin)
+        => toolOrigin?.Type switch
+        {
+            ToolOriginType.Mcp => "mcp",
+            ToolOriginType.AgentAsTool => "agent_as_tool",
+            _ => "function",
+        };
 }

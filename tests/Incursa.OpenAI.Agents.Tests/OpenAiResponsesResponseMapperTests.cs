@@ -277,6 +277,8 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("delete_message", toolCall.ToolName);
         Assert.True(toolCall.RequiresApproval);
         Assert.Equal("mcp", toolCall.ToolType);
+        Assert.Equal(ToolOriginType.Mcp, toolCall.ToolOrigin?.Type);
+        Assert.Equal("mail", toolCall.ToolOrigin?.McpServerName);
         Assert.Equal("msg_42", toolCall.Arguments?["message_id"]?.GetValue<string>());
     }
 
@@ -317,6 +319,7 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.True(toolCall.RequiresApproval);
         Assert.Equal("confirm destructive action", toolCall.ApprovalReason);
         Assert.Equal("mcp", toolCall.ToolType);
+        Assert.Equal(ToolOriginType.Mcp, toolCall.ToolOrigin?.Type);
         Assert.Null(toolCall.Arguments);
     }
 
@@ -358,6 +361,8 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("mcp_call_1", toolCall.CallId);
         Assert.Equal("search_mail", toolCall.ToolName);
         Assert.Equal("mcp", toolCall.ToolType);
+        Assert.Equal(ToolOriginType.Mcp, toolCall.ToolOrigin?.Type);
+        Assert.Equal("mail", toolCall.ToolOrigin?.McpServerName);
         Assert.Equal("invoice", toolCall.Arguments?["query"]?.GetValue<string>());
         Assert.Null(turn.FinalOutput);
     }
@@ -399,6 +404,7 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("search_mail", toolCall.ToolName);
         Assert.Equal("mcp", toolCall.ToolType);
         Assert.False(toolCall.RequiresApproval);
+        Assert.Equal(ToolOriginType.Mcp, toolCall.ToolOrigin?.Type);
         Assert.Equal("invoice", toolCall.Arguments?["query"]?.GetValue<string>());
     }
 
@@ -563,6 +569,7 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("lookup_customer", toolCall.ToolName);
         Assert.Equal("function", toolCall.ToolType);
         Assert.False(toolCall.RequiresApproval);
+        Assert.Equal(ToolOriginType.Function, toolCall.ToolOrigin?.Type);
         Assert.Equal("42", toolCall.Arguments?["customer_id"]?.GetValue<string>());
     }
 
@@ -710,6 +717,7 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("call_stream", runItem.ToolCallId);
         Assert.Equal("{not-json", arguments["value"]?.GetValue<string>());
         Assert.Equal("in_progress", runItem.Status);
+        Assert.Equal(ToolOriginType.Function, runItem.ToolOrigin?.Type);
     }
 
     /// <summary>Unknown streaming item types do not emit misleading run items.</summary>
@@ -816,6 +824,8 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("mcp_stream_1", runItem.ToolCallId);
         Assert.Equal("invoice", runItem.Data?["query"]?.GetValue<string>());
         Assert.Equal("completed", runItem.Status);
+        Assert.Equal(ToolOriginType.Mcp, runItem.ToolOrigin?.Type);
+        Assert.Equal("mail", runItem.ToolOrigin?.McpServerName);
     }
 
     /// <summary>Typed MCP list-tools streaming items map to system run items.</summary>

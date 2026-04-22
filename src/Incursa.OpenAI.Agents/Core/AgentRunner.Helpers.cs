@@ -161,15 +161,16 @@ public sealed partial class AgentRunner
         {
             IAgentTool<TContext> tool = await FindToolAsync(agent, context, sessionKey, conversation, toolCall.ToolName, cancellationToken).ConfigureAwait(false)
                 ?? throw new InvalidOperationException($"Tool '{toolCall.ToolName}' was requested but not found on agent '{agent.Name}'.");
+            ToolOrigin toolOrigin = ResolveToolOrigin(tool, toolCall.ToolOrigin);
 
             await AppendItemAsync(
-                new AgentRunItem(AgentItemTypes.ToolCall, "assistant", agent.Name) { Name = toolCall.ToolName, ToolCallId = toolCall.CallId, Data = toolCall.Arguments, TimestampUtc = DateTimeOffset.UtcNow },
+                new AgentRunItem(AgentItemTypes.ToolCall, "assistant", agent.Name) { Name = toolCall.ToolName, ToolCallId = toolCall.CallId, Data = toolCall.Arguments, ToolOrigin = toolOrigin, TimestampUtc = DateTimeOffset.UtcNow },
                 conversation,
                 items,
                 emitAsync,
                 cancellationToken).ConfigureAwait(false);
 
-            AgentPendingApproval<TContext> pendingApproval = new(agent, toolCall.ToolName, toolCall.CallId, toolCall.Arguments, toolCall.ApprovalReason, toolCall.ToolType);
+            AgentPendingApproval<TContext> pendingApproval = new(agent, toolCall.ToolName, toolCall.CallId, toolCall.Arguments, toolCall.ApprovalReason, toolCall.ToolType, toolOrigin);
             ApprovalDecision approvalDecision = tool.RequiresApproval || toolCall.RequiresApproval
                 ? await approvalService.EvaluateAsync(new AgentApprovalContext<TContext>(agent, context, sessionKey, pendingApproval, tool, conversation.AsReadOnly()), cancellationToken).ConfigureAwait(false)
                 : ApprovalDecision.Allow();
@@ -177,7 +178,7 @@ public sealed partial class AgentRunner
             if (approvalDecision.RequiresApproval)
             {
                 await AppendItemAsync(
-                    new AgentRunItem(AgentItemTypes.ApprovalRequired, "system", agent.Name, toolCall.ToolName, approvalDecision.Reason ?? toolCall.ApprovalReason, toolCall.CallId, toolCall.Arguments, null, DateTimeOffset.UtcNow),
+                    new AgentRunItem(AgentItemTypes.ApprovalRequired, "system", agent.Name, toolCall.ToolName, approvalDecision.Reason ?? toolCall.ApprovalReason, toolCall.CallId, toolCall.Arguments, null, DateTimeOffset.UtcNow, toolOrigin),
                     conversation,
                     items,
                     emitAsync,
@@ -191,7 +192,7 @@ public sealed partial class AgentRunner
                     conversation,
                     turns,
                     responseId,
-                    approvalRequest: new AgentApprovalRequest(agent.Name, toolCall.ToolName, toolCall.CallId, approvalDecision.Reason ?? toolCall.ApprovalReason, toolCall.Arguments),
+                    approvalRequest: new AgentApprovalRequest(agent.Name, toolCall.ToolName, toolCall.CallId, approvalDecision.Reason ?? toolCall.ApprovalReason, toolCall.Arguments, toolOrigin),
                     state: new AgentRunState<TContext>(
                         sessionKey,
                         agent,
@@ -217,7 +218,7 @@ public sealed partial class AgentRunner
             }
 
             await AppendItemAsync(
-                new AgentRunItem(AgentItemTypes.ToolOutput, "tool", agent.Name, toolCall.ToolName, result.Text, toolCall.CallId, result.StructuredValue, null, DateTimeOffset.UtcNow),
+                new AgentRunItem(AgentItemTypes.ToolOutput, "tool", agent.Name, toolCall.ToolName, result.Text, toolCall.CallId, result.StructuredValue, null, DateTimeOffset.UtcNow, toolOrigin),
                 conversation,
                 items,
                 emitAsync,
@@ -227,7 +228,10 @@ public sealed partial class AgentRunner
             {
                 foreach (AgentRunItem item in result.Items)
                 {
-                    await AppendItemAsync(item, conversation, items, emitAsync, cancellationToken).ConfigureAwait(false);
+                    AgentRunItem normalizedItem = item.ToolOrigin is null
+                        ? item with { ToolOrigin = toolOrigin }
+                        : item;
+                    await AppendItemAsync(normalizedItem, conversation, items, emitAsync, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -256,7 +260,7 @@ public sealed partial class AgentRunner
                 conversation,
                 request.ResumeState?.TurnsExecuted ?? 0,
                 request.ResumeState?.LastResponseId,
-                approvalRequest: new AgentApprovalRequest(currentAgent.Name, pending.ToolName, pending.ToolCallId, pending.Reason, pending.Arguments),
+                approvalRequest: new AgentApprovalRequest(currentAgent.Name, pending.ToolName, pending.ToolCallId, pending.Reason, pending.Arguments, pending.ToolOrigin),
                 state: new AgentRunState<TContext>(
                     sessionKey,
                     currentAgent,
@@ -279,7 +283,7 @@ public sealed partial class AgentRunner
                     conversation,
                     request.ResumeState?.TurnsExecuted ?? 0,
                     request.ResumeState?.LastResponseId,
-                    approvalRequest: new AgentApprovalRequest(currentAgent.Name, pending.ToolName, pending.ToolCallId, pending.Reason, pending.Arguments),
+                    approvalRequest: new AgentApprovalRequest(currentAgent.Name, pending.ToolName, pending.ToolCallId, pending.Reason, pending.Arguments, pending.ToolOrigin),
                     state: new AgentRunState<TContext>(
                         sessionKey,
                         currentAgent,
@@ -293,9 +297,9 @@ public sealed partial class AgentRunner
             {
                 var rejection = FormatToolError(
                     request.Options ?? new AgentRunOptions<TContext>(),
-                    new AgentToolErrorContext("approval_rejected", pending.ToolType, pending.ToolName, pending.ToolCallId, response.Reason ?? "Tool call rejected during approval."));
+                    new AgentToolErrorContext("approval_rejected", pending.ToolType, pending.ToolName, pending.ToolCallId, response.Reason ?? "Tool call rejected during approval.", pending.ToolOrigin));
                 await AppendItemAsync(
-                    new AgentRunItem(AgentItemTypes.ApprovalRejected, "system", currentAgent.Name, pending.ToolName, rejection, pending.ToolCallId, pending.Arguments, null, DateTimeOffset.UtcNow),
+                    new AgentRunItem(AgentItemTypes.ApprovalRejected, "system", currentAgent.Name, pending.ToolName, rejection, pending.ToolCallId, pending.Arguments, null, DateTimeOffset.UtcNow, pending.ToolOrigin),
                     conversation,
                     items,
                     emitAsync,
@@ -323,7 +327,7 @@ public sealed partial class AgentRunner
             IAgentTool<TContext> tool = await FindToolAsync(currentAgent, request.Context, sessionKey, conversation, pending.ToolName, cancellationToken).ConfigureAwait(false)
                 ?? throw new InvalidOperationException($"Approved tool '{pending.ToolName}' no longer exists on agent '{currentAgent.Name}'.");
 
-            AgentToolCall<TContext> call = new(pending.ToolCallId, pending.ToolName, pending.Arguments) { ToolType = pending.ToolType };
+            AgentToolCall<TContext> call = new(pending.ToolCallId, pending.ToolName, pending.Arguments) { ToolType = pending.ToolType, ToolOrigin = pending.ToolOrigin };
             var inputGuardrail = await RunToolInputGuardrailsAsync(currentAgent, request.Context, sessionKey, call, tool, conversation, items, emitAsync, cancellationToken).ConfigureAwait(false);
             if (inputGuardrail is not null)
             {
@@ -339,7 +343,7 @@ public sealed partial class AgentRunner
             }
 
             await AppendItemAsync(
-                new AgentRunItem(AgentItemTypes.ToolOutput, "tool", currentAgent.Name, pending.ToolName, result.Text, pending.ToolCallId, result.StructuredValue, null, DateTimeOffset.UtcNow),
+                new AgentRunItem(AgentItemTypes.ToolOutput, "tool", currentAgent.Name, pending.ToolName, result.Text, pending.ToolCallId, result.StructuredValue, null, DateTimeOffset.UtcNow, pending.ToolOrigin),
                 conversation,
                 items,
                 emitAsync,
@@ -360,13 +364,14 @@ public sealed partial class AgentRunner
         Func<AgentStreamEvent, ValueTask>? emitAsync,
         CancellationToken cancellationToken)
     {
+        ToolOrigin toolOrigin = ResolveToolOrigin(tool, toolCall.ToolOrigin);
         foreach (IToolInputGuardrail<TContext> guardrail in tool.InputGuardrails)
         {
             GuardrailResult result = await guardrail.EvaluateAsync(new ToolInputGuardrailContext<TContext>(agent, context, sessionKey, toolCall.ToolName, toolCall.CallId, toolCall.Arguments, conversation.AsReadOnly()), cancellationToken).ConfigureAwait(false);
             if (result.TripwireTriggered)
             {
                 var message = result.Reason ?? "Tool input guardrail triggered.";
-                await AppendItemAsync(new AgentRunItem(AgentItemTypes.GuardrailTripwire, "system", agent.Name, toolCall.ToolName, message, toolCall.CallId, toolCall.Arguments, null, DateTimeOffset.UtcNow), conversation, items, emitAsync, cancellationToken).ConfigureAwait(false);
+                await AppendItemAsync(new AgentRunItem(AgentItemTypes.GuardrailTripwire, "system", agent.Name, toolCall.ToolName, message, toolCall.CallId, toolCall.Arguments, null, DateTimeOffset.UtcNow, toolOrigin), conversation, items, emitAsync, cancellationToken).ConfigureAwait(false);
                 return message;
             }
         }
@@ -386,13 +391,14 @@ public sealed partial class AgentRunner
         Func<AgentStreamEvent, ValueTask>? emitAsync,
         CancellationToken cancellationToken)
     {
+        ToolOrigin toolOrigin = ResolveToolOrigin(tool, toolCall.ToolOrigin);
         foreach (IToolOutputGuardrail<TContext> guardrail in tool.OutputGuardrails)
         {
             GuardrailResult output = await guardrail.EvaluateAsync(new ToolOutputGuardrailContext<TContext>(agent, context, sessionKey, toolCall.ToolName, toolCall.CallId, toolCall.Arguments, result, conversation.AsReadOnly()), cancellationToken).ConfigureAwait(false);
             if (output.TripwireTriggered)
             {
                 var message = output.Reason ?? "Tool output guardrail triggered.";
-                await AppendItemAsync(new AgentRunItem(AgentItemTypes.GuardrailTripwire, "system", agent.Name, toolCall.ToolName, message, toolCall.CallId, toolCall.Arguments, null, DateTimeOffset.UtcNow), conversation, items, emitAsync, cancellationToken).ConfigureAwait(false);
+                await AppendItemAsync(new AgentRunItem(AgentItemTypes.GuardrailTripwire, "system", agent.Name, toolCall.ToolName, message, toolCall.CallId, toolCall.Arguments, null, DateTimeOffset.UtcNow, toolOrigin), conversation, items, emitAsync, cancellationToken).ConfigureAwait(false);
                 return message;
             }
         }
@@ -439,6 +445,29 @@ public sealed partial class AgentRunner
         {
             await emitAsync(new AgentStreamEvent(AgentStreamEventTypes.RunItem, normalized.AgentName, normalized, null, null, normalized.TimestampUtc)).ConfigureAwait(false);
         }
+    }
+
+    private static ToolOrigin ResolveToolOrigin<TContext>(IAgentTool<TContext> tool, ToolOrigin? fallbackOrigin = null)
+    {
+        if (tool.Metadata.TryGetValue("tool_origin", out object? metadataOrigin) && metadataOrigin is ToolOrigin toolOrigin)
+        {
+            return toolOrigin;
+        }
+
+        if (tool.Metadata.TryGetValue("mcp_server", out object? mcpServer) && mcpServer is string serverName && !string.IsNullOrWhiteSpace(serverName))
+        {
+            return new ToolOrigin(ToolOriginType.Mcp, serverName, null, null);
+        }
+
+        if (tool.Metadata.TryGetValue("agent_name", out object? agentName) && agentName is string agentNameValue && !string.IsNullOrWhiteSpace(agentNameValue))
+        {
+            string? agentToolName = tool.Metadata.TryGetValue("agent_tool_name", out object? agentToolNameValue) && agentToolNameValue is string agentToolNameString && !string.IsNullOrWhiteSpace(agentToolNameString)
+                ? agentToolNameString
+                : null;
+            return new ToolOrigin(ToolOriginType.AgentAsTool, null, agentNameValue, agentToolName);
+        }
+
+        return fallbackOrigin ?? new ToolOrigin(ToolOriginType.Function);
     }
 
     private static async Task<IAgentTool<TContext>?> FindToolAsync<TContext>(

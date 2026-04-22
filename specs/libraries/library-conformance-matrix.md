@@ -51,6 +51,7 @@ Status values:
 | LIB-MCP-META-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
 | LIB-MCP-FILTER-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-FILTER-001.cs``](../../tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-FILTER-001.cs) |
 | LIB-MCP-CACHE-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
+| LIB-MCP-RESOURCES-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
 | LIB-MCP-ERROR-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-ERROR-001.cs``](../../tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-ERROR-001.cs) |
 | LIB-MCP-RETRY-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/McpTests.cs``](../../tests/Incursa.OpenAI.Agents.Tests/McpTests.cs) |
 | LIB-MCP-AUTHFAIL-001 | Agents | Behavior | Covered | [``tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-AUTHFAIL-001.cs``](../../tests/Incursa.OpenAI.Agents.Tests/RequirementHomes/Mcp/REQ-LIB-MCP-AUTHFAIL-001.cs) |

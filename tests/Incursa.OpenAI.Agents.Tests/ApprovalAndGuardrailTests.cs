@@ -18,6 +18,10 @@ public sealed class ApprovalAndGuardrailTests
         {
             Name = "send_mail",
             RequiresApproval = true,
+            Metadata = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["tool_origin"] = new ToolOrigin(ToolOriginType.Mcp, "mail", null, null),
+            },
             ExecuteAsync = (_, _) =>
             {
                 toolExecuted++;
@@ -46,6 +50,8 @@ public sealed class ApprovalAndGuardrailTests
         Assert.Equal(AgentRunStatus.ApprovalRequired, first.Status);
         Assert.NotNull(first.State);
         Assert.Equal(0, toolExecuted);
+        Assert.Equal(ToolOriginType.Mcp, first.ApprovalRequest?.ToolOrigin?.Type);
+        Assert.Equal("mail", first.ApprovalRequest?.ToolOrigin?.McpServerName);
 
         AgentRunResult<TestContext> resumed = await runner.RunAsync(
             AgentRunRequest<TestContext>.FromState(
@@ -56,7 +62,7 @@ public sealed class ApprovalAndGuardrailTests
 
         Assert.Equal(AgentRunStatus.Completed, resumed.Status);
         Assert.Equal(1, toolExecuted);
-        Assert.Contains(resumed.Items, item => item.ItemType == AgentItemTypes.ToolOutput && item.Text == "mail sent");
+        Assert.Contains(resumed.Items, item => item.ItemType == AgentItemTypes.ToolOutput && item.Text == "mail sent" && item.ToolOrigin?.Type == ToolOriginType.Mcp);
     }
 
     /// <summary>Rejected approvals use the configured tool error formatter.</summary>
@@ -200,6 +206,10 @@ public sealed class ApprovalAndGuardrailTests
             {
                 Name = "send_mail",
                 RequiresApproval = true,
+                Metadata = new Dictionary<string, object?>(StringComparer.Ordinal)
+                {
+                    ["tool_origin"] = new ToolOrigin(ToolOriginType.Mcp, "mail", null, null),
+                },
                 ExecuteAsync = (_, _) =>
                 {
                     toolExecuted++;
@@ -231,6 +241,9 @@ public sealed class ApprovalAndGuardrailTests
             Assert.Equal(AgentRunStatus.ApprovalRequired, first.Status);
             Assert.NotNull(persisted);
             Assert.True(persisted!.RequiresApproval());
+            Assert.Single(persisted.PendingApprovals);
+            Assert.Equal(ToolOriginType.Mcp, persisted.PendingApprovals[0].ToolOrigin?.Type);
+            Assert.Equal("mail", persisted.PendingApprovals[0].ToolOrigin?.McpServerName);
 
             AgentRunResult<TestContext> resumed = await runner.RunAsync(
                 persisted.ResumeApproved(agent, new TestContext(), first.ApprovalRequest!.ToolCallId),
@@ -238,11 +251,36 @@ public sealed class ApprovalAndGuardrailTests
 
             Assert.Equal(AgentRunStatus.Completed, resumed.Status);
             Assert.Equal(1, toolExecuted);
+            Assert.Contains(resumed.Items, item => item.ItemType == AgentItemTypes.ToolOutput && item.ToolOrigin?.Type == ToolOriginType.Mcp);
         }
         finally
         {
             Directory.Delete(directory, recursive: true);
         }
+    }
+
+    /// <summary>Legacy tool-type overloads continue to infer non-function origins.</summary>
+    /// <intent>Protect compatibility for callers that already construct approval and tool-call records with explicit tool types.</intent>
+    /// <scenario>LIB-EXEC-APPROVAL-001</scenario>
+    /// <behavior>Legacy constructors that only receive `toolType` still infer MCP and agent-as-tool origins instead of downgrading them to plain function tools.</behavior>
+    [Fact]
+    public void ToolMetadata_ConstructorsInferOriginFromLegacyToolTypeOverloads()
+    {
+        Agent<TestContext> agent = CreateAgent(new AgentTool<TestContext>
+        {
+            Name = "noop",
+            ExecuteAsync = (_, _) => ValueTask.FromResult(AgentToolResult.FromText("ok")),
+        });
+
+        AgentToolCall<TestContext> mcpToolCall = new("call-1", "search_mail", new JsonObject(), false, null, "mcp");
+        AgentPendingApproval<TestContext> agentApproval = new(agent, "delegate", "call-2", new JsonObject(), null, "agent_as_tool");
+        AgentSessionPendingApproval sessionApproval = new("search_mail", "call-3", new JsonObject(), null, "mcp");
+        AgentToolErrorContext errorContext = new("approval_rejected", "agent_as_tool", "delegate", "call-4", "blocked");
+
+        Assert.Equal(ToolOriginType.Mcp, mcpToolCall.ToolOrigin?.Type);
+        Assert.Equal(ToolOriginType.AgentAsTool, agentApproval.ToolOrigin?.Type);
+        Assert.Equal(ToolOriginType.Mcp, sessionApproval.ToolOrigin?.Type);
+        Assert.Equal(ToolOriginType.AgentAsTool, errorContext.ToolOrigin?.Type);
     }
 
     private static Agent<TestContext> CreateAgent(IAgentTool<TestContext> tool)
