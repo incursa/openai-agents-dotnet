@@ -82,6 +82,68 @@ public sealed class AgentRunnerTests
         Assert.Contains(result.Items, item => item.ItemType == AgentItemTypes.ToolOutput && item.Text == "customer-42");
     }
 
+    /// <summary>Agent-backed tool metadata flows onto tool outputs and nested result items.</summary>
+    /// <intent>Protect runner-side origin inference for tools that represent delegated agents.</intent>
+    /// <scenario>LIB-EXEC-TOOLS-001</scenario>
+    /// <behavior>Agent-as-tool metadata stamps the tool output and fills in missing origins on nested result items without overwriting explicit origins.</behavior>
+    [Fact]
+    public async Task RunAsync_InfersAgentAsToolOriginAndNormalizesNestedToolItems()
+    {
+        AgentTool<TestContext> tool = new()
+        {
+            Name = "delegate_lookup",
+            Metadata = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["agent_name"] = "delegate-agent",
+                ["agent_tool_name"] = "lookup_customer",
+            },
+            ExecuteAsync = (_, _) => ValueTask.FromResult(AgentToolResult.FromText(
+                "delegated",
+                [
+                    new AgentRunItem(AgentItemTypes.MessageOutput, "assistant", "delegate-agent") { Text = "nested item" },
+                    new AgentRunItem(AgentItemTypes.MessageOutput, "assistant", "delegate-agent")
+                    {
+                        Text = "pretagged",
+                        ToolOrigin = new ToolOrigin(ToolOriginType.Function),
+                    },
+                ])),
+        };
+
+        Agent<TestContext> agent = CreateAgent(tool);
+        AgentRunner runner = new();
+        SequenceTurnExecutor<TestContext> executor = new(
+            new AgentTurnResponse<TestContext>
+            {
+                ToolCalls =
+                [
+                    new AgentToolCall<TestContext>("call-1", "delegate_lookup", new JsonObject { ["customer_id"] = "42" }),
+                ],
+                ResponseId = "resp-1",
+            },
+            new AgentTurnResponse<TestContext>
+            {
+                FinalOutput = new AgentFinalOutput("finished"),
+                ResponseId = "resp-2",
+            });
+
+        AgentRunResult<TestContext> result = await runner.RunAsync(
+            AgentRunRequest<TestContext>.FromUserInput(agent, "delegate this", new TestContext(), "session-agent-tool"),
+            executor);
+
+        AgentRunItem toolOutput = Assert.Single(result.Items, item => item.ItemType == AgentItemTypes.ToolOutput && item.ToolCallId == "call-1");
+        Assert.Equal(ToolOriginType.AgentAsTool, toolOutput.ToolOrigin?.Type);
+        Assert.Equal("delegate-agent", toolOutput.ToolOrigin?.AgentName);
+        Assert.Equal("lookup_customer", toolOutput.ToolOrigin?.AgentToolName);
+
+        AgentRunItem normalizedNestedItem = Assert.Single(result.Items, item => item.Text == "nested item");
+        Assert.Equal(ToolOriginType.AgentAsTool, normalizedNestedItem.ToolOrigin?.Type);
+        Assert.Equal("delegate-agent", normalizedNestedItem.ToolOrigin?.AgentName);
+        Assert.Equal("lookup_customer", normalizedNestedItem.ToolOrigin?.AgentToolName);
+
+        AgentRunItem preservedNestedItem = Assert.Single(result.Items, item => item.Text == "pretagged");
+        Assert.Equal(ToolOriginType.Function, preservedNestedItem.ToolOrigin?.Type);
+    }
+
     /// <summary>Handoffs switch execution to the delegated agent.</summary>
     /// <intent>Protect runtime routing between cooperating agents.</intent>
     /// <scenario>LIB-EXEC-HANDOFF-001</scenario>

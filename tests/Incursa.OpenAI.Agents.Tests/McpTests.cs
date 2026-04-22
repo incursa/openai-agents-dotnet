@@ -150,6 +150,87 @@ public sealed class McpTests
         Assert.Equal("hello world", content.Text);
     }
 
+    /// <summary>Convenience overloads forward expected defaults to the token-aware MCP client contract.</summary>
+    /// <intent>Protect the extension-method shims added around streamable MCP clients.</intent>
+    /// <scenario>LIB-MCP-RESOURCES-001</scenario>
+    /// <behavior>Extension overloads forward null/default cursors, URIs, arguments, and `CancellationToken.None` to the underlying client methods.</behavior>
+    [Fact]
+    public async Task StreamableMcpClient_ExtensionOverloadsForwardExpectedDefaults()
+    {
+        RecordingStreamableClient client = new();
+        JsonObject arguments = new() { ["query"] = "invoice" };
+
+        IReadOnlyList<McpToolDescriptor> tools = await client.ListToolsAsync();
+        ListResourcesResult resourcesWithoutCursor = await client.ListResourcesAsync();
+        ListResourcesResult resourcesWithCursor = await client.ListResourcesAsync("cursor-1");
+        ListResourceTemplatesResult templatesWithoutCursor = await client.ListResourceTemplatesAsync();
+        ListResourceTemplatesResult templatesWithCursor = await client.ListResourceTemplatesAsync("cursor-2");
+        ReadResourceResult readResult = await client.ReadResourceAsync("file:///docs/doc.txt");
+        McpToolCallResult toolWithoutArguments = await client.CallToolAsync("search_mail");
+        McpToolCallResult toolWithArguments = await client.CallToolAsync("search_mail", arguments);
+
+        Assert.Same(client.Tools, tools);
+        Assert.Same(client.ResourcesResult, resourcesWithoutCursor);
+        Assert.Same(client.ResourcesResult, resourcesWithCursor);
+        Assert.Same(client.ResourceTemplatesResult, templatesWithoutCursor);
+        Assert.Same(client.ResourceTemplatesResult, templatesWithCursor);
+        Assert.Same(client.ReadResult, readResult);
+        Assert.Same(client.ToolCallResult, toolWithoutArguments);
+        Assert.Same(client.ToolCallResult, toolWithArguments);
+
+        Assert.Collection(
+            client.Invocations,
+            invocation =>
+            {
+                Assert.Equal("ListTools", invocation.Method);
+                Assert.Equal(CancellationToken.None, invocation.CancellationToken);
+            },
+            invocation =>
+            {
+                Assert.Equal("ListResources", invocation.Method);
+                Assert.Null(invocation.Cursor);
+                Assert.Equal(CancellationToken.None, invocation.CancellationToken);
+            },
+            invocation =>
+            {
+                Assert.Equal("ListResources", invocation.Method);
+                Assert.Equal("cursor-1", invocation.Cursor);
+                Assert.Equal(CancellationToken.None, invocation.CancellationToken);
+            },
+            invocation =>
+            {
+                Assert.Equal("ListResourceTemplates", invocation.Method);
+                Assert.Null(invocation.Cursor);
+                Assert.Equal(CancellationToken.None, invocation.CancellationToken);
+            },
+            invocation =>
+            {
+                Assert.Equal("ListResourceTemplates", invocation.Method);
+                Assert.Equal("cursor-2", invocation.Cursor);
+                Assert.Equal(CancellationToken.None, invocation.CancellationToken);
+            },
+            invocation =>
+            {
+                Assert.Equal("ReadResource", invocation.Method);
+                Assert.Equal("file:///docs/doc.txt", invocation.Uri);
+                Assert.Equal(CancellationToken.None, invocation.CancellationToken);
+            },
+            invocation =>
+            {
+                Assert.Equal("CallTool", invocation.Method);
+                Assert.Equal("search_mail", invocation.ToolName);
+                Assert.Null(invocation.Arguments);
+                Assert.Equal(CancellationToken.None, invocation.CancellationToken);
+            },
+            invocation =>
+            {
+                Assert.Equal("CallTool", invocation.Method);
+                Assert.Equal("search_mail", invocation.ToolName);
+                Assert.Same(arguments, invocation.Arguments);
+                Assert.Equal(CancellationToken.None, invocation.CancellationToken);
+            });
+    }
+
     /// <summary>Transient MCP failures retry and emit observations when retry settings allow it.</summary>
     /// <intent>Protect resiliency and observation behavior for MCP tool calls.</intent>
     /// <scenario>LIB-MCP-RETRY-001</scenario>
@@ -255,6 +336,63 @@ public sealed class McpTests
             return ValueTask.CompletedTask;
         }
     }
+
+    private sealed class RecordingStreamableClient : IStreamableMcpClient
+    {
+        public Uri ServerUrl { get; } = new("https://example.test/mcp");
+
+        public string ServerLabel { get; } = "mail";
+
+        public IReadOnlyList<McpToolDescriptor> Tools { get; } = [new McpToolDescriptor("search_mail")];
+
+        public ListResourcesResult ResourcesResult { get; } = new();
+
+        public ListResourceTemplatesResult ResourceTemplatesResult { get; } = new();
+
+        public ReadResourceResult ReadResult { get; } = new();
+
+        public McpToolCallResult ToolCallResult { get; } = new("ok");
+
+        public List<McpInvocation> Invocations { get; } = [];
+
+        public Task<IReadOnlyList<McpToolDescriptor>> ListToolsAsync(CancellationToken cancellationToken)
+        {
+            Invocations.Add(new McpInvocation("ListTools", null, null, null, null, cancellationToken));
+            return Task.FromResult(Tools);
+        }
+
+        public Task<ListResourcesResult> ListResourcesAsync(string? cursor, CancellationToken cancellationToken)
+        {
+            Invocations.Add(new McpInvocation("ListResources", cursor, null, null, null, cancellationToken));
+            return Task.FromResult(ResourcesResult);
+        }
+
+        public Task<ListResourceTemplatesResult> ListResourceTemplatesAsync(string? cursor, CancellationToken cancellationToken)
+        {
+            Invocations.Add(new McpInvocation("ListResourceTemplates", cursor, null, null, null, cancellationToken));
+            return Task.FromResult(ResourceTemplatesResult);
+        }
+
+        public Task<ReadResourceResult> ReadResourceAsync(string uri, CancellationToken cancellationToken)
+        {
+            Invocations.Add(new McpInvocation("ReadResource", null, uri, null, null, cancellationToken));
+            return Task.FromResult(ReadResult);
+        }
+
+        public Task<McpToolCallResult> CallToolAsync(string toolName, JsonNode? arguments, CancellationToken cancellationToken)
+        {
+            Invocations.Add(new McpInvocation("CallTool", null, null, toolName, arguments, cancellationToken));
+            return Task.FromResult(ToolCallResult);
+        }
+    }
+
+    private sealed record McpInvocation(
+        string Method,
+        string? Cursor,
+        string? Uri,
+        string? ToolName,
+        JsonNode? Arguments,
+        CancellationToken CancellationToken);
 
     private static HttpRequestMessage CloneRequest(HttpRequestMessage request)
     {

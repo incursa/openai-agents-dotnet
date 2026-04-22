@@ -170,7 +170,7 @@ public sealed partial class AgentRunner
                 emitAsync,
                 cancellationToken).ConfigureAwait(false);
 
-            AgentPendingApproval<TContext> pendingApproval = new(agent, toolCall.ToolName, toolCall.CallId, toolCall.Arguments, toolCall.ApprovalReason, toolCall.ToolType, toolOrigin);
+            AgentPendingApproval<TContext> pendingApproval = new(agent, toolCall.ToolName, toolCall.CallId, toolCall.Arguments, toolCall.ApprovalReason, GetToolTypeFromOrigin(toolOrigin), toolOrigin);
             ApprovalDecision approvalDecision = tool.RequiresApproval || toolCall.RequiresApproval
                 ? await approvalService.EvaluateAsync(new AgentApprovalContext<TContext>(agent, context, sessionKey, pendingApproval, tool, conversation.AsReadOnly()), cancellationToken).ConfigureAwait(false)
                 : ApprovalDecision.Allow();

@@ -259,6 +259,116 @@ public sealed class ApprovalAndGuardrailTests
         }
     }
 
+    /// <summary>Approval-required agent tools preserve agent-as-tool metadata in pending state.</summary>
+    /// <intent>Protect approval state reconstruction for delegated tools that are exposed as agent-backed tools.</intent>
+    /// <scenario>LIB-EXEC-APPROVAL-001</scenario>
+    /// <behavior>Agent-as-tool approvals preserve their origin metadata and derived `toolType` through the pending approval state used for resume.</behavior>
+    [Fact]
+    public async Task RunAsync_PreservesAgentAsToolMetadataInPendingApprovalState()
+    {
+        var toolExecuted = 0;
+        AgentTool<TestContext> tool = new()
+        {
+            Name = "delegate_lookup",
+            RequiresApproval = true,
+            Metadata = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["agent_name"] = "delegate-agent",
+                ["agent_tool_name"] = "lookup_customer",
+            },
+            ExecuteAsync = (_, _) =>
+            {
+                toolExecuted++;
+                return ValueTask.FromResult(AgentToolResult.FromText("delegated"));
+            },
+        };
+
+        Agent<TestContext> agent = CreateAgent(tool);
+        AgentRunner runner = new(new RequireApprovalService<TestContext>());
+        SequenceTurnExecutor<TestContext> executor = new(
+            new AgentTurnResponse<TestContext>
+            {
+                ToolCalls =
+                [
+                    new AgentToolCall<TestContext>("call-1", "delegate_lookup", new JsonObject { ["customer_id"] = "42" }, true),
+                ],
+                ResponseId = "resp-1",
+            },
+            new AgentTurnResponse<TestContext>
+            {
+                FinalOutput = new AgentFinalOutput("all set"),
+                ResponseId = "resp-2",
+            });
+
+        AgentRunResult<TestContext> first = await runner.RunAsync(
+            AgentRunRequest<TestContext>.FromUserInput(agent, "delegate it", new TestContext(), "session-agent-approval"),
+            executor);
+
+        Assert.Equal(AgentRunStatus.ApprovalRequired, first.Status);
+        Assert.NotNull(first.State);
+        Assert.Equal(0, toolExecuted);
+        Assert.Equal(ToolOriginType.AgentAsTool, first.ApprovalRequest?.ToolOrigin?.Type);
+        Assert.Equal("delegate-agent", first.ApprovalRequest?.ToolOrigin?.AgentName);
+        Assert.Equal("lookup_customer", first.ApprovalRequest?.ToolOrigin?.AgentToolName);
+        Assert.Single(first.State!.PendingApprovals);
+        Assert.Equal("agent_as_tool", first.State.PendingApprovals[0].ToolType);
+        Assert.Equal(ToolOriginType.AgentAsTool, first.State.PendingApprovals[0].ToolOrigin?.Type);
+
+        AgentRunResult<TestContext> resumed = await runner.RunAsync(
+            AgentRunRequest<TestContext>.ResumeApproved(first.State, new TestContext(), "call-1"),
+            executor);
+
+        Assert.Equal(AgentRunStatus.Completed, resumed.Status);
+        Assert.Equal(1, toolExecuted);
+        Assert.Contains(resumed.Items, item => item.ItemType == AgentItemTypes.ToolOutput && item.ToolOrigin?.Type == ToolOriginType.AgentAsTool);
+    }
+
+    /// <summary>Output guardrail tripwires preserve MCP tool origin inferred from metadata.</summary>
+    /// <intent>Protect runner-side origin inference when an MCP-backed tool trips an output guardrail.</intent>
+    /// <scenario>LIB-EXEC-GUARDRAIL-001</scenario>
+    /// <behavior>MCP server metadata stamps guardrail tripwire items with MCP origin details even when the originating tool call carries no explicit origin.</behavior>
+    [Fact]
+    public async Task RunAsync_UsesMcpMetadataForOutputGuardrailTripwireItems()
+    {
+        AgentTool<TestContext> tool = new()
+        {
+            Name = "search_mail",
+            Metadata = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["mcp_server"] = "mail",
+            },
+            OutputGuardrails =
+            [
+                new DelegateToolOutputGuardrail<TestContext>((_, _) => ValueTask.FromResult(GuardrailResult.Tripwire("blocked output"))),
+            ],
+            ExecuteAsync = (_, _) => ValueTask.FromResult(AgentToolResult.FromText("mail results")),
+        };
+
+        Agent<TestContext> agent = CreateAgent(tool);
+        AgentRunner runner = new();
+        SequenceTurnExecutor<TestContext> executor = new(
+            new AgentTurnResponse<TestContext>
+            {
+                ToolCalls =
+                [
+                    new AgentToolCall<TestContext>("call-1", "search_mail", new JsonObject { ["query"] = "invoice" }),
+                ],
+                ResponseId = "resp-1",
+            });
+
+        AgentRunResult<TestContext> result = await runner.RunAsync(
+            AgentRunRequest<TestContext>.FromUserInput(agent, "search", new TestContext(), "session-output-guardrail"),
+            executor);
+
+        Assert.Equal(AgentRunStatus.GuardrailTriggered, result.Status);
+        Assert.Equal("blocked output", result.GuardrailMessage);
+        Assert.Contains(
+            result.Items,
+            item => item.ItemType == AgentItemTypes.GuardrailTripwire
+                && item.ToolOrigin?.Type == ToolOriginType.Mcp
+                && item.ToolOrigin?.McpServerName == "mail");
+    }
+
     /// <summary>Legacy tool-type overloads continue to infer non-function origins.</summary>
     /// <intent>Protect compatibility for callers that already construct approval and tool-call records with explicit tool types.</intent>
     /// <scenario>LIB-EXEC-APPROVAL-001</scenario>
@@ -328,6 +438,19 @@ public sealed class ApprovalAndGuardrailTests
         }
 
         public ValueTask<GuardrailResult> EvaluateAsync(ToolInputGuardrailContext<TContext> context, CancellationToken cancellationToken)
+            => handler(context, cancellationToken);
+    }
+
+    private sealed class DelegateToolOutputGuardrail<TContext> : IToolOutputGuardrail<TContext>
+    {
+        private readonly Func<ToolOutputGuardrailContext<TContext>, CancellationToken, ValueTask<GuardrailResult>> handler;
+
+        public DelegateToolOutputGuardrail(Func<ToolOutputGuardrailContext<TContext>, CancellationToken, ValueTask<GuardrailResult>> handler)
+        {
+            this.handler = handler;
+        }
+
+        public ValueTask<GuardrailResult> EvaluateAsync(ToolOutputGuardrailContext<TContext> context, CancellationToken cancellationToken)
             => handler(context, cancellationToken);
     }
 

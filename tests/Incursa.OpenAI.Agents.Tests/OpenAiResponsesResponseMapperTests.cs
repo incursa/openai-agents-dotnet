@@ -1228,6 +1228,57 @@ public sealed class OpenAiResponsesResponseMapperTests
         Assert.Equal("custom_function", toolCall.ToolType);
     }
 
+    /// <summary>Raw function-call fallbacks preserve agent-as-tool origin metadata.</summary>
+    /// <intent>Protect the fallback tool-call branch that now projects agent-backed tool metadata into tool origins.</intent>
+    /// <scenario>LIB-OAI-RESP-MAP-017</scenario>
+    /// <behavior>Raw function-call items with `tool_type=agent_as_tool` preserve the originating agent and agent-tool names on the mapped tool call.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Negative)]
+    public async Task ResponseMapper_FallbackPreservesAgentAsToolOriginMetadata()
+    {
+        OpenAiResponsesTurnPlan<TestContext> plan = await CreatePlanAsync(new Agent<TestContext>
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle delegated tool metadata.",
+        });
+
+        OpenAiResponsesResponse response = new("resp-raw-agent-tool", new JsonObject
+        {
+            ["id"] = "resp-raw-agent-tool",
+            ["output"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["type"] = "reasoning",
+                    ["id"] = "rs_bad",
+                    ["summary"] = new JsonArray("plain-text-summary"),
+                },
+                new JsonObject
+                {
+                    ["type"] = "function_call",
+                    ["call_id"] = "delegate_call",
+                    ["name"] = "delegate_lookup",
+                    ["arguments"] = """{"customer_id":"42"}""",
+                    ["status"] = "completed",
+                    ["tool_type"] = "agent_as_tool",
+                    ["agent_name"] = "delegate-agent",
+                    ["agent_tool_name"] = "lookup_customer",
+                },
+            },
+        });
+
+        AgentTurnResponse<TestContext> turn = new OpenAiResponsesResponseMapper().Map(response, plan);
+
+        AgentToolCall<TestContext> toolCall = Assert.Single(turn.ToolCalls);
+        Assert.Equal("delegate_call", toolCall.CallId);
+        Assert.Equal("agent_as_tool", toolCall.ToolType);
+        Assert.Equal(ToolOriginType.AgentAsTool, toolCall.ToolOrigin?.Type);
+        Assert.Equal("delegate-agent", toolCall.ToolOrigin?.AgentName);
+        Assert.Equal("lookup_customer", toolCall.ToolOrigin?.AgentToolName);
+        Assert.Equal("42", toolCall.Arguments?["customer_id"]?.GetValue<string>());
+    }
+
     /// <summary>Raw tool-call aliases still map when ids are omitted.</summary>
     /// <intent>Protect the raw `tool_call` alias path and the helper branch that generates fallback call ids.</intent>
     /// <scenario>LIB-OAI-RESP-MAP-018</scenario>
