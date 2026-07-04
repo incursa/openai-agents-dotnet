@@ -134,7 +134,7 @@ internal sealed class OpenAiResponsesTurnExecutor<TContext> : IStreamingAgentTur
                     {
                         // Invoke the remote MCP tool and wrap the transport result in the agent tool contract.
                         McpToolCallResult result = await client.CallToolAsync(descriptor.Name, invocation.Arguments, ct).ConfigureAwait(false);
-                        return new AgentToolResult(result.Text, result.Raw);
+                        return new AgentToolResult(result.Text, result.StructuredContent ?? result.Raw);
                     },
                 });
             }

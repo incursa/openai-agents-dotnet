@@ -122,6 +122,57 @@ public sealed class OpenAiResponsesRunnerTests
         Assert.Contains(client.Requests[0].Tools, item => item is FunctionTool function && function.FunctionName == "mcp_mail__list_messages");
     }
 
+    /// <summary>Runtime MCP proxy tools preserve structured tool-call content.</summary>
+    /// <intent>Protect MCP tool result fidelity when streamable MCP calls are executed through the OpenAI runner.</intent>
+    /// <scenario>LIB-OAI-RUNNER-003</scenario>
+    /// <behavior>MCP `structuredContent` is stored on the tool output item that is fed into the next model turn.</behavior>
+    [Fact]
+    [CoverageType(RequirementCoverageType.Positive)]
+    public async Task RunAsync_PreservesStructuredMcpToolResultContent()
+    {
+        RecordingResponsesClient client = new(
+        [
+            CreateFunctionCallResponse("resp-call", "mcp_mail__list_messages", """{"folder":"inbox"}"""),
+            CreateFinalTextResponse("resp-final", "done"),
+        ]);
+        var mcpCalls = 0;
+        RecordingHandler handler = new((_, _) =>
+        {
+            mcpCalls++;
+            string payload = mcpCalls is 1 or 3
+                ? """{"jsonrpc":"2.0","id":"1","result":{"tools":[{"name":"list_messages","description":"List mail","inputSchema":{"type":"object"}}]}}"""
+                : """{"jsonrpc":"2.0","id":"1","result":{"content":[{"type":"text","text":"found mail"}],"structuredContent":{"messages":[{"id":"msg_1"}]},"_meta":{"trace_id":"trace-1"}}}""";
+
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(payload, Encoding.UTF8, "application/json"),
+            });
+        });
+        using HttpClient mcpHttpClient = new(handler);
+
+        Agent<TestContext> agent = new()
+        {
+            Name = "triage",
+            Model = "gpt-5.4",
+            Instructions = "Handle mail.",
+            StreamableMcpServers =
+            [
+                new StreamableHttpMcpServerDefinition("mail", new Uri("https://example.test/mcp")),
+            ],
+        };
+
+        OpenAiResponsesRunner runner = new(client, null, null, null, mcpHttpClient, null, null, null);
+
+        AgentRunResult<TestContext> result = await runner.RunAsync(
+            AgentRunRequest<TestContext>.FromUserInput(agent, "check mail", new TestContext(), "session-mcp-structured"));
+
+        AgentRunItem toolOutput = Assert.Single(result.Items, item => item.ItemType == AgentItemTypes.ToolOutput);
+        Assert.Equal("found mail", toolOutput.Text);
+        Assert.Equal("msg_1", toolOutput.Data?["messages"]?[0]?["id"]?.GetValue<string>());
+        Assert.Equal(3, mcpCalls);
+        Assert.Equal(2, client.Requests.Count);
+    }
+
     /// <summary>Streaming wrapper execution emits both raw model events and normalized run items.</summary>
     /// <intent>Protect the OpenAI runner streaming path that composes the streaming turn executor with the core runner event loop.</intent>
     /// <scenario>LIB-OAI-RUNNER-004</scenario>

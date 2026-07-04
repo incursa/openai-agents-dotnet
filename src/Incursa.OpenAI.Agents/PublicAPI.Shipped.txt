@@ -920,9 +920,16 @@ Incursa.OpenAI.Agents.Mcp.McpToolCallResult.<Clone>$() -> Incursa.OpenAI.Agents.
 Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Equals(Incursa.OpenAI.Agents.Mcp.McpToolCallResult? other) -> bool
 Incursa.OpenAI.Agents.Mcp.McpToolCallResult.McpToolCallResult() -> void
 Incursa.OpenAI.Agents.Mcp.McpToolCallResult.McpToolCallResult(string? text, System.Text.Json.Nodes.JsonNode? raw) -> void
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.McpToolCallResult(string? text, System.Text.Json.Nodes.JsonNode? raw, System.Collections.Generic.IReadOnlyList<System.Text.Json.Nodes.JsonNode!>? content, System.Text.Json.Nodes.JsonNode? structuredContent, System.Text.Json.Nodes.JsonNode? meta) -> void
 Incursa.OpenAI.Agents.Mcp.McpToolCallResult.McpToolCallResult(string? text) -> void
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Content.get -> System.Collections.Generic.IReadOnlyList<System.Text.Json.Nodes.JsonNode!>!
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Content.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Meta.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Meta.init -> void
 Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Raw.get -> System.Text.Json.Nodes.JsonNode?
 Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Raw.init -> void
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.StructuredContent.get -> System.Text.Json.Nodes.JsonNode?
+Incursa.OpenAI.Agents.Mcp.McpToolCallResult.StructuredContent.init -> void
 Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Text.get -> string?
 Incursa.OpenAI.Agents.Mcp.McpToolCallResult.Text.init -> void
 Incursa.OpenAI.Agents.Mcp.McpToolDescriptor

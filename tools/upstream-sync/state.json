@@ -1,26 +1,26 @@
 {
   "schemaVersion": 2,
-  "lastSuccessUtc": null,
+  "lastSuccessUtc": "2026-07-04T01:21:25.1406508Z",
   "sources": [
     {
       "key": "python",
       "displayName": "openai-agents-python",
       "repoUrl": "https://github.com/openai/openai-agents-python.git",
-      "localPath": "C:\\src\\openai\\openai-agents-python",
+      "localPath": "C:\\shared\\src\\openai\\openai-agents-python",
       "branch": "main",
       "role": "behavioral-source-of-truth",
-      "lastAppliedSha": null,
-      "lastAppliedUtc": null
+      "lastAppliedSha": "ec8fbb875ef6ca6f8589af002de13ba42083f85b",
+      "lastAppliedUtc": "2026-07-04T01:21:25.1406508Z"
     },
     {
       "key": "js",
       "displayName": "openai-agents-js",
       "repoUrl": "https://github.com/openai/openai-agents-js.git",
-      "localPath": "C:\\src\\openai\\openai-agents-js",
+      "localPath": "C:\\shared\\src\\openai\\openai-agents-js",
       "branch": "main",
       "role": "supporting-signal",
-      "lastAppliedSha": null,
-      "lastAppliedUtc": null
+      "lastAppliedSha": "dc7864afd44230015ff374fe6ebce40be128f42f",
+      "lastAppliedUtc": "2026-07-04T01:21:25.1406508Z"
     }
   ]
 }

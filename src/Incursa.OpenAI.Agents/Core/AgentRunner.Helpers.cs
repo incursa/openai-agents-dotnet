@@ -348,6 +348,17 @@ public sealed partial class AgentRunner
                 items,
                 emitAsync,
                 cancellationToken).ConfigureAwait(false);
+
+            if (result.Items is not null)
+            {
+                foreach (AgentRunItem item in result.Items)
+                {
+                    AgentRunItem normalizedItem = item.ToolOrigin is null
+                        ? item with { ToolOrigin = pending.ToolOrigin }
+                        : item;
+                    await AppendItemAsync(normalizedItem, conversation, items, emitAsync, cancellationToken).ConfigureAwait(false);
+                }
+            }
         }
 
         return null;

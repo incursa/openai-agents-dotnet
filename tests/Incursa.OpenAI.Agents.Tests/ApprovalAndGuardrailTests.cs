@@ -25,7 +25,9 @@ public sealed class ApprovalAndGuardrailTests
             ExecuteAsync = (_, _) =>
             {
                 toolExecuted++;
-                return ValueTask.FromResult(AgentToolResult.FromText("mail sent"));
+                return ValueTask.FromResult(AgentToolResult.FromText(
+                    "mail sent",
+                    [new AgentRunItem(AgentItemTypes.MessageOutput, "assistant", "mail-helper") { Text = "nested approval item" }]));
             },
         };
 
@@ -63,6 +65,7 @@ public sealed class ApprovalAndGuardrailTests
         Assert.Equal(AgentRunStatus.Completed, resumed.Status);
         Assert.Equal(1, toolExecuted);
         Assert.Contains(resumed.Items, item => item.ItemType == AgentItemTypes.ToolOutput && item.Text == "mail sent" && item.ToolOrigin?.Type == ToolOriginType.Mcp);
+        Assert.Contains(resumed.Items, item => item.Text == "nested approval item" && item.ToolOrigin?.Type == ToolOriginType.Mcp);
     }
 
     /// <summary>Rejected approvals use the configured tool error formatter.</summary>

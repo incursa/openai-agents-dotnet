@@ -23,7 +23,7 @@ public sealed class McpTests
             recorded.Add((CloneRequest(request), request.Content is null ? string.Empty : await request.Content.ReadAsStringAsync()));
             var payload = recorded.Count == 1
                 ? """{"jsonrpc":"2.0","id":"1","result":{"tools":[{"name":"list_messages","description":"List messages","inputSchema":{"type":"object"}}]}}"""
-                : """{"jsonrpc":"2.0","id":"1","result":{"content":[{"text":"ok"}]}}""";
+                : """{"jsonrpc":"2.0","id":"1","result":{"content":[{"type":"text","text":"ok"}],"structuredContent":{"messages":[{"id":"msg_1"}]},"_meta":{"trace_id":"trace-1"}}}""";
             return new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent(payload, Encoding.UTF8, "application/json"),
@@ -55,6 +55,9 @@ public sealed class McpTests
 
         Assert.Single(tools);
         Assert.Equal("ok", result.Text);
+        Assert.Single(result.Content);
+        Assert.Equal("msg_1", result.StructuredContent?["messages"]?[0]?["id"]?.GetValue<string>());
+        Assert.Equal("trace-1", result.Meta?["trace_id"]?.GetValue<string>());
         Assert.Equal(2, recorded.Count);
         Assert.Equal("Bearer token-123", recorded[0].Request.Headers.Authorization?.ToString());
         Assert.Contains(recorded[0].Request.Headers, header => header.Key == "X-Tenant" && header.Value.Contains("tenant-a"));

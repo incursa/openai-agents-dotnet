@@ -271,10 +271,13 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
         }
 
         string? text = null;
+        List<JsonNode> content = [];
 
         // Normalize tool response content arrays into a single text blob for human-readable run item display.
         if (response["content"] is JsonArray contentArray)
         {
+            content.AddRange(contentArray.Select(item => item?.DeepClone()).OfType<JsonNode>());
+
             var parts = contentArray
                 .OfType<JsonObject>()
                 .Select(item => item["text"]?.GetValue<string>())
@@ -286,7 +289,11 @@ public sealed class StreamableHttpMcpClient : IStreamableMcpClient
             }
         }
 
-        return new McpToolCallResult(text, response);
+        JsonNode? structuredContent = response["structuredContent"]?.DeepClone()
+            ?? response["structured_content"]?.DeepClone();
+        JsonNode? responseMeta = response["_meta"]?.DeepClone();
+
+        return new McpToolCallResult(text, response, content, structuredContent, responseMeta);
     }
 
     private async Task<JsonObject?> SendAsync(

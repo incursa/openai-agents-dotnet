@@ -259,6 +259,62 @@ public sealed class AgentRunnerTests
         Assert.Contains(events, item => item.Item?.ItemType == AgentItemTypes.FinalOutput);
     }
 
+    /// <summary>Streaming failures propagate to the enumerating caller.</summary>
+    /// <intent>Protect interactive callers from streams that silently stop after a background failure.</intent>
+    /// <scenario>LIB-EXEC-STREAM-001</scenario>
+    /// <behavior>A streaming executor exception is surfaced by the async enumerable instead of hanging the caller.</behavior>
+    [Fact]
+    public async Task RunStreamingAsync_PropagatesExecutorFailure()
+    {
+        Agent<TestContext> agent = CreateAgent();
+        AgentRunner runner = new();
+        FailingStreamingTurnExecutor<TestContext> executor = new();
+        List<AgentStreamEvent> events = [];
+
+        async Task EnumerateAsync()
+        {
+            await foreach (AgentStreamEvent item in runner.RunStreamingAsync(
+                AgentRunRequest<TestContext>.FromUserInput(agent, "hello", new TestContext(), "session-stream-failure"),
+                executor))
+            {
+                events.Add(item);
+            }
+        }
+
+        InvalidOperationException ex = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => EnumerateAsync().WaitAsync(TimeSpan.FromSeconds(5)));
+
+        Assert.Equal("stream failed", ex.Message);
+        Assert.Contains(events, item => item.Item?.ItemType == AgentItemTypes.UserInput);
+        Assert.Contains(events, item => item.Message == "partial event");
+    }
+
+    /// <summary>Streaming cancellation wakes the event reader.</summary>
+    /// <intent>Protect interactive callers from cancellation paths that leave the stream reader blocked.</intent>
+    /// <scenario>LIB-EXEC-STREAM-001</scenario>
+    /// <behavior>When the caller cancels a streaming run, enumeration exits with cancellation instead of waiting indefinitely.</behavior>
+    [Fact]
+    public async Task RunStreamingAsync_CancellationStopsWaitingReader()
+    {
+        Agent<TestContext> agent = CreateAgent();
+        AgentRunner runner = new();
+        HangingStreamingTurnExecutor<TestContext> executor = new();
+        using CancellationTokenSource cancellation = new(TimeSpan.FromMilliseconds(100));
+
+        async Task EnumerateAsync()
+        {
+            await foreach (AgentStreamEvent _ in runner.RunStreamingAsync(
+                AgentRunRequest<TestContext>.FromUserInput(agent, "hello", new TestContext(), "session-stream-cancel"),
+                executor,
+                cancellation.Token))
+            {
+            }
+        }
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => EnumerateAsync().WaitAsync(TimeSpan.FromSeconds(5)));
+    }
+
     private static Agent<TestContext> CreateAgent(IAgentTool<TestContext>? tool = null)
         => new()
         {
@@ -285,6 +341,44 @@ public sealed class AgentRunnerTests
             }
 
             return ValueTask.FromResult(responses.Dequeue());
+        }
+    }
+
+    private sealed class FailingStreamingTurnExecutor<TContext> : IStreamingAgentTurnExecutor<TContext>
+    {
+        public ValueTask<AgentTurnResponse<TContext>> ExecuteTurnAsync(AgentTurnRequest<TContext> request, CancellationToken cancellationToken)
+            => throw new InvalidOperationException("stream failed");
+
+        public async ValueTask<AgentTurnResponse<TContext>> ExecuteStreamingTurnAsync(
+            AgentTurnRequest<TContext> request,
+            Func<AgentStreamEvent, ValueTask> emitAsync,
+            CancellationToken cancellationToken)
+        {
+            await emitAsync(new AgentStreamEvent(AgentStreamEventTypes.RawModelEvent, request.Agent.Name)
+            {
+                Message = "partial event",
+                TimestampUtc = DateTimeOffset.UtcNow,
+            }).ConfigureAwait(false);
+            throw new InvalidOperationException("stream failed");
+        }
+    }
+
+    private sealed class HangingStreamingTurnExecutor<TContext> : IStreamingAgentTurnExecutor<TContext>
+    {
+        public ValueTask<AgentTurnResponse<TContext>> ExecuteTurnAsync(AgentTurnRequest<TContext> request, CancellationToken cancellationToken)
+            => new(Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken).ContinueWith(
+                static _ => AgentTurnResponse<TContext>.Empty,
+                CancellationToken.None,
+                TaskContinuationOptions.ExecuteSynchronously,
+                TaskScheduler.Default));
+
+        public async ValueTask<AgentTurnResponse<TContext>> ExecuteStreamingTurnAsync(
+            AgentTurnRequest<TContext> request,
+            Func<AgentStreamEvent, ValueTask> emitAsync,
+            CancellationToken cancellationToken)
+        {
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken).ConfigureAwait(false);
+            return AgentTurnResponse<TContext>.Empty;
         }
     }
 
