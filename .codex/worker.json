@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "name": "openai-agents-dotnet",
+  "platform": {
+    "os": "debian",
+    "majorVersion": 13
+  },
+  "workingDirectory": ".",
+  "dependencies": {
+    "aptPackages": [
+      "ca-certificates",
+      "curl",
+      "git"
+    ],
+    "dotnet": {
+      "globalJson": "global.json",
+      "installExactSdk": true
+    },
+    "codexCli": {
+      "install": true,
+      "updateOnBootstrap": true
+    }
+  },
+  "commands": {
+    "bootstrap": [
+      {
+        "file": "dotnet",
+        "args": ["restore", "Incursa.OpenAI.Agents.slnx"]
+      },
+      {
+        "file": "dotnet",
+        "args": ["build", "Incursa.OpenAI.Agents.slnx", "--configuration", "Release", "--no-restore", "-p:ContinuousIntegrationBuild=true"]
+      }
+    ],
+    "test": [
+      {
+        "file": "pwsh",
+        "args": ["-NoProfile", "-File", "scripts/quality/run-blocking-tests.ps1", "-NoRestore", "-NoBuild"]
+      }
+    ]
+  },
+  "readiness": {
+    "codexAuthenticationRequired": true
+  }
+}
