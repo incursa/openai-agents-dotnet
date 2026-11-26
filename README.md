@@ -124,13 +124,13 @@ dotnet test
 
 ## NuGet release flow
 
-- Current version policy uses `1.0.12` as the first public release version.
+- Release versions follow semantic versioning and the shipped public API baseline.
 - Shipped API surface is the gate for semver intent:
   - `PublicAPI.Shipped.txt` additive changes require at least a minor version bump.
   - `PublicAPI.Shipped.txt` removals/compatibility changes require a major version bump.
   - `PublicAPI.Unshipped.txt` changes are allowed to track work-in-progress API additions and are not treated as release-breaking by the policy gate.
 - Publishing uses the GitHub workflow [``.github/workflows/publish-nuget-packages.yml``](.github/workflows/publish-nuget-packages.yml).
-  - Tag with `vX.Y.Z` (for example `v1.0.12`) and push, or run workflow dispatch with `version` set to `X.Y.Z`.
+  - Tag with `vX.Y.Z` and push, or run workflow dispatch with `version` set to `X.Y.Z`.
   - The workflow validates policy using [``scripts/release/validate-public-api-versioning.ps1``](scripts/release/validate-public-api-versioning.ps1) before packing and pushing both packages to nuget.org.
 - Standard CI uses [``.github/workflows/ci.yml``](.github/workflows/ci.yml) for push and pull request validation, including the blocking tests and full quality evidence lane, without publishing.
 

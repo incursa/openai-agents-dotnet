@@ -7,4 +7,5 @@
 - In Markdown docs, link concrete references such as classes, interfaces, commands, files, folders, schemas, requirements/specs, and generated artifacts to the most specific stable target available instead of leaving them as bare code spans.
 - Use repository-relative links for Markdown that lives in the repo. Use absolute URLs only for Markdown that is expected to render outside the repo, such as NuGet or other package-facing documentation.
 - When the linked label should stay in code style, put the backticks inside the link text, for example [`Bar`](../path/to/Bar.cs).
-- Keep every change minimal and reviewable, with clear linkage to the upstream commit summary and diff
+- Keep every change minimal and reviewable, with clear linkage to the upstream commit summary and diff.
+- Keep durable documentation free of branch, commit, deployment, point-in-time validation, test-count, package-count, exact-latest-version, and unfinished-work status. Put release history in the changelog and review outcomes in work items or pull requests.
